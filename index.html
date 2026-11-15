@@ -3,383 +3,748 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Faruk Sami Bilgin — Quantum devices</title>
-<meta name="description" content="Faruk Sami Bilgin, independent researcher in quantum devices: Josephson and moiré qubits, graphene quantum dots, quantum networks. Preprints, code and data.">
-<meta property="og:title" content="Faruk Sami Bilgin — Quantum devices">
-<meta property="og:description" content="Josephson and moiré qubits, graphene quantum dots, quantum networks. Every load-bearing result re-derived by an independent method.">
-<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' rx='6' fill='%230b0e13'/%3E%3Cg fill='%23d9a441'%3E%3Ccircle cx='9' cy='11' r='2'/%3E%3Ccircle cx='16' cy='11' r='2'/%3E%3Ccircle cx='23' cy='11' r='2'/%3E%3Ccircle cx='12.5' cy='17' r='2'/%3E%3Ccircle cx='19.5' cy='17' r='2'/%3E%3Ccircle cx='9' cy='23' r='2'/%3E%3Ccircle cx='16' cy='23' r='2'/%3E%3Ccircle cx='23' cy='23' r='2'/%3E%3C/g%3E%3C/svg%3E">
+<title>Notes on Quantum Devices — Faruk Sami Bilgin</title>
+<meta name="description" content="Seven short chapters on the physics of twisted lattices, Josephson junctions, qubits, coherence and quantum repeaters, each with a figure you can change and the full calculation in a public repository.">
+<meta property="og:title" content="Notes on Quantum Devices">
+<meta property="og:description" content="Twisted lattices, Josephson junctions, qubits, coherence and repeaters — explained with live figures. By Faruk Sami Bilgin.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230a0a0a'/%3E%3Cg fill='%23f2f2f0'%3E%3Ccircle cx='9' cy='11' r='1.8'/%3E%3Ccircle cx='16' cy='11' r='1.8'/%3E%3Ccircle cx='23' cy='11' r='1.8'/%3E%3Ccircle cx='12.5' cy='17' r='1.8'/%3E%3Ccircle cx='19.5' cy='17' r='1.8'/%3E%3Ccircle cx='9' cy='23' r='1.8'/%3E%3Ccircle cx='16' cy='23' r='1.8'/%3E%3Ccircle cx='23' cy='23' r='1.8'/%3E%3C/g%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500;600&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
 <style>
 :root{
-  --bg:#0b0e13; --bg2:#0f131a; --line:#1d232c; --line2:#2a323d;
-  --text:#e9edf2; --muted:#8b95a3; --faint:#5d6876; --accent:#d9a441; --accent-ink:#0b0e13;
-  --dot:201,211,223;
   --sans:"IBM Plex Sans",-apple-system,"Segoe UI",Helvetica,Arial,sans-serif;
+  --serif:"Source Serif 4",Georgia,"Times New Roman",serif;
   --mono:"IBM Plex Mono",ui-monospace,Consolas,Menlo,monospace;
-  --w:1120px;
+  --w:1180px;
 }
-@media (prefers-color-scheme: light){
-  :root:not([data-theme="dark"]){
-    --bg:#fbfbfa; --bg2:#f3f4f2; --line:#e2e5e8; --line2:#cfd4da;
-    --text:#12171e; --muted:#566170; --faint:#8a94a1; --accent:#94650f; --accent-ink:#fff; --dot:30,42,56;
-  }
-}
-:root[data-theme="light"]{
-  --bg:#fbfbfa; --bg2:#f3f4f2; --line:#e2e5e8; --line2:#cfd4da;
-  --text:#12171e; --muted:#566170; --faint:#8a94a1; --accent:#94650f; --accent-ink:#fff; --dot:30,42,56;
-}
+.dark{--bg:#0a0a0a;--fg:#f2f2f0;--muted:#9b9b96;--faint:#5f5f5b;--line:#262626;--line2:#3a3a38;--accent:#ff4433;--plate:#fff}
+.light{--bg:#f4f4f1;--fg:#121212;--muted:#5c5c57;--faint:#93938d;--line:#dbdbd5;--line2:#c4c4bd;--accent:#cf1f25;--plate:#fff}
 *{box-sizing:border-box}
-html{scroll-behavior:smooth}
-body{margin:0;background:var(--bg);color:var(--text);font:400 17px/1.6 var(--sans);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+html{scroll-behavior:smooth;background:#0a0a0a}
+body{margin:0;font:400 18px/1.62 var(--serif);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+.dark,.light{background:var(--bg);color:var(--fg)}
 a{color:inherit;text-decoration-color:var(--line2);text-underline-offset:3px}
 a:hover{text-decoration-color:var(--accent)}
-.wrap{max-width:var(--w);margin:0 auto;padding:0 32px}
+.wrap{max-width:var(--w);margin:0 auto;padding:0 40px}
+.label{font:500 12px/1 var(--sans);letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
 .mono{font-family:var(--mono)}
-.muted{color:var(--muted)}
 
-/* nav */
-nav{position:sticky;top:0;z-index:10;background:color-mix(in srgb,var(--bg) 86%,transparent);backdrop-filter:blur(8px);border-bottom:1px solid var(--line)}
-nav .wrap{display:flex;align-items:center;justify-content:space-between;height:56px}
-nav .name{font-weight:600;letter-spacing:-.01em;text-decoration:none}
-nav ul{display:flex;gap:28px;list-style:none;margin:0;padding:0;font-size:15px}
-nav ul a{text-decoration:none;color:var(--muted)}
-nav ul a:hover{color:var(--text)}
-#theme{background:none;border:1px solid var(--line2);color:var(--muted);border-radius:6px;font:500 12px var(--mono);padding:4px 8px;cursor:pointer}
+.top{position:fixed;inset:0 0 auto 0;z-index:20;height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 40px;font:500 12px var(--sans);letter-spacing:.16em;text-transform:uppercase;color:#f2f2f0;background:#0a0a0a;border-bottom:1px solid #262626}
+.top a{text-decoration:none}
 
-/* hero */
-.hero{position:relative;min-height:calc(100vh - 56px);display:flex;align-items:stretch;border-bottom:1px solid var(--line);overflow:hidden}
+.hero{position:relative;height:100vh;min-height:640px;overflow:hidden}
 #moire{position:absolute;inset:0;width:100%;height:100%;cursor:grab;touch-action:none}
 #moire.drag{cursor:grabbing}
-.hero .veil{position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,var(--bg) 0%,var(--bg) 30%,color-mix(in srgb,var(--bg) 70%,transparent) 48%,transparent 70%)}
-.hero .wrap{position:relative;display:flex;flex-direction:column;justify-content:space-between;width:100%;padding-top:14vh;padding-bottom:40px;pointer-events:none}
-.hero h1{font-size:clamp(44px,6vw,76px);line-height:1.02;font-weight:600;letter-spacing:-.025em;margin:0 0 22px}
-.hero .lede{font-size:clamp(18px,1.6vw,21px);color:var(--muted);max-width:30em;margin:0}
-.hero .lede b{color:var(--text);font-weight:500}
-.panel{pointer-events:auto;display:grid;grid-template-columns:auto auto auto;gap:4px 36px;align-items:end;max-width:640px;padding-top:28px;border-top:1px solid var(--line)}
-.panel label{grid-column:1/-1;font-size:13px;color:var(--faint);letter-spacing:.02em}
-.panel input[type=range]{grid-column:1/-1;width:100%;accent-color:var(--accent);margin:6px 0 14px}
-.read{display:flex;flex-direction:column}
-.read span{font-size:13px;color:var(--faint)}
-.read output{font:500 24px/1.2 var(--mono);color:var(--text)}
-.read output.acc{color:var(--accent)}
-.hint{font-size:13px;color:var(--faint);margin-top:14px;grid-column:1/-1}
-.magic{pointer-events:auto;background:none;border:0;padding:0;color:var(--accent);font:inherit;cursor:pointer;text-decoration:underline;text-decoration-color:color-mix(in srgb,var(--accent) 40%,transparent);text-underline-offset:3px}
+.hero .veil{position:absolute;inset:0;pointer-events:none;background:linear-gradient(90deg,#0a0a0a 0%,#0a0a0a 34%,rgba(10,10,10,.78) 56%,rgba(10,10,10,0) 80%)}
+.hero .wrap{position:relative;height:100%;display:flex;flex-direction:column;justify-content:center;pointer-events:none}
+.hero h1{font:600 clamp(46px,6.4vw,92px)/.98 var(--sans);letter-spacing:-.035em;margin:20px 0 28px;max-width:9.5em}
+.hero .lede{font-size:clamp(18px,1.5vw,21px);color:var(--muted);max-width:30em;margin:0 0 34px}
+.hero .by{font:400 15px var(--sans);color:var(--muted)}
+.hero .by b{color:var(--fg);font-weight:500}
+.hud{position:absolute;right:40px;bottom:34px;text-align:right;pointer-events:none}
+.hud .v{font:500 28px/1.1 var(--mono);color:var(--fg)}
+.hud .v em{font-style:normal;color:var(--accent)}
+.hud .s{font:400 13px var(--sans);color:var(--muted);margin-top:6px}
+@media (max-width:1000px){.scroll{display:none}}
+.scroll{position:absolute;left:50%;bottom:26px;transform:translateX(-50%);font:500 11px var(--sans);letter-spacing:.2em;color:var(--faint);text-transform:uppercase}
 
-/* sections */
-section{padding:112px 0;border-bottom:1px solid var(--line)}
-.sh{display:grid;grid-template-columns:220px 1fr;gap:48px}
-.sh h2{font-size:15px;font-weight:500;color:var(--muted);margin:6px 0 0;letter-spacing:.01em}
-.sh h2 .n{font-family:var(--mono);color:var(--faint);margin-right:10px}
+.contents{padding:120px 0 130px;border-top:1px solid var(--line)}
+.contents ol{list-style:none;margin:48px 0 0;padding:0;display:grid;grid-template-columns:repeat(2,1fr);column-gap:64px}
+.contents li{border-top:1px solid var(--line)}
+.contents a{display:grid;grid-template-columns:72px 1fr;gap:8px 0;padding:22px 0 24px;text-decoration:none}
+.contents .num{font:400 15px var(--mono);color:var(--faint);padding-top:4px}
+.contents .t{font:500 22px/1.25 var(--sans);letter-spacing:-.01em}
+.contents .d{grid-column:2;color:var(--muted);font-size:16px;line-height:1.5}
+.contents a:hover .t{color:var(--accent)}
 
-/* results */
-.results{display:grid;grid-template-columns:repeat(2,1fr);border-top:1px solid var(--line)}
-.result{padding:26px 28px 28px 0;border-bottom:1px solid var(--line)}
-.result:nth-child(odd){border-right:1px solid var(--line)}
-.result:nth-child(even){padding-left:28px}
-.result .v{font:500 30px/1.15 var(--mono);color:var(--accent);margin:8px 0 10px}
-.result .k{font-size:14px;color:var(--faint)}
-.result p{margin:0;color:var(--muted);font-size:15.5px}
-.result a{font-size:14px;color:var(--muted)}
+.chapter{padding:132px 0 120px}
+.chead{display:grid;grid-template-columns:auto 1fr;align-items:end;gap:28px;border-bottom:1px solid var(--line);padding-bottom:26px;margin-bottom:56px}
+.chead .n{font:300 clamp(64px,9vw,128px)/.8 var(--sans);letter-spacing:-.05em;color:var(--fg)}
+.chead h2{font:600 clamp(30px,3.6vw,48px)/1.06 var(--sans);letter-spacing:-.025em;margin:10px 0 0;max-width:16em}
+.cbody{display:grid;grid-template-columns:minmax(0,34em) 1fr;gap:72px;align-items:start}
+.prose p{margin:0 0 1.05em}
+.side{position:sticky;top:90px}
+.side .label{display:block;margin-bottom:14px}
+.side dl{margin:0;display:grid;grid-template-columns:1fr auto;border-top:1px solid var(--line)}
+.side dt,.side dd{padding:12px 0;border-bottom:1px solid var(--line);margin:0}
+.side dt{font:400 14px var(--sans);color:var(--muted)}
+.side dd{font:500 15px var(--mono);text-align:right;padding-left:12px}
+.side dd.acc{color:var(--accent)}
+.katex-display{margin:1.1em 0 1.3em;overflow-x:auto;overflow-y:hidden}
+.katex{font-size:1.06em}
 
-/* preprints */
-.pp{display:grid;grid-template-columns:300px 1fr;gap:36px;padding:30px 0;border-top:1px solid var(--line)}
-.pp:last-child{border-bottom:1px solid var(--line)}
-.pp figure{margin:0;background:#fff;border-radius:4px;overflow:hidden;border:1px solid var(--line);align-self:start}
-.pp img{display:block;width:100%;height:auto}
-.pp .tag{font:500 13px var(--mono);color:var(--faint)}
-.pp h3{font-size:21px;line-height:1.35;font-weight:600;letter-spacing:-.01em;margin:6px 0 10px}
-.pp p{margin:0 0 14px;color:var(--muted);font-size:16px}
-.links{display:flex;flex-wrap:wrap;gap:6px 18px;font-size:14.5px}
-.links a{color:var(--text)}
-.sw{margin-top:34px;color:var(--muted);font-size:16px;max-width:46em}
-.sw a{color:var(--text)}
+figure.fig{margin:64px 0 0}
+.figbox{border-top:1px solid var(--line);border-bottom:1px solid var(--line);padding:22px 0 18px}
+canvas.plot{display:block;width:100%;height:380px}
+.controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:12px 40px;margin-top:18px}
+.ctl{display:grid;grid-template-columns:1fr auto;gap:2px 12px;align-items:center}
+.ctl label{font:400 14px var(--sans);color:var(--muted)}
+.ctl output{font:500 15px var(--mono);color:var(--accent)}
+.ctl input{grid-column:1/-1;width:100%;accent-color:var(--accent)}
+figcaption{font:400 14.5px/1.55 var(--sans);color:var(--muted);margin-top:16px;max-width:52em}
+figcaption b{color:var(--fg);font-weight:500}
+.plate{background:var(--plate);padding:18px;border:1px solid var(--line)}
+.plate img{display:block;width:100%;height:auto}
+.twofig{display:grid;grid-template-columns:1fr 1fr;gap:28px;align-items:start}
 
-/* index */
-.filters{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:22px}
-.filters button{background:none;border:1px solid var(--line2);color:var(--muted);border-radius:999px;padding:6px 14px;font:400 14px var(--sans);cursor:pointer}
-.filters button[aria-pressed=true]{background:var(--text);border-color:var(--text);color:var(--bg)}
-.filters button:hover{border-color:var(--muted)}
+details.more{margin-top:56px;border-top:1px solid var(--line2);border-bottom:1px solid var(--line2)}
+details.more summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:14px;padding:18px 0;font:500 13px var(--sans);letter-spacing:.16em;text-transform:uppercase}
+details.more summary::-webkit-details-marker{display:none}
+details.more summary .pm{display:inline-grid;place-items:center;width:30px;height:30px;border:1px solid var(--fg);border-radius:50%;font:400 16px var(--sans);letter-spacing:0;transition:transform .25s}
+details.more[open] summary .pm{transform:rotate(45deg)}
+details.more summary .sub{margin-left:auto;font:400 14px var(--sans);letter-spacing:0;text-transform:none;color:var(--muted);text-align:right}
+.mbody{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:48px;padding:10px 0 40px;align-items:start}
+.mbody p{margin:0 0 .9em;font-size:17px}
+.links{display:flex;flex-wrap:wrap;gap:6px 22px;font:500 14px var(--sans);margin-top:6px}
+.links a{text-decoration:none;border-bottom:1px solid var(--line2);padding-bottom:2px}
+.links a:hover{border-color:var(--accent)}
+
+.nolist{list-style:none;margin:56px 0 0;padding:0;border-top:1px solid var(--line)}
+.nolist li{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.3fr) 240px;gap:32px;padding:22px 0;border-bottom:1px solid var(--line);align-items:baseline}
+.nolist h3{font:500 18px/1.35 var(--sans);margin:0}
+.nolist p{margin:0;color:var(--muted);font-size:16.5px}
+.nolist a{font:400 13.5px var(--mono);text-align:right;color:var(--muted);overflow-wrap:anywhere}
+
+.papers{padding:132px 0 100px}
+.pub{display:grid;grid-template-columns:72px minmax(0,1fr) 240px;gap:24px;padding:24px 0;border-top:1px solid var(--line)}
+.pub .num{font:400 15px var(--mono);color:var(--faint);padding-top:3px}
+.pub h3{font:500 20px/1.35 var(--sans);margin:0 0 6px;letter-spacing:-.005em}
+.pub p{margin:0;color:var(--muted);font-size:16px}
+.pub .links{justify-content:flex-end;align-content:start}
+.filters{display:flex;flex-wrap:wrap;gap:8px;margin:28px 0 20px}
+.filters button{background:none;border:1px solid var(--line2);color:var(--muted);border-radius:999px;padding:7px 15px;font:400 14px var(--sans);cursor:pointer}
+.filters button[aria-pressed=true]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
 .idx{border-top:1px solid var(--line)}
-.row{display:grid;grid-template-columns:minmax(0,250px) 1fr 120px;gap:24px;padding:16px 0;border-bottom:1px solid var(--line);align-items:baseline}
-.row a.r{font:500 14.5px var(--mono);text-decoration:none;color:var(--text);overflow-wrap:anywhere}
-.row a.r:hover{color:var(--accent)}
-.row p{margin:0;color:var(--muted);font-size:15.5px}
-.row .st{font-size:13px;color:var(--faint);text-align:right}
-.row .st.neg{color:var(--accent)}
+.row{display:grid;grid-template-columns:minmax(0,290px) minmax(0,1fr) 150px;gap:28px;padding:15px 0;border-bottom:1px solid var(--line);align-items:baseline}
+.row a{font:500 14.5px var(--mono);text-decoration:none;overflow-wrap:anywhere}
+.row a:hover{color:var(--accent)}
+.row p{margin:0;color:var(--muted);font:400 15.5px/1.5 var(--sans)}
+.row span{font:400 13px var(--sans);color:var(--faint);text-align:right}
+.row span.neg{color:var(--accent)}
 .count{font:400 13px var(--mono);color:var(--faint);margin-top:16px}
+h2.sec{font:600 clamp(30px,3.6vw,48px)/1.06 var(--sans);letter-spacing:-.025em;margin:14px 0 40px}
 
-/* method */
-.method p{max-width:40em;margin:0 0 18px;font-size:18px}
-.method ol{list-style:none;padding:0;margin:34px 0 0;display:grid;grid-template-columns:repeat(3,1fr);gap:28px;counter-reset:m}
-.method li{counter-increment:m;border-top:1px solid var(--line2);padding-top:16px;color:var(--muted);font-size:15.5px}
-.method li::before{content:counter(m,decimal-leading-zero);display:block;font:500 13px var(--mono);color:var(--faint);margin-bottom:10px}
-.method li b{display:block;color:var(--text);font-weight:500;margin-bottom:4px}
+footer{padding:64px 0 120px;border-top:1px solid var(--line);font:400 14.5px var(--sans);color:var(--muted)}
+footer .wrap{display:grid;grid-template-columns:1fr 1fr;gap:32px}
+footer p{margin:0 0 8px;max-width:38em}
+footer .r{text-align:right}
 
-footer{padding:56px 0 72px;color:var(--faint);font-size:14.5px}
-footer .wrap{display:flex;flex-wrap:wrap;justify-content:space-between;gap:16px}
-footer a{color:var(--muted)}
+.cbar{position:fixed;left:0;right:0;bottom:0;z-index:20;height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 40px;background:#0a0a0a;color:#f2f2f0;border-top:1px solid #262626;font:500 12px var(--sans);letter-spacing:.16em;text-transform:uppercase;transform:translateY(100%);transition:transform .35s ease}
+.cbar.on{transform:none}
+.cbar .cn{font-family:var(--mono);letter-spacing:0;color:#9b9b96;margin-right:16px}
+.cbar a{text-decoration:none;color:#9b9b96}
+.cbar a:hover{color:#fff}
 
-@media (max-width:1100px){ .sh{grid-template-columns:1fr;gap:24px} }
-@media (max-width:860px){
-  nav ul{display:none}
-  .sh{grid-template-columns:1fr;gap:20px}
-  .results{grid-template-columns:1fr}
-  .result:nth-child(odd){border-right:0}
-  .result:nth-child(even){padding-left:0}
-  .pp{grid-template-columns:1fr;gap:18px}
+@media (max-width:980px){
+  .cbody{grid-template-columns:1fr;gap:36px}
+  .side{position:static}
+  .mbody,.twofig{grid-template-columns:1fr}
+  .contents ol{grid-template-columns:1fr}
+  .nolist li{grid-template-columns:1fr;gap:6px}
+  .nolist a{text-align:left}
+  .pub{grid-template-columns:48px 1fr}
+  .pub .links{grid-column:2;justify-content:flex-start}
   .row{grid-template-columns:1fr;gap:4px}
-  .row .st{text-align:left}
-  .method ol{grid-template-columns:1fr}
-  .hero .veil{background:linear-gradient(180deg,var(--bg) 0%,color-mix(in srgb,var(--bg) 80%,transparent) 55%,color-mix(in srgb,var(--bg) 40%,transparent) 100%)}
-  .panel{grid-template-columns:1fr 1fr;gap:4px 20px}
-  section{padding:72px 0}
-  .wrap{padding:0 20px}
+  .row span{text-align:left}
+  footer .wrap{grid-template-columns:1fr}
+  footer .r{text-align:left}
 }
-@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+@media (max-width:640px){
+  .wrap,.top,.cbar{padding-left:20px;padding-right:20px}
+  .hero .veil{background:linear-gradient(180deg,rgba(10,10,10,.92) 0%,rgba(10,10,10,.7) 60%,rgba(10,10,10,.35) 100%)}
+  .hud{right:20px;bottom:64px}
+  .hud .v{font-size:20px}
+  .chapter,.papers{padding:84px 0 80px}
+  canvas.plot{height:300px}
+  .chead{gap:16px}
+  .cbar .ct{display:none}
+  details.more summary .sub{display:none}
+}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}.cbar{transition:none}}
 </style>
 </head>
 <body>
 
-<nav aria-label="Main">
-  <div class="wrap">
-    <a class="name" href="#top">Faruk Sami Bilgin</a>
-    <ul>
-      <li><a href="#results">Results</a></li>
-      <li><a href="#preprints">Preprints</a></li>
-      <li><a href="#research">Research</a></li>
-      <li><a href="#method">Method</a></li>
-      <li><a href="https://github.com/FarukSamiBilgin">GitHub</a></li>
-    </ul>
-    <button id="theme" type="button" aria-label="Toggle colour theme">theme</button>
-  </div>
-</nav>
+<div class="top"><a href="#top">Faruk Sami Bilgin</a><a href="#contents">Contents</a></div>
 
-<header class="hero" id="top">
-  <canvas id="moire" aria-label="Interactive moiré pattern of two triangular lattices. Drag horizontally or use the slider to change the twist angle." role="img"></canvas>
+<header class="hero dark" id="top">
+  <canvas id="moire" role="img" aria-label="Interactive moiré pattern of two triangular lattices; drag horizontally to change the twist angle."></canvas>
   <div class="veil"></div>
   <div class="wrap">
-    <div>
-      <h1>Faruk Sami Bilgin</h1>
-      <p class="lede">Independent researcher in quantum devices. I study <b>Josephson and moiré qubits</b>, <b>graphene quantum dots</b> and <b>quantum networks</b> computationally, and publish every project with its code and data.</p>
-    </div>
-    <div class="panel" role="group" aria-label="Twist-angle control">
-      <label for="theta">Twist angle between the two lattices</label>
-      <input id="theta" type="range" min="0.4" max="8" step="0.01" value="2.6">
-      <div class="read"><span>twist θ</span><output id="o-theta" class="acc">2.60°</output></div>
-      <div class="read"><span>moiré period, graphene</span><output id="o-L">5.42 nm</output></div>
-      <div class="read"><span>atoms per moiré cell</span><output id="o-N">1 940</output></div>
-      <div class="hint">L = a / 2 sin(θ/2), a = 0.246 nm. Drag the pattern, or jump to the <button class="magic" id="magic" type="button">magic angle, 1.08°</button>.</div>
-    </div>
+    <div class="label">Notes on quantum devices</div>
+    <h1>Twisted lattices, junctions and qubits</h1>
+    <p class="lede">Seven short chapters on the physics behind my work. Each has a figure you can change, and each ends with the full calculation — code and data — in a public repository.</p>
+    <div class="by"><b>Faruk Sami Bilgin</b> · independent researcher</div>
   </div>
+  <div class="hud" aria-live="polite">
+    <div class="v">θ = <em id="h-theta">2.60°</em> &nbsp; L = <span id="h-L">5.42</span> nm</div>
+    <div class="s">Drag the pattern. Two graphene lattices, a = 0.246 nm.</div>
+  </div>
+  <div class="scroll">Scroll</div>
 </header>
 
+<section class="contents dark" id="contents">
+  <div class="wrap">
+    <div class="label">Contents</div>
+    <ol>
+      <li><a href="#ch1"><span class="num">01</span><span class="t">Two lattices, one twist</span><span class="d">How a small rotation makes a large superlattice, and why 1.08° is special.</span></a></li>
+      <li><a href="#ch2"><span class="num">02</span><span class="t">A junction is a nonlinear inductor</span><span class="d">The current–phase relation, and how transparency reshapes it.</span></a></li>
+      <li><a href="#ch3"><span class="num">03</span><span class="t">Listening to a junction with microwaves</span><span class="d">Shapiro steps, computed live, and what a half step tells you.</span></a></li>
+      <li><a href="#ch4"><span class="num">04</span><span class="t">A qubit is the bottom of a ladder</span><span class="d">Charging against Josephson energy, and why the transmon works.</span></a></li>
+      <li><a href="#ch5"><span class="num">05</span><span class="t">What a qubit forgets, and how fast</span><span class="d">Relaxation, dephasing, and how a coherence budget is built.</span></a></li>
+      <li><a href="#ch6"><span class="num">06</span><span class="t">Sending entanglement far</span><span class="d">Repeater chains, memories, and the cutoff that makes key possible.</span></a></li>
+      <li><a href="#ch7"><span class="num">07</span><span class="t">When the answer is no</span><span class="d">Six calculations that ruled something out, and the reasons.</span></a></li>
+      <li><a href="#papers"><span class="num">—</span><span class="t">Papers, code and data</span><span class="d">Three preprints, one software release, and every repository.</span></a></li>
+    </ol>
+  </div>
+</section>
+
 <main>
-<section id="results">
-  <div class="wrap sh">
-    <h2><span class="n">01</span>Selected results</h2>
-    <div class="results">
-      <div class="result">
-        <div class="k">Twisted hBN, registry-resolved DFT</div>
-        <div class="v">V₀ = 40 meV</div>
-        <p>The proposed moiré well is three to four times shallower than claimed, and its assumed form is forbidden by symmetry.</p>
-        <a href="https://doi.org/10.5281/zenodo.24201814">Preprint 1 →</a>
+<section class="chapter light" id="ch1" data-title="Two lattices, one twist">
+  <div class="wrap">
+    <div class="chead"><div class="n">01</div><div><div class="label">Geometry</div><h2>Two lattices, one twist</h2></div></div>
+    <div class="cbody">
+      <div class="prose">
+        <p>Lay one sheet of atoms on top of another and rotate it by a small angle&nbsp;\(\theta\). In some regions the atoms of the two sheets sit on top of each other; a little further on they fall between each other; further still they line up again. That slow alternation is a <em>moiré pattern</em>, and its period is far larger than the spacing&nbsp;\(a\) of the atoms themselves:</p>
+        $$L \;=\; \frac{a}{2\sin(\theta/2)} \;\approx\; \frac{a}{\theta}.$$
+        <p>For graphene, \(a = 0.246\) nm. At \(\theta = 1.08^\circ\) the moiré period is about 13 nm, and one moiré cell holds roughly eleven thousand carbon atoms. An electron moving through the bilayer now feels a new, slowly varying landscape on top of the atomic one.</p>
+        <p>At this particular angle, the "magic angle", the electrons' kinetic energy nearly vanishes: the bands become almost flat, interactions between electrons dominate, and the material can become insulating or superconducting depending on how many electrons it holds. The same geometry, with other two-dimensional crystals, is now used to build arrays of quantum emitters and qubit candidates — which is where the calculations in the panel below come in.</p>
+        <p>The figure shows the relation above. Drag along it, or drag the pattern at the top of the page; both set the same angle.</p>
       </div>
-      <div class="result">
-        <div class="k">Orbital qubit in twisted hBN</div>
-        <div class="v">T₁ ≈ 6–11 ps</div>
-        <p>A two-phonon floor leaves it two to three orders of magnitude short of the 30 ns a logical qubit needs. A negative result.</p>
-        <a href="https://github.com/FarukSamiBilgin/twisted-hbn-orbital-qubit-limit">Repository →</a>
-      </div>
-      <div class="result">
-        <div class="k">Magic-angle graphene Josephson junction</div>
-        <div class="v">w½ = 0.200 I<sub>c</sub></div>
-        <p>A skewed current–phase relation opens a half-integer Shapiro step — a fingerprint of transparency, readable as an electron thermometer.</p>
-        <a href="https://github.com/FarukSamiBilgin/tbg-fractional-shapiro">Repository →</a>
-      </div>
-      <div class="result">
-        <div class="k">Quantum repeater chain, 400 km</div>
-        <div class="v">1.94 Hz</div>
-        <p>Secret-key rate at the optimal memory cutoff, where running without a cutoff yields no key at all.</p>
-        <a href="https://github.com/FarukSamiBilgin/repeater-cutoff-policies">Repository →</a>
-      </div>
+      <aside class="side">
+        <span class="label">Live values</span>
+        <dl>
+          <dt>Twist angle θ</dt><dd class="acc" id="v1-theta">2.60°</dd>
+          <dt>Moiré period L</dt><dd id="v1-L">5.42 nm</dd>
+          <dt>L / a</dt><dd id="v1-r">22.0</dd>
+          <dt>Atoms per moiré cell</dt><dd id="v1-N">1 942</dd>
+        </dl>
+      </aside>
     </div>
+    <figure class="fig">
+      <div class="figbox"><canvas class="plot" id="f1" role="img" aria-label="Moiré period versus twist angle on a logarithmic axis, with the current angle and the magic angle marked."></canvas></div>
+      <div class="controls">
+        <div class="ctl"><label for="s1">Twist angle θ</label><output id="o1">2.60°</output><input id="s1" type="range" min="0.3" max="8" step="0.01" value="2.6"></div>
+      </div>
+      <figcaption><b>Figure 1.</b> Moiré period of twisted bilayer graphene against twist angle. The dotted line marks the magic angle, 1.08°. Below about 1° lattice relaxation, not drawn here, reshapes the pattern into domains.</figcaption>
+    </figure>
+    <details class="more">
+      <summary><span class="pm">+</span>More — in my work<span class="sub">Twisted hBN as an array of artificial atoms</span></summary>
+      <div class="mbody">
+        <div>
+          <p>A recent proposal treats twisted hexagonal boron nitride as a lattice of identical "artificial atoms": each moiré cell would trap an electron in a deep, smooth well. The proposal rests on a fitted model of the moiré potential.</p>
+          <p>I recomputed the potential directly with density-functional theory at twenty-one stacking registries. The well is three to four times shallower than assumed (\(V_0 = 40\) meV), and the functional form the proposal uses is forbidden by the symmetry of the stack. A follow-up calculation of how fast the trapped states relax shows they cannot serve as orbital qubits (Chapter&nbsp;5).</p>
+          <div class="links"><a href="https://doi.org/10.5281/zenodo.24201814">Preprint · Zenodo</a><a href="https://www.alphaxiv.org/abs/2611.twisted-hbn-artificial-atoms-registry-dft">alphaXiv</a><a href="https://github.com/FarukSamiBilgin/twisted-hbn-artificial-atoms">Code and data</a></div>
+        </div>
+        <div class="plate"><img loading="lazy" src="https://raw.githubusercontent.com/FarukSamiBilgin/twisted-hbn-artificial-atoms/main/figures/fig2_levels.png" alt="Claimed moiré well versus the potential computed by registry-resolved DFT"></div>
+      </div>
+    </details>
   </div>
 </section>
 
-<section id="preprints">
-  <div class="wrap sh">
-    <h2><span class="n">02</span>Preprints</h2>
-    <div>
-      <article class="pp">
-        <figure><img loading="lazy" src="https://raw.githubusercontent.com/FarukSamiBilgin/twisted-hbn-artificial-atoms/main/figures/fig2_levels.png" alt="Claimed versus DFT-measured moiré potential in twisted hBN"></figure>
-        <div>
-          <div class="tag">[1] · 2026</div>
-          <h3>Testing the twisted-hBN artificial-atom proposal by registry-resolved DFT: a symmetry-forbidden potential form, a three-to-fourfold-weaker well, and what survives</h3>
-          <p>Twenty-one stacking registries computed from first principles test the proposed potential directly; what survives of the artificial-atom picture is stated explicitly.</p>
-          <div class="links"><a href="https://doi.org/10.5281/zenodo.24201814">Zenodo</a><a href="https://www.alphaxiv.org/abs/2611.twisted-hbn-artificial-atoms-registry-dft">alphaXiv</a><a href="https://github.com/FarukSamiBilgin/twisted-hbn-artificial-atoms">Code and data</a></div>
-        </div>
-      </article>
-      <article class="pp">
-        <figure><img loading="lazy" src="https://raw.githubusercontent.com/FarukSamiBilgin/twisted-mos2-hole-spin-coherence/main/figures/fig3_koherans_butcesi.png" alt="Hole-spin coherence budget versus residual spinful-isotope fraction"></figure>
-        <div>
-          <div class="tag">[2] · 2026</div>
-          <h3>Twisted bilayer MoS₂ cannot talk to light: a Γ-valley hole spin memory and its isotope-purification coherence budget</h3>
-          <p>The Γ-valley hole is optically dark, which rules out photonic links but makes it a candidate spin memory; the budget shows how far isotope purification can take its coherence.</p>
-          <div class="links"><a href="https://www.alphaxiv.org/abs/2611.twisted-mos2-hole-spin-coherence">alphaXiv</a><a href="https://github.com/FarukSamiBilgin/twisted-mos2-hole-spin-coherence">Code and data</a></div>
-        </div>
-      </article>
-      <article class="pp">
-        <figure><img loading="lazy" src="https://raw.githubusercontent.com/FarukSamiBilgin/moire-microwave-loss/main/figures/fig2_q_scale.png" alt="Quality-factor scale for a moiré superconducting element"></figure>
-        <div>
-          <div class="tag">[3] · 2026</div>
-          <h3>The single-photon microwave loss of a moiré superconducting element: why the published geometry cannot measure it, and a two-device experiment that can</h3>
-          <p>The published device bounds the quality factor only from below, at Q ≥ 21; a two-device experiment is proposed that can measure the loss itself.</p>
-          <div class="links"><a href="https://doi.org/10.5281/zenodo.24204124">Zenodo</a><a href="https://github.com/FarukSamiBilgin/moire-microwave-loss">Code and data</a></div>
-        </div>
-      </article>
-      <p class="sw"><b style="color:var(--text);font-weight:500">Software.</b> <a href="https://github.com/FarukSamiBilgin/josim-cpr-bridge">josim-cpr-bridge</a> carries any current–phase relation simulated in JoSIM to the quantum qubit spectrum. Johannes Delport, the lead developer of JoSIM, is a collaborator on the repository. <a href="https://doi.org/10.5281/zenodo.24246404">DOI 10.5281/zenodo.24246404</a></p>
+<section class="chapter dark" id="ch2" data-title="A junction is a nonlinear inductor">
+  <div class="wrap">
+    <div class="chead"><div class="n">02</div><div><div class="label">Junction</div><h2>A junction is a nonlinear inductor</h2></div></div>
+    <div class="cbody">
+      <div class="prose">
+        <p>Join two superconductors through a thin barrier and a supercurrent flows with no voltage across it. Its size depends on the difference \(\varphi\) between the quantum phases of the two sides, and when the phase changes in time, a voltage appears. These are the two Josephson relations:</p>
+        $$I = I_c\, f(\varphi), \qquad V = \frac{\hbar}{2e}\,\frac{d\varphi}{dt}.$$
+        <p>Together they make the junction behave like an inductor whose inductance depends on the current through it — a nonlinear inductor, and the one ingredient that turns a resonant circuit into a qubit.</p>
+        <p>For an insulating tunnel barrier, \(f(\varphi) = \sin\varphi\). In graphene, and in other weak links where electrons cross ballistically with transmission probability \(\tau\), the relation is skewed towards larger phase:</p>
+        $$f(\varphi) \;\propto\; \frac{\sin\varphi}{\sqrt{1-\tau\sin^2(\varphi/2)}}.$$
+        <p>The skew is not cosmetic. Expanding the junction's energy around its minimum, \(U \propto \tfrac12\varphi^2 + \bigl(\tfrac{\tau}{32}-\tfrac{1}{24}\bigr)\varphi^4 + \dots\), the quartic term — which makes the levels of a qubit unequally spaced — shrinks as \(\tau\) grows. A transparent junction gives a less anharmonic qubit: \(\alpha/\alpha_{\text{tunnel}} = 1 - 3\tau/4\).</p>
+      </div>
+      <aside class="side">
+        <span class="label">Live values</span>
+        <dl>
+          <dt>Transmission τ</dt><dd class="acc" id="v2-tau">0.80</dd>
+          <dt>Phase at maximum current</dt><dd id="v2-phi">0.62 π</dd>
+          <dt>Quartic / quadratic, c₄/c₂</dt><dd id="v2-c">−0.0333</dd>
+          <dt>Anharmonicity vs tunnel junction</dt><dd id="v2-a">0.40</dd>
+        </dl>
+      </aside>
     </div>
+    <figure class="fig">
+      <div class="figbox"><canvas class="plot" id="f2" role="img" aria-label="Current-phase relation of a junction for the chosen transmission, compared with a sinusoid."></canvas></div>
+      <div class="controls">
+        <div class="ctl"><label for="s2">Transmission τ</label><output id="o2">0.80</output><input id="s2" type="range" min="0" max="0.99" step="0.01" value="0.8"></div>
+      </div>
+      <figcaption><b>Figure 2.</b> Current–phase relation of a short ballistic junction at zero temperature (solid), normalised to its maximum, against the tunnel-junction sinusoid (dashed). As τ approaches 1 the maximum moves towards φ = π and the relation develops a steep edge.</figcaption>
+    </figure>
+    <details class="more">
+      <summary><span class="pm">+</span>More — in my work<span class="sub">josim-cpr-bridge</span></summary>
+      <div class="mbody">
+        <div>
+          <p>Circuit designers simulate junctions classically in JoSIM; qubit designers need the quantum spectrum. I wrote a small, tested bridge that takes any current–phase relation used in JoSIM — sinusoidal, transparency-skewed, or tabulated — and carries it unchanged to the qubit side: potential, Hamiltonian, levels, anharmonicity, three-wave mixing and a loss estimate.</p>
+          <p>It is checked against analytic limits and against the JoSIM v2.7 binary. Johannes Delport, the lead developer of JoSIM, is a collaborator on the repository, and a native generalized junction element for JoSIM itself is in discussion.</p>
+        </div>
+        <div>
+          <p class="mono" style="font-size:14px;color:var(--muted)">c₄/c₂ = τ/16 − 1/12 &nbsp;·&nbsp; 7/7 physics checks &nbsp;·&nbsp; 5/5 JoSIM regressions</p>
+          <div class="links"><a href="https://github.com/FarukSamiBilgin/josim-cpr-bridge">Repository</a><a href="https://doi.org/10.5281/zenodo.24246404">Software DOI</a><a href="https://github.com/FarukSamiBilgin/jjqubit-studio">JJQubit Studio</a></div>
+        </div>
+      </div>
+    </details>
   </div>
 </section>
 
-<section id="research">
-  <div class="wrap sh">
-    <h2><span class="n">03</span>Research index</h2>
-    <div>
-      <div class="filters" role="toolbar" aria-label="Filter by area" id="filters"></div>
-      <div class="idx" id="idx"></div>
-      <div class="count" id="count"></div>
+<section class="chapter light" id="ch3" data-title="Listening to a junction with microwaves">
+  <div class="wrap">
+    <div class="chead"><div class="n">03</div><div><div class="label">Drive</div><h2>Listening to a junction with microwaves</h2></div></div>
+    <div class="cbody">
+      <div class="prose">
+        <p>Shine microwaves of angular frequency \(\Omega\) on a junction and pass a steady current through it. Over some ranges of current, the phase locks to the drive and advances by a whole number of turns per cycle. While it is locked the voltage cannot change, so the current–voltage curve develops flat steps at</p>
+        $$V_n = n\,\frac{\hbar\Omega}{2e}.$$
+        <p>These are Shapiro steps. They depend only on frequency and fundamental constants, which is why they once defined the volt.</p>
+        <p>A sinusoidal junction gives steps at whole numbers \(n\). A skewed junction (Chapter 2) contains a second harmonic, \(\sin 2\varphi\), and that harmonic can lock at half the voltage: <em>half-integer</em> steps appear. Their width grows with the transmission, so a half step is a fingerprint of the current–phase relation.</p>
+        <p>The figure is computed in your browser from the resistively shunted junction model,</p>
+        $$\frac{d\varphi}{dt} = i_{dc} + i_{ac}\sin\Omega t - f(\varphi),$$
+        <p>with currents in units of \(I_c\) and time in units of the junction's characteristic time. Raise \(\tau\) and watch the step at \(n = \tfrac12\) open.</p>
+      </div>
+      <aside class="side">
+        <span class="label">Live values</span>
+        <dl>
+          <dt>Transmission τ</dt><dd class="acc" id="v3-tau">0.95</dd>
+          <dt>Drive amplitude i<sub>ac</sub></dt><dd id="v3-ac">2.00</dd>
+          <dt>Drive frequency Ω</dt><dd>2.00</dd>
+          <dt>Half-step width w½</dt><dd class="acc" id="v3-w">—</dd>
+          <dt>First-step width w₁</dt><dd id="v3-w1">—</dd>
+        </dl>
+      </aside>
     </div>
+    <figure class="fig">
+      <div class="figbox"><canvas class="plot" id="f3" role="img" aria-label="Current-voltage curve of a microwave-driven junction showing Shapiro steps, computed live."></canvas></div>
+      <div class="controls">
+        <div class="ctl"><label for="s3t">Transmission τ</label><output id="o3t">0.95</output><input id="s3t" type="range" min="0" max="0.99" step="0.01" value="0.95"></div>
+        <div class="ctl"><label for="s3a">Drive amplitude i<sub>ac</sub></label><output id="o3a">2.00</output><input id="s3a" type="range" min="0" max="4" step="0.05" value="2"></div>
+      </div>
+      <figcaption><b>Figure 3.</b> Time-averaged voltage, in units of ħΩ/2e, against DC bias current for an overdamped junction driven at Ω = 2. Red dashed guides mark half-integer voltages. At τ = 0.95 and i<sub>ac</sub> = 2 the half step is about 0.2 I<sub>c</sub> wide; at τ = 0 it closes.</figcaption>
+    </figure>
+    <details class="more">
+      <summary><span class="pm">+</span>More — in my work<span class="sub">Magic-angle graphene junctions in a sub-THz cavity</span></summary>
+      <div class="mbody">
+        <div>
+          <p>I built a modular simulation of a magic-angle graphene junction placed in a photonic-crystal cavity and driven at sub-terahertz frequency — material, cavity, junction and qubit as separate, cross-checked modules. The half step is a usable fingerprint: 0.200 I<sub>c</sub> wide at τ = 0.95, and its temperature dependence turns it into an electron thermometer.</p>
+          <p>A companion study draws the limits. The step measures transparency, not mechanism: trapped flux in an asymmetric loop also makes half steps, and which purely electrical measurements can tell the two apart is worked out separately.</p>
+        </div>
+        <div>
+          <div class="plate"><img loading="lazy" src="https://raw.githubusercontent.com/FarukSamiBilgin/matbg-subthz-limits/main/figures/fig3_cpr_shapiro.png" alt="Skewed current-phase relations and the resulting half-integer Shapiro step"></div>
+          <div class="links" style="margin-top:16px"><a href="https://github.com/FarukSamiBilgin/tbg-fractional-shapiro">Fractional Shapiro steps</a><a href="https://github.com/FarukSamiBilgin/matbg-subthz-limits">Limits of sub-THz readout</a><a href="https://github.com/FarukSamiBilgin/fractional-shapiro-discrimination">Intrinsic or trapped flux?</a></div>
+        </div>
+      </div>
+    </details>
   </div>
 </section>
 
-<section id="method" class="method">
-  <div class="wrap sh">
-    <h2><span class="n">04</span>Method</h2>
-    <div>
-      <p>Each result that a conclusion depends on is computed twice, by two different methods. Where they disagree, the disagreement is the finding.</p>
-      <ol>
-        <li><b>Two independent routes</b>A closed form against a numerical solver, a continuum model against an atomistic one, a second code written from the paper rather than from the first.</li>
-        <li><b>Negative results stay public</b>Six of the repositories end in a negative or limiting result. Withdrawn claims are kept on the record next to the numbers that produced them.</li>
-        <li><b>Stated assistance</b>AI coding assistants are used for development and adversarial review. Each repository states how its results were checked; responsibility for every claim is mine.</li>
-      </ol>
+<section class="chapter dark" id="ch4" data-title="A qubit is the bottom of a ladder">
+  <div class="wrap">
+    <div class="chead"><div class="n">04</div><div><div class="label">Levels</div><h2>A qubit is the bottom of a ladder</h2></div></div>
+    <div class="cbody">
+      <div class="prose">
+        <p>Put a capacitor across a junction and you have an oscillator whose restoring force comes from the junction. Its quantum description has two energy scales — the charging energy \(E_C\) of the capacitor and the Josephson energy \(E_J\) of the junction:</p>
+        $$H = 4E_C\,(n - n_g)^2 - E_J\cos\varphi .$$
+        <p>Here \(n\) counts the electron pairs that have crossed the junction and \(n_g\) is an offset charge set by the surroundings. Because the cosine is not a parabola, the levels are not equally spaced, and the lowest two can be driven without disturbing the rest: that pair is the qubit.</p>
+        <p>The ratio \(E_J/E_C\) decides how well it works. When it is small, every level depends strongly on \(n_g\), so a stray electron anywhere nearby shifts the qubit frequency. Raising \(E_J/E_C\) flattens the levels exponentially — the idea behind the transmon — while the anharmonicity falls only slowly, towards \(-E_C\).</p>
+        <p>The figure diagonalises \(H\) in the charge basis as you move the slider.</p>
+      </div>
+      <aside class="side">
+        <span class="label">Live values</span>
+        <dl>
+          <dt>E<sub>J</sub> / E<sub>C</sub></dt><dd class="acc" id="v4-r">2.0</dd>
+          <dt>E₀₁ / E<sub>C</sub> at n<sub>g</sub> = ½</dt><dd id="v4-e01">—</dd>
+          <dt>Anharmonicity α / E<sub>C</sub></dt><dd id="v4-al">—</dd>
+          <dt>Charge dispersion of E₀₁</dt><dd id="v4-d">—</dd>
+        </dl>
+      </aside>
     </div>
+    <figure class="fig">
+      <div class="figbox"><canvas class="plot" id="f4" role="img" aria-label="Lowest four energy levels of a Cooper-pair box against offset charge, for the chosen ratio of Josephson to charging energy."></canvas></div>
+      <div class="controls">
+        <div class="ctl"><label for="s4">E<sub>J</sub> / E<sub>C</sub></label><output id="o4">2.0</output><input id="s4" type="range" min="0" max="1" step="0.001" value="0.26"></div>
+      </div>
+      <figcaption><b>Figure 4.</b> The four lowest levels of the Hamiltonian above against offset charge, measured from the ground level at n<sub>g</sub> = ½ in units of the 0→1 transition energy there. Slide from the charge-qubit regime (E<sub>J</sub>/E<sub>C</sub> ≈ 1) to the transmon regime (≳ 50) and watch the levels flatten.</figcaption>
+    </figure>
+    <details class="more">
+      <summary><span class="pm">+</span>More — in my work<span class="sub">From one transmon to a chip</span></summary>
+      <div class="mbody">
+        <div>
+          <p>A complete design flow, from layout to logical qubit: a transmon and its readout resonator drawn in Qiskit Metal, lumped values turned into \(E_J\), \(E_C\) and coupling, dispersive readout, relaxation and dephasing, a leakage-suppressing DRAG pulse, a two-qubit CZ gate, a five-qubit layout exported to GDS, and the logical error of a repetition code against distance.</p>
+          <p>The same Hamiltonian with a graphene junction gives a gatemon, whose \(E_J\) is tuned by a gate voltage rather than a magnetic flux.</p>
+        </div>
+        <div class="links"><a href="https://github.com/FarukSamiBilgin/superconducting-qubit-chip-design">Chip design notebook</a><a href="https://github.com/FarukSamiBilgin/tbg-gatemon">Graphene gatemon</a><a href="https://github.com/FarukSamiBilgin/jjqubit-studio">JJQubit Studio</a></div>
+      </div>
+    </details>
+  </div>
+</section>
+
+<section class="chapter light" id="ch5" data-title="What a qubit forgets, and how fast">
+  <div class="wrap">
+    <div class="chead"><div class="n">05</div><div><div class="label">Coherence</div><h2>What a qubit forgets, and how fast</h2></div></div>
+    <div class="cbody">
+      <div class="prose">
+        <p>A qubit loses information in two ways. It can give its energy away and fall to the ground state — relaxation, with time constant \(T_1\). Or it can keep its energy but lose track of its phase, because its frequency wanders — dephasing, with time \(T_\varphi\). The phase memory that matters for computation combines both:</p>
+        $$\frac{1}{T_2} = \frac{1}{2T_1} + \frac{1}{T_\varphi}.$$
+        <p>A <em>coherence budget</em> lists every mechanism that contributes to these rates, estimates each one from the physics of the device, and sums them. The useful output is not the total but the ranking: which mechanism sets the limit, and what it would take to remove it.</p>
+        <p>Two budgets from my work show the two possible endings. For hole spins in twisted MoS₂ (left), the dominant noise comes from nuclear spins. Isotope purification of the host removes them — until the nuclear spins of the hBN encapsulation, which cannot be purified away, set a floor near a microsecond. For orbital states in twisted hBN (right), relaxation by emitting two phonons sets \(T_1\) at a few picoseconds, far short of the 30 ns a logical qubit would need, and no parameter in reach closes the gap.</p>
+      </div>
+      <aside class="side">
+        <span class="label">Two budgets</span>
+        <dl>
+          <dt>MoS₂ hole spin, hBN floor</dt><dd>T₂* ≈ 1 µs</dd>
+          <dt>hBN orbital state</dt><dd class="acc">T₁ ≈ 6–11 ps</dd>
+          <dt>Needed for a logical qubit</dt><dd>T₁ ≳ 30 ns</dd>
+        </dl>
+      </aside>
+    </div>
+    <figure class="fig">
+      <div class="twofig">
+        <div class="plate"><img loading="lazy" src="https://raw.githubusercontent.com/FarukSamiBilgin/twisted-mos2-hole-spin-coherence/main/figures/fig3_koherans_butcesi.png" alt="Hole-spin dephasing time against residual spinful-isotope fraction in twisted MoS2"></div>
+        <div class="plate"><img loading="lazy" src="https://raw.githubusercontent.com/FarukSamiBilgin/twisted-hbn-orbital-qubit-limit/main/figures/figm5_taban.png" alt="Orbital relaxation time against level spacing in twisted hBN, by phonon channel"></div>
+      </div>
+      <figcaption><b>Figure 5.</b> Left: T₂* of a Γ-valley hole spin in twisted MoS₂ against the residual fraction of spinful isotopes, with the floor set by hBN encapsulation. Right: relaxation time of an orbital state in a twisted-hBN moiré well against level spacing, by phonon channel; the dashed line is the 30 ns needed for a logical qubit.</figcaption>
+    </figure>
+    <details class="more">
+      <summary><span class="pm">+</span>More — in my work<span class="sub">Preprint and repositories</span></summary>
+      <div class="mbody">
+        <div><p>The MoS₂ budget is published as a preprint. The hBN relaxation calculation combines one-phonon, two-phonon and flexural channels, and is calibrated against the known relaxation of phosphorus donors in silicon.</p></div>
+        <div class="links"><a href="https://www.alphaxiv.org/abs/2611.twisted-mos2-hole-spin-coherence">MoS₂ preprint</a><a href="https://github.com/FarukSamiBilgin/twisted-mos2-hole-spin-coherence">MoS₂ code and data</a><a href="https://github.com/FarukSamiBilgin/twisted-hbn-orbital-qubit-limit">hBN relaxation</a><a href="https://github.com/FarukSamiBilgin/heterotmd-purcell-emitters">Emitters and cavities</a></div>
+      </div>
+    </details>
+  </div>
+</section>
+
+<section class="chapter dark" id="ch6" data-title="Sending entanglement far">
+  <div class="wrap">
+    <div class="chead"><div class="n">06</div><div><div class="label">Distance</div><h2>Sending entanglement far</h2></div></div>
+    <div class="cbody">
+      <div class="prose">
+        <p>Photons in optical fibre are lost exponentially with distance, and a quantum state cannot be copied and amplified. To share entanglement over hundreds of kilometres, a <em>repeater chain</em> splits the distance into short segments, entangles each segment separately, and joins neighbouring links by entanglement swapping until the two ends are connected.</p>
+        <p>The segments do not succeed at the same time. A link that is ready must wait in a quantum memory for its neighbours, and while it waits it decoheres. A <em>cutoff</em> discards any link that has waited longer than \(t_{\text{cut}}\) and starts it again.</p>
+        <p>The cutoff is a trade. A short one keeps only fresh, high-fidelity links but throws many away; a long one keeps links but lets them degrade. A secret key can only be distilled above a fidelity threshold, so the key rate is not monotone in the cutoff: with no cutoff at all it can be zero, and an intermediate cutoff gives the best rate.</p>
+        <p>In the four-segment, 400 km chain below, running without a cutoff gives no key. A cutoff of 0.06 of the memory coherence time gives 1.94 key bits per second.</p>
+      </div>
+      <aside class="side">
+        <span class="label">The example chain</span>
+        <dl>
+          <dt>Length, segments</dt><dd>400 km, 4</dd>
+          <dt>Memory coherence time</dt><dd>0.5 s</dd>
+          <dt>No cutoff</dt><dd>no key</dd>
+          <dt>Best cutoff, 0.06 T<sub>coh</sub></dt><dd class="acc">1.94 Hz</dd>
+        </dl>
+      </aside>
+    </div>
+    <figure class="fig">
+      <div class="plate"><img loading="lazy" src="https://raw.githubusercontent.com/FarukSamiBilgin/repeater-cutoff-policies/main/figures/e1_cutoff_pareto.png" alt="Fidelity, delivery rate and key rate against memory cutoff in a four-segment repeater chain"></div>
+      <figcaption><b>Figure 6.</b> Left: end-to-end delivery rate and fidelity against the memory cutoff. Right: secret-key rate, non-monotone in the cutoff. Swap-as-soon-as-possible chain, Werner states, exponential dephasing.</figcaption>
+    </figure>
+    <details class="more">
+      <summary><span class="pm">+</span>More — in my work<span class="sub">Do richer cutoff policies help?</span></summary>
+      <div class="mbody">
+        <div>
+          <p>This reproduces the established result that a single, uniform cutoff is optimal for this chain (Li, Coopmans and Elkouss, 2021) and asks whether richer policies help: cutoffs that grow with the span of a link, or a gate on accumulated decoherence. With paired, source-coupled sampling, neither beats the uniform cutoff; the decay gate is dominated rather than offering a trade-off.</p>
+          <p>The generation layer is validated against an exact closed form, and the note was revised after an adversarial referee pass whose overturned claims are kept on record.</p>
+        </div>
+        <div class="links"><a href="https://github.com/FarukSamiBilgin/repeater-cutoff-policies">Repository and short paper</a></div>
+      </div>
+    </details>
+  </div>
+</section>
+
+<section class="chapter light" id="ch7" data-title="When the answer is no">
+  <div class="wrap">
+    <div class="chead"><div class="n">07</div><div><div class="label">Limits</div><h2>When the answer is no</h2></div></div>
+    <div class="cbody">
+      <div class="prose">
+        <p>A calculation that rules something out is as useful as one that works, provided its reasoning can be followed and checked. The ones below each started as a promising idea. They are kept public, with the numbers that settled them.</p>
+        <p>The method behind all of them is the same. Every result a conclusion depends on is computed twice, by two different routes — a closed form against a numerical solver, a continuum model against an atomistic one, a second code written from the paper rather than from the first. Where the routes disagree, the disagreement is the finding. AI coding assistants are used for development and for adversarial review; each repository states how its results were checked.</p>
+      </div>
+      <aside class="side">
+        <span class="label">Count</span>
+        <dl><dt>Negative or limiting results</dt><dd class="acc">6</dd><dt>Repositories in total</dt><dd>31</dd></dl>
+      </aside>
+    </div>
+    <ul class="nolist">
+      <li><h3>AC confinement does not protect a bilayer-graphene dot qubit</h3><p>A modulated well looked like a dynamical sweet spot against charge noise. The gain rested on a period-averaging step that full Floquet evolution invalidates.</p><a href="https://github.com/FarukSamiBilgin/bilayer-graphene-qd-qubit">bilayer-graphene-qd-qubit</a></li>
+      <li><h3>Antidot defects in graphene are not a qubit platform</h3><p>A pre-registered geometry scan found a favourable ordering of defect states at one size; it reverses at the next. A finite-size artifact.</p><a href="https://github.com/FarukSamiBilgin/holey-graphene-antidot-qubit">holey-graphene-antidot-qubit</a></li>
+      <li><h3>Twisted-hBN artificial atoms cannot hold orbital qubits</h3><p>Two-phonon relaxation sets T₁ at about 6–11 ps, against the 30 ns required.</p><a href="https://github.com/FarukSamiBilgin/twisted-hbn-orbital-qubit-limit">twisted-hbn-orbital-qubit-limit</a></li>
+      <li><h3>A 300-logical-qubit moiré processor does not close</h3><p>Per-bond control needs energy precision of micro-electronvolts to a tenth of a milli-electronvolt, against about 15 meV of site disorder; no wiring scheme reaches the required pitch.</p><a href="https://github.com/FarukSamiBilgin/moire-300-logical-qubit-feasibility">moire-300-logical-qubit-feasibility</a></li>
+      <li><h3>Sub-THz readout of a magic-angle junction has three hard limits</h3><p>The Shapiro fingerprint measures transparency, not mechanism; a quantum-geometric readout is ruled out; the Higgs mode is overdamped.</p><a href="https://github.com/FarukSamiBilgin/matbg-subthz-limits">matbg-subthz-limits</a></li>
+      <li><h3>The "hardest" interaction range is not a converged number</h3><p>For long-range Ising quenches, the range that maximises classical simulation cost moves with both system size and normalisation convention.</p><a href="https://github.com/FarukSamiBilgin/tfim-classical-cost">tfim-classical-cost</a></li>
+    </ul>
+  </div>
+</section>
+
+<section class="papers dark" id="papers" data-title="Papers, code and data">
+  <div class="wrap">
+    <div class="label">Papers, code and data</div>
+    <h2 class="sec">Preprints and software</h2>
+    <div class="pub"><div class="num">[1]</div><div><h3>Testing the twisted-hBN artificial-atom proposal by registry-resolved DFT: a symmetry-forbidden potential form, a three-to-fourfold-weaker well, and what survives</h3><p>F. S. Bilgin, preprint, 2026.</p></div><div class="links"><a href="https://doi.org/10.5281/zenodo.24201814">Zenodo</a><a href="https://www.alphaxiv.org/abs/2611.twisted-hbn-artificial-atoms-registry-dft">alphaXiv</a><a href="https://github.com/FarukSamiBilgin/twisted-hbn-artificial-atoms">Code</a></div></div>
+    <div class="pub"><div class="num">[2]</div><div><h3>Twisted bilayer MoS₂ cannot talk to light: a Γ-valley hole spin memory and its isotope-purification coherence budget</h3><p>F. S. Bilgin, preprint, 2026.</p></div><div class="links"><a href="https://www.alphaxiv.org/abs/2611.twisted-mos2-hole-spin-coherence">alphaXiv</a><a href="https://github.com/FarukSamiBilgin/twisted-mos2-hole-spin-coherence">Code</a></div></div>
+    <div class="pub"><div class="num">[3]</div><div><h3>The single-photon microwave loss of a moiré superconducting element: why the published geometry cannot measure it, and a two-device experiment that can</h3><p>F. S. Bilgin, preprint, 2026.</p></div><div class="links"><a href="https://doi.org/10.5281/zenodo.24204124">Zenodo</a><a href="https://github.com/FarukSamiBilgin/moire-microwave-loss">Code</a></div></div>
+    <div class="pub"><div class="num">[S]</div><div><h3>josim-cpr-bridge: a classical-to-quantum current–phase-relation bridge for exotic Josephson junctions</h3><p>F. S. Bilgin, software v0.1.0, 2026.</p></div><div class="links"><a href="https://doi.org/10.5281/zenodo.24246404">Zenodo</a><a href="https://github.com/FarukSamiBilgin/josim-cpr-bridge">Code</a></div></div>
+
+    <h2 class="sec" style="margin-top:110px">Every repository</h2>
+    <div class="filters" role="toolbar" aria-label="Filter repositories by area" id="filters"></div>
+    <div class="idx" id="idx"></div>
+    <div class="count" id="count"></div>
   </div>
 </section>
 </main>
 
-<footer>
+<footer class="dark">
   <div class="wrap">
-    <span>Faruk Sami Bilgin · Electrical engineer, Yildiz Technical University</span>
-    <span><a href="https://orcid.org/0009-0001-9064-4410">ORCID</a> · <a href="https://github.com/FarukSamiBilgin">GitHub</a> · <a href="https://github.com/FarukSamiBilgin/FarukSamiBilgin.github.io">Source of this page</a></span>
+    <div>
+      <p>Faruk Sami Bilgin — independent researcher in quantum devices. Electrical engineer, Yildiz Technical University.</p>
+      <p>Figures 1–4 are computed in your browser from the equations shown beside them. Figures 5–6 and the panels are taken unchanged from the linked repositories.</p>
+    </div>
+    <div class="r">
+      <p><a href="https://orcid.org/0009-0001-9064-4410">ORCID 0009-0001-9064-4410</a></p>
+      <p><a href="https://github.com/FarukSamiBilgin">github.com/FarukSamiBilgin</a></p>
+      <p><a href="https://github.com/FarukSamiBilgin/FarukSamiBilgin.github.io">Source of this page</a></p>
+    </div>
   </div>
 </footer>
 
+<nav class="cbar" id="cbar" aria-label="Current chapter"><div><span class="cn" id="cbn">01</span><span class="ct" id="cbt">Two lattices, one twist</span></div><a href="#contents">Contents ↑</a></nav>
+
 <script>
 (() => {
-  /* ---------- theme ---------- */
-  const root = document.documentElement, tbtn = document.getElementById('theme');
-  const sysDark = matchMedia('(prefers-color-scheme: dark)');
-  let saved = null; try { saved = localStorage.getItem('theme'); } catch (e) {}
-  if (saved) root.dataset.theme = saved;
-  const isDark = () => root.dataset.theme ? root.dataset.theme === 'dark' : sysDark.matches;
-  const label = () => { tbtn.textContent = isDark() ? 'light' : 'dark'; };
-  label();
-  tbtn.addEventListener('click', () => {
-    root.dataset.theme = isDark() ? 'light' : 'dark';
-    try { localStorage.setItem('theme', root.dataset.theme); } catch (e) {}
-    label(); draw();
-  });
-  sysDark.addEventListener('change', () => { label(); draw(); });
+const $ = id => document.getElementById(id);
+const css = (el, v) => getComputedStyle(el).getPropertyValue(v).trim();
+const fmt = (x, d) => x.toFixed(d);
+const thin = n => Math.round(n).toLocaleString('en-US').replace(/,/g, ' ');
+const SUP = '⁰¹²³⁴⁵⁶⁷⁸⁹';
 
-  /* ---------- moiré ---------- */
-  const cv = document.getElementById('moire'), ctx = cv.getContext('2d');
-  const slider = document.getElementById('theta');
-  const oT = document.getElementById('o-theta'), oL = document.getElementById('o-L'), oN = document.getElementById('o-N');
-  const A_NM = 0.246;                       // graphene lattice constant
-  const SPACING = 11;                       // on-screen lattice constant, px
-  let theta = parseFloat(slider.value), tile = null, dpr = 1, W = 0, H = 0;
-  const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+function setup(cv) {
+  const dpr = Math.min(window.devicePixelRatio || 1, 2), r = cv.getBoundingClientRect();
+  cv.width = Math.round(r.width * dpr); cv.height = Math.round(r.height * dpr);
+  const ctx = cv.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  const sec = cv.closest('section');
+  return { ctx, W: r.width, H: r.height, c: { fg: css(sec, '--fg'), mu: css(sec, '--muted'), fa: css(sec, '--faint'), li: css(sec, '--line'), l2: css(sec, '--line2'), ac: css(sec, '--accent') } };
+}
+function frame(P, o) {
+  const { ctx, W, H, c } = P, m = { l: 84, r: 18, t: 14, b: 46 };
+  const bx = m.l, by = m.t, bw = W - m.l - m.r, bh = H - m.t - m.b;
+  const ty = v => o.logy ? Math.log10(v) : v, y0 = ty(o.y0), y1 = ty(o.y1);
+  const X = v => bx + (v - o.x0) / (o.x1 - o.x0) * bw;
+  const Y = v => by + bh - (ty(v) - y0) / (y1 - y0) * bh;
+  ctx.clearRect(0, 0, W, H);
+  ctx.font = '400 12px "IBM Plex Mono", monospace'; ctx.textBaseline = 'middle'; ctx.lineWidth = 1;
+  for (const [v, s] of o.yt) { const y = Math.round(Y(v)) + .5; ctx.strokeStyle = c.li; ctx.beginPath(); ctx.moveTo(bx, y); ctx.lineTo(bx + bw, y); ctx.stroke(); ctx.fillStyle = c.mu; ctx.textAlign = 'right'; ctx.fillText(s, bx - 10, y); }
+  ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+  for (const [v, s] of o.xt) { const x = Math.round(X(v)) + .5; ctx.strokeStyle = c.l2; ctx.beginPath(); ctx.moveTo(x, by + bh); ctx.lineTo(x, by + bh + 5); ctx.stroke(); ctx.fillStyle = c.mu; ctx.fillText(s, x, by + bh + 10); }
+  ctx.strokeStyle = c.l2; ctx.beginPath(); ctx.moveTo(bx, by + bh + .5); ctx.lineTo(bx + bw, by + bh + .5); ctx.stroke();
+  ctx.font = '400 13px "IBM Plex Sans", sans-serif'; ctx.fillStyle = c.mu;
+  ctx.textAlign = 'right'; ctx.textBaseline = 'alphabetic'; ctx.fillText(o.xl, bx + bw, H - 4);
+  ctx.save(); ctx.translate(16, by + bh / 2); ctx.rotate(-Math.PI / 2); ctx.textAlign = 'center'; ctx.fillText(o.yl, 0, 0); ctx.restore();
+  return { X, Y, bx, by, bw, bh };
+}
+function line(P, pts, color, w, dash) {
+  const { ctx } = P; ctx.save(); ctx.strokeStyle = color; ctx.lineWidth = w; ctx.lineJoin = 'round';
+  if (dash) ctx.setLineDash(dash); ctx.beginPath();
+  pts.forEach(([x, y], i) => i ? ctx.lineTo(x, y) : ctx.moveTo(x, y)); ctx.stroke(); ctx.restore();
+}
 
-  function buildTile() {
-    // a triangular lattice large enough to cover the canvas at any rotation
-    const D = Math.ceil(Math.hypot(W, H)) + 4 * SPACING;
-    tile = document.createElement('canvas');
-    tile.width = D * dpr; tile.height = D * dpr;
-    const t = tile.getContext('2d');
-    t.scale(dpr, dpr);
-    const rgb = getComputedStyle(root).getPropertyValue('--dot').trim();
-    t.fillStyle = `rgba(${rgb},${isDark() ? 0.55 : 0.42})`;
-    const h = SPACING * Math.sqrt(3) / 2, r = 1.35;
-    for (let row = 0, y = 0; y < D; row++, y += h) {
-      const off = (row % 2) * SPACING / 2;
-      for (let x = off; x < D; x += SPACING) { t.beginPath(); t.arc(x, y, r, 0, 6.2832); t.fill(); }
-    }
-  }
-  function resize() {
-    dpr = Math.min(window.devicePixelRatio || 1, 2);
-    const r = cv.getBoundingClientRect(); W = r.width; H = r.height;
-    cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr);
-    buildTile(); draw();
-  }
-  function layer(angleDeg) {
-    const cx = W * 0.68, cy = H * 0.5, D = tile.width / dpr;
-    ctx.save(); ctx.translate(cx, cy); ctx.rotate(angleDeg * Math.PI / 180);
-    ctx.drawImage(tile, -D / 2, -D / 2, D, D); ctx.restore();
+/* shared twist angle */
+const A_NM = 0.246;
+let theta = 2.6;
+const Lof = t => A_NM / (2 * Math.sin(t * Math.PI / 360));
+const listeners = [];
+function setTheta(t) {
+  theta = Math.min(8, Math.max(0.3, t));
+  const L = Lof(theta), Ls = L >= 100 ? fmt(L, 0) : fmt(L, 2);
+  $('h-theta').textContent = fmt(theta, 2) + '°'; $('h-L').textContent = Ls;
+  $('v1-theta').textContent = fmt(theta, 2) + '°'; $('o1').textContent = fmt(theta, 2) + '°';
+  $('v1-L').textContent = Ls + ' nm'; $('v1-r').textContent = fmt(L / A_NM, 1);
+  $('v1-N').textContent = thin(4 * (L / A_NM) ** 2);
+  $('s1').value = theta;
+  listeners.forEach(f => f());
+}
+
+/* hero moiré */
+(() => {
+  const cv = $('moire'), ctx = cv.getContext('2d'), SP = 11; let tile, dpr = 1, W = 0, H = 0;
+  function build() {
+    const D = Math.ceil(Math.hypot(W, H)) + 4 * SP; tile = document.createElement('canvas');
+    tile.width = D * dpr; tile.height = D * dpr; const t = tile.getContext('2d'); t.scale(dpr, dpr);
+    t.fillStyle = 'rgba(232,232,228,0.55)'; const h = SP * Math.sqrt(3) / 2;
+    for (let row = 0, y = 0; y < D; row++, y += h) for (let x = (row % 2) * SP / 2; x < D; x += SP) { t.beginPath(); t.arc(x, y, 1.3, 0, 6.2832); t.fill(); }
   }
   function draw() {
-    if (!tile) return;
-    if (draw.dark !== isDark()) { draw.dark = isDark(); buildTile(); }
+    if (!tile) return; const D = tile.width / dpr;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.clearRect(0, 0, W, H);
-    layer(-theta / 2); layer(theta / 2);
-    const L = A_NM / (2 * Math.sin(theta * Math.PI / 360));
-    oT.textContent = theta.toFixed(2) + '°';
-    oL.textContent = (L >= 100 ? L.toFixed(0) : L.toFixed(2)) + ' nm';
-    const N = Math.round(2 * (L / A_NM) ** 2);   // two atoms per graphene cell, per layer
-    oN.textContent = (2 * N).toLocaleString('en-US').replace(/,/g, ' ');
+    for (const s of [-1, 1]) { ctx.save(); ctx.translate(W * 0.68, H * 0.5); ctx.rotate(s * theta * Math.PI / 360); ctx.drawImage(tile, -D / 2, -D / 2, D, D); ctx.restore(); }
   }
-  function setTheta(v) { theta = Math.min(8, Math.max(0.4, v)); slider.value = theta; draw(); }
-  slider.addEventListener('input', () => { animTo = null; setTheta(parseFloat(slider.value)); });
+  function resize() { dpr = Math.min(devicePixelRatio || 1, 2); const r = cv.getBoundingClientRect(); W = r.width; H = r.height; cv.width = Math.round(W * dpr); cv.height = Math.round(H * dpr); build(); draw(); }
+  let dx = null, st = 0;
+  cv.addEventListener('pointerdown', e => { dx = e.clientX; st = theta; cv.classList.add('drag'); cv.setPointerCapture(e.pointerId); });
+  cv.addEventListener('pointermove', e => { if (dx !== null) setTheta(st + (e.clientX - dx) / 120); });
+  const up = () => { dx = null; cv.classList.remove('drag'); }; cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', up);
+  listeners.push(draw); addEventListener('resize', () => { clearTimeout(resize.t); resize.t = setTimeout(resize, 150); }); resize();
+})();
 
-  let dragX = null, start = 0;
-  cv.addEventListener('pointerdown', e => { dragX = e.clientX; start = theta; cv.classList.add('drag'); cv.setPointerCapture(e.pointerId); animTo = null; });
-  cv.addEventListener('pointermove', e => { if (dragX !== null) setTheta(start + (e.clientX - dragX) / 120); });
-  const end = () => { dragX = null; cv.classList.remove('drag'); };
-  cv.addEventListener('pointerup', end); cv.addEventListener('pointercancel', end);
+/* Fig 1 */
+(() => {
+  const cv = $('f1');
+  function draw() {
+    const P = setup(cv);
+    const F = frame(P, { x0: 0.3, x1: 8, y0: 1, y1: 100, logy: true,
+      xt: [[1, '1°'], [2, '2°'], [3, '3°'], [4, '4°'], [5, '5°'], [6, '6°'], [7, '7°'], [8, '8°']],
+      yt: [[1, '1 nm'], [3, '3'], [10, '10 nm'], [30, '30'], [100, '100 nm']], xl: 'twist angle θ', yl: 'moiré period L' });
+    const pts = []; for (let t = 0.3; t <= 8.0001; t += 0.02) { const L = Lof(t); if (L <= 100) pts.push([F.X(t), F.Y(L)]); }
+    line(P, pts, P.c.fg, 1.6);
+    const { ctx } = P; ctx.save(); ctx.setLineDash([2, 4]); ctx.strokeStyle = P.c.mu; ctx.beginPath(); ctx.moveTo(F.X(1.08), F.by); ctx.lineTo(F.X(1.08), F.by + F.bh); ctx.stroke(); ctx.restore();
+    ctx.font = '400 12px "IBM Plex Sans", sans-serif'; ctx.fillStyle = P.c.mu; ctx.textAlign = 'left'; ctx.textBaseline = 'middle'; ctx.fillText('magic angle 1.08°', F.X(1.08) + 8, F.by + 12);
+    const L = Lof(theta), x = F.X(theta), y = F.Y(Math.min(L, 100));
+    ctx.save(); ctx.strokeStyle = P.c.ac; ctx.lineWidth = 1; ctx.setLineDash([3, 3]);
+    ctx.beginPath(); ctx.moveTo(x, F.by + F.bh); ctx.lineTo(x, y); ctx.lineTo(F.bx, y); ctx.stroke(); ctx.restore();
+    ctx.fillStyle = P.c.ac; ctx.beginPath(); ctx.arc(x, y, 6, 0, 6.2832); ctx.fill();
+    ctx.font = '500 13px "IBM Plex Mono", monospace'; const right = x > F.bx + F.bw * 0.7; ctx.textAlign = right ? 'right' : 'left';
+    ctx.fillText(`L = ${L >= 100 ? fmt(L, 0) : fmt(L, 2)} nm`, x + (right ? -12 : 12), y - 16);
+    cv._F = F;
+  }
+  let drag = false;
+  const pick = e => { const F = cv._F; if (!F) return; const r = cv.getBoundingClientRect(); setTheta(0.3 + (e.clientX - r.left - F.bx) / F.bw * 7.7); };
+  cv.addEventListener('pointerdown', e => { drag = true; cv.setPointerCapture(e.pointerId); pick(e); });
+  cv.addEventListener('pointermove', e => { if (drag) pick(e); });
+  cv.addEventListener('pointerup', () => drag = false);
+  cv.style.cursor = 'crosshair'; cv.style.touchAction = 'pan-y';
+  $('s1').addEventListener('input', e => setTheta(+e.target.value));
+  listeners.push(draw); addEventListener('resize', draw);
+})();
 
-  let animTo = null;
-  document.getElementById('magic').addEventListener('click', () => {
-    if (reduce) { setTheta(1.08); return; }
-    animTo = 1.08; const step = () => {
-      if (animTo === null) return;
-      const d = animTo - theta; if (Math.abs(d) < 0.002) { setTheta(animTo); animTo = null; return; }
-      setTheta(theta + d * 0.08); requestAnimationFrame(step);
-    }; requestAnimationFrame(step);
-  });
-  window.addEventListener('resize', () => { clearTimeout(resize.t); resize.t = setTimeout(resize, 120); });
-  resize();
+/* normalised Beenakker current-phase relation, max = 1 */
+function cpr(tau) {
+  const N = 4096, tab = new Float64Array(N); let mx = 0, at = 0;
+  for (let k = 0; k < N; k++) { const p = 2 * Math.PI * k / N, v = Math.sin(p) / Math.sqrt(1 - tau * Math.sin(p / 2) ** 2); tab[k] = v; if (v > mx) { mx = v; at = p; } }
+  for (let k = 0; k < N; k++) tab[k] /= mx;
+  const f = p => { let x = p / (2 * Math.PI); x -= Math.floor(x); return tab[(x * N) | 0]; };
+  f.phiMax = at; return f;
+}
 
-  /* ---------- research index ---------- */
+/* Fig 2 */
+(() => {
+  const cv = $('f2'), s = $('s2');
+  function draw() {
+    const tau = +s.value, f = cpr(tau), P = setup(cv);
+    const F = frame(P, { x0: 0, x1: 2, y0: -1.15, y1: 1.15,
+      xt: [[0, '0'], [0.5, 'π/2'], [1, 'π'], [1.5, '3π/2'], [2, '2π']], yt: [[-1, '−1'], [0, '0'], [1, '1']],
+      xl: 'phase difference φ', yl: 'I / max I' });
+    const sp = [], cp = []; for (let i = 0; i <= 800; i++) { const u = 2 * i / 800, p = Math.PI * u; sp.push([F.X(u), F.Y(Math.sin(p))]); cp.push([F.X(u), F.Y(f(p))]); }
+    line(P, sp, P.c.mu, 1.2, [5, 5]); line(P, cp, P.c.ac, 2.2);
+    const u = f.phiMax / Math.PI; P.ctx.fillStyle = P.c.ac; P.ctx.beginPath(); P.ctx.arc(F.X(u), F.Y(1), 5, 0, 6.2832); P.ctx.fill();
+    $('o2').textContent = fmt(tau, 2); $('v2-tau').textContent = fmt(tau, 2);
+    $('v2-phi').textContent = fmt(u, 2) + ' π';
+    $('v2-c').textContent = (tau / 16 - 1 / 12).toFixed(4).replace('-', '−');
+    $('v2-a').textContent = fmt(1 - 0.75 * tau, 2);
+  }
+  s.addEventListener('input', draw); addEventListener('resize', draw); draw();
+})();
+
+/* Fig 3: live RSJ */
+(() => {
+  const cv = $('f3'), st = $('s3t'), sa = $('s3a'), W = 2.0, IMAX = 8, NB = 161;
+  let job = 0, data = [];
+  function iv(f, iac, ib) {
+    const T = 2 * Math.PI / W, spp = 140, dt = T / spp; let phi = 0, t = 0;
+    const run = n => { for (let k = 0; k < n * spp; k++) { const a = ib - f(phi) + iac * Math.sin(W * t), b = ib - f(phi + dt * a) + iac * Math.sin(W * (t + dt)); phi += dt * (a + b) / 2; t += dt; } };
+    run(8); const p0 = phi; run(24); return (phi - p0) / (24 * T) / W;
+  }
+  function width(v, target) { let n = 0; for (const [, y] of v) if (Math.abs(y - target) < 0.012) n++; return n * IMAX / (NB - 1); }
+  function draw() {
+    const P = setup(cv);
+    const F = frame(P, { x0: 0, x1: IMAX, y0: 0, y1: 4,
+      xt: [0, 1, 2, 3, 4, 5, 6, 7, 8].map(v => [v, String(v)]), yt: [[0, '0'], [1, '1'], [2, '2'], [3, '3'], [4, '4']],
+      xl: 'DC bias  I / Ic', yl: 'voltage  V / (ħΩ/2e)' });
+    const { ctx } = P;
+    for (let n = 0.5; n < 4; n += 1) { ctx.save(); ctx.strokeStyle = P.c.ac; ctx.globalAlpha = .5; ctx.setLineDash([4, 5]); ctx.beginPath(); ctx.moveTo(F.bx, F.Y(n)); ctx.lineTo(F.bx + F.bw, F.Y(n)); ctx.stroke(); ctx.restore(); }
+    ctx.font = '400 12px "IBM Plex Mono", monospace'; ctx.fillStyle = P.c.ac; ctx.textAlign = 'left'; ctx.textBaseline = 'middle'; ctx.fillText('n = ½', F.bx + 6, F.Y(0.5) - 10);
+    if (data.length > 1) line(P, data.map(([x, y]) => [F.X(x), F.Y(Math.min(y, 4))]), P.c.fg, 2);
+  }
+  function compute() {
+    const my = ++job, tau = +st.value, iac = +sa.value, f = cpr(tau); data = [];
+    $('o3t').textContent = fmt(tau, 2); $('v3-tau').textContent = fmt(tau, 2);
+    $('o3a').textContent = fmt(iac, 2); $('v3-ac').textContent = fmt(iac, 2);
+    $('v3-w').textContent = '…'; $('v3-w1').textContent = '…';
+    let i = 0;
+    const chunk = () => {
+      if (my !== job) return; const t0 = performance.now();
+      while (i < NB && performance.now() - t0 < 14) { const ib = i * IMAX / (NB - 1); data.push([ib, iv(f, iac, ib)]); i++; }
+      draw();
+      if (i < NB) requestAnimationFrame(chunk);
+      else { $('v3-w').textContent = fmt(width(data, 0.5), 2) + ' Ic'; $('v3-w1').textContent = fmt(width(data, 1), 2) + ' Ic'; }
+    };
+    requestAnimationFrame(chunk);
+  }
+  let deb; const sched = () => { clearTimeout(deb); deb = setTimeout(compute, 60); };
+  st.addEventListener('input', sched); sa.addEventListener('input', sched);
+  addEventListener('resize', draw);
+  new IntersectionObserver((es, ob) => { if (es[0].isIntersecting) { compute(); ob.disconnect(); } }, { rootMargin: '300px' }).observe(cv);
+  draw();
+})();
+
+/* Fig 4: Cooper-pair box / transmon levels */
+(() => {
+  const cv = $('f4'), s = $('s4'), NC = 20;
+  const ratio = () => Math.pow(10, -0.3 + 2.3 * +s.value);    // E_J/E_C from 0.5 to 100 on a log slider
+  function eig(ng, ej, k) { // k-th eigenvalue of tridiagonal H (units of E_C) by Sturm-sequence bisection
+    const n = 2 * NC + 1, d = new Float64Array(n); for (let j = 0; j < n; j++) { const q = j - NC - ng; d[j] = 4 * q * q; }
+    const e2 = (ej / 2) ** 2; let lo = -ej - 1, hi = 4 * (NC + 1) ** 2 + ej;
+    const count = x => { let c = 0, q = d[0] - x; if (q < 0) c++; for (let j = 1; j < n; j++) { q = d[j] - x - e2 / (q === 0 ? 1e-300 : q); if (q < 0) c++; } return c; };
+    for (let it = 0; it < 60; it++) { const mid = (lo + hi) / 2; if (count(mid) > k) hi = mid; else lo = mid; }
+    return (lo + hi) / 2;
+  }
+  function draw() {
+    const r = ratio(), P = setup(cv), NG = 121, lv = [[], [], [], []];
+    for (let i = 0; i < NG; i++) { const ng = -1 + 2 * i / (NG - 1); for (let k = 0; k < 4; k++) lv[k].push([ng, eig(ng, r, k)]); }
+    const e0h = eig(0.5, r, 0), e1h = eig(0.5, r, 1), e2h = eig(0.5, r, 2), E01 = e1h - e0h;
+    const E01z = eig(0, r, 1) - eig(0, r, 0), ymax = 4;
+    const F = frame(P, { x0: -1, x1: 1, y0: -0.3, y1: ymax,
+      xt: [[-1, '−1'], [-0.5, '−½'], [0, '0'], [0.5, '½'], [1, '1']], yt: [[0, '0'], [1, '1'], [2, '2'], [3, '3'], [4, '4']],
+      xl: 'offset charge  n_g', yl: 'energy / E₀₁' });
+    const cols = [P.c.fg, P.c.ac, P.c.mu, P.c.fa];
+    P.ctx.save(); P.ctx.beginPath(); P.ctx.rect(F.bx, F.by - 2, F.bw, F.bh + 4); P.ctx.clip();
+    for (let k = 3; k >= 0; k--) {
+      const pts = lv[k].map(([x, y]) => [F.X(x), F.Y(Math.min(ymax + 0.25, (y - e0h) / E01))]);
+      line(P, pts, cols[k], k === 1 ? 2.2 : 1.6);
+    }
+    P.ctx.restore();
+    const { ctx } = P; ctx.font = '400 12px "IBM Plex Mono", monospace'; ctx.textAlign = 'right'; ctx.textBaseline = 'bottom';
+    ['|0⟩', '|1⟩', '|2⟩', '|3⟩'].forEach((t, k) => { const y = (lv[k][NG - 1][1] - e0h) / E01; if (y < ymax - 0.1) { ctx.fillStyle = cols[k]; ctx.fillText(t, F.bx + F.bw - 4, F.Y(y) - 4); } });
+    const rs = fmt(r, r < 10 ? 1 : 0);
+    $('o4').textContent = rs; $('v4-r').textContent = rs;
+    $('v4-e01').textContent = fmt(E01, 2);
+    $('v4-al').textContent = ((e2h - e1h) - E01).toFixed(2).replace('-', '−');
+    const disp = Math.abs(E01z - E01) / E01;
+    if (disp >= 1e-3) $('v4-d').textContent = (100 * disp).toFixed(1) + ' %';
+    else { const ex = Math.floor(Math.log10(disp)), man = disp / 10 ** ex; $('v4-d').textContent = man.toFixed(1) + ' × 10⁻' + String(-ex).split('').map(c => SUP[c]).join(''); }
+  }
+  s.addEventListener('input', draw); addEventListener('resize', draw); draw();
+})();
+
+/* repository index */
+(() => {
   const GH = 'https://github.com/FarukSamiBilgin/';
-  const AREAS = {jj:'Josephson devices', sc:'Moiré superconductors', tmd:'Moiré TMD qubits', qd:'Graphene quantum dots', rep:'Reproductions', oth:'Programming and engineering'};
+  const AR = { jj: 'Josephson devices', sc: 'Moiré superconductors', tmd: 'Moiré TMD qubits', qd: 'Graphene quantum dots', rep: 'Reproductions', oth: 'Programming and engineering' };
   const R = [
     ['tbg-fractional-shapiro','jj','Fractional Shapiro steps as a current–phase fingerprint of a magic-angle graphene junction in a sub-THz cavity; electron thermometry.','In preparation'],
     ['tbg-gatemon','jj','A twisted-bilayer-graphene gatemon with a photonic control plane: readout and a parametric coherence budget.','In preparation'],
-    ['matbg-subthz-limits','jj','What sub-THz driving of a magic-angle junction can and cannot reveal: three limiting results and a safe window.','Limiting result'],
-    ['superconducting-qubit-chip-design','jj','From a transmon layout to a logical qubit: parameters, readout, DRAG and CZ gates, five-qubit GDS, repetition-code scaling.','Design study'],
-    ['jjqubit-studio','jj','A schematic-to-solver desktop simulator for superconducting circuits, validated against analytic limits.','Software'],
-    ['josim-cpr-bridge','jj','Any JoSIM current–phase relation to the quantum spectrum; 7 physics checks, 5 regression tests against JoSIM v2.7.','Software · DOI'],
+    ['matbg-subthz-limits','jj','What sub-THz driving of a magic-angle junction can and cannot reveal.','Limiting result'],
+    ['superconducting-qubit-chip-design','jj','From a transmon layout to a logical qubit: readout, DRAG and CZ gates, five-qubit GDS, repetition code.','Design study'],
+    ['jjqubit-studio','jj','A schematic-to-solver desktop simulator for superconducting circuits.','Software'],
+    ['josim-cpr-bridge','jj','Any JoSIM current–phase relation to the quantum spectrum.','Software · DOI'],
     ['adversarial-verification-method','jj','How adversarial verification caught a gauge artifact, a tautology and a silent parameter error.','Methodology note'],
     ['moire-microwave-loss','sc','Single-photon microwave loss of a moiré element, and a two-device experiment that can measure it.','Preprint 3'],
     ['moire-superconductor-circuits','sc','Geometric uniformity is not energetic uniformity: what moiré superconductors owe protected circuits.','In preparation'],
-    ['2d-superinductor-figure-of-merit','sc','A material figure of merit for two-dimensional superinductors, and where moiré graphene falls.','In preparation'],
+    ['2d-superinductor-figure-of-merit','sc','A material figure of merit for two-dimensional superinductors.','In preparation'],
     ['matbg-vortex-majorana','sc','Can a vortex in magic-angle graphene host a Majorana zero mode?','In preparation'],
     ['twist-disorder-topological-gap','sc','Log-correlated twist disorder and the closure of the topological gap.','In preparation'],
     ['matbg-pairing-symmetry-proposal','sc','A phase-sensitive experiment to determine the pairing symmetry of magic-angle graphene.','Experiment proposal'],
     ['twisted-hbn-artificial-atoms','tmd','Registry-resolved DFT test of the twisted-hBN artificial-atom proposal.','Preprint 1'],
-    ['twisted-hbn-orbital-qubit-limit','tmd','Twisted-hBN artificial atoms cannot host orbital qubits: a two-phonon T₁ floor of about 6–11 ps.','Negative result'],
+    ['twisted-hbn-orbital-qubit-limit','tmd','Twisted-hBN artificial atoms cannot host orbital qubits.','Negative result'],
     ['twisted-mos2-hole-spin-coherence','tmd','A Γ-valley hole-spin memory in twisted MoS₂ and its isotope-purification budget.','Preprint 2'],
     ['twse2-valley-qubit-control','tmd','Electrical versus optical control of valley qubits in twisted WSe₂.','In preparation'],
     ['heterotmd-purcell-emitters','tmd','Twist-disorder immunity and a Purcell budget for interlayer-exciton emitters.','In preparation'],
@@ -387,34 +752,35 @@ footer a{color:var(--muted)}
     ['twse2-valley-spin-processor','tmd','A valley–spin processor architecture for twisted WSe₂.','In revision'],
     ['ix-erasure-architecture','tmd','An erasure-biased architecture for interlayer-exciton position qubits.','In revision'],
     ['janus-erasure-architecture','tmd','An erasure-native architecture for twisted Janus bilayers.','In revision'],
-    ['moire-300-logical-qubit-feasibility','tmd','Can a moiré platform reach 300 logical qubits? Control layers fail against site disorder; wiring does not close.','Negative result'],
-    ['bilayer-graphene-qd-qubit','qd','Does AC-modulated confinement protect a bilayer-graphene dot qubit from charge noise? It does not survive full Floquet evolution.','Negative result'],
-    ['holey-graphene-antidot-qubit','qd','A pre-registered geometry scan of defect qubits in graphene antidot lattices.','Negative result'],
+    ['moire-300-logical-qubit-feasibility','tmd','Can a moiré platform reach 300 logical qubits?','Negative result'],
+    ['bilayer-graphene-qd-qubit','qd','AC confinement and charge noise in bilayer-graphene dot qubits.','Negative result'],
+    ['holey-graphene-antidot-qubit','qd','A pre-registered geometry scan of antidot defect qubits.','Negative result'],
     ['repeater-cutoff-policies','rep','Memory cutoffs in a swap-asap repeater chain, extending Li, Coopmans and Elkouss (2021).','Short paper'],
-    ['fractional-shapiro-discrimination','rep','Which purely electrical measurements separate intrinsic from extrinsic fractional Shapiro steps.','Short paper'],
-    ['hubbard-entropy-optimum','rep','The entropy-controlled optimum in U/t on small Hubbard clusters; a withdrawn claim kept on the record.','Technical note'],
-    ['tfim-classical-cost','rep','The interaction range that maximises classical simulation cost is not converged at accessible sizes.','Limiting result'],
-    ['qhack-2026-pennylane','oth','Xanadu QHack 2026 solutions, 65 earlier QHack problems checked against independent references, and the qlab toolkit.','Competition'],
-    ['femtosat-power-architecture','oth','Energy-banking power architecture for coin-sized femtosatellites, and a B.Sc. thesis on flyback converters.','Drafts and thesis'],
+    ['fractional-shapiro-discrimination','rep','Which electrical measurements separate intrinsic from extrinsic fractional Shapiro steps.','Short paper'],
+    ['hubbard-entropy-optimum','rep','The entropy-controlled optimum in U/t on small Hubbard clusters.','Technical note'],
+    ['tfim-classical-cost','rep','The interaction range that maximises classical simulation cost is not converged.','Limiting result'],
+    ['qhack-2026-pennylane','oth','Xanadu QHack 2026 solutions, earlier QHack problems, and the qlab toolkit.','Competition'],
+    ['femtosat-power-architecture','oth','Energy-banking power for coin-sized femtosatellites; B.Sc. thesis on flyback converters.','Drafts and thesis'],
   ];
-  const fbox = document.getElementById('filters'), idx = document.getElementById('idx'), cnt = document.getElementById('count');
-  let cur = 'all';
-  const esc = s => s.replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
-  function chips() {
-    fbox.innerHTML = '';
-    [['all','All']].concat(Object.entries(AREAS)).forEach(([k, v]) => {
-      const b = document.createElement('button'); b.type = 'button'; b.textContent = v;
-      b.setAttribute('aria-pressed', String(k === cur));
-      b.addEventListener('click', () => { cur = k; chips(); list(); }); fbox.appendChild(b);
-    });
-  }
-  function list() {
-    const rows = R.filter(r => cur === 'all' || r[1] === cur);
-    idx.innerHTML = rows.map(([n, a, d, s]) =>
-      `<div class="row"><a class="r" href="${GH}${n}">${n}</a><p>${esc(d)}</p><span class="st${/Negative|Limiting/.test(s) ? ' neg' : ''}">${esc(s)}</span></div>`).join('');
-    cnt.textContent = `${rows.length} of ${R.length} repositories`;
-  }
+  const fb = $('filters'), ix = $('idx'), ct = $('count'); let cur = 'all';
+  const esc = s => s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+  function chips() { fb.innerHTML = ''; [['all', 'All']].concat(Object.entries(AR)).forEach(([k, v]) => { const b = document.createElement('button'); b.type = 'button'; b.textContent = v; b.setAttribute('aria-pressed', String(k === cur)); b.onclick = () => { cur = k; chips(); list(); }; fb.appendChild(b); }); }
+  function list() { const rows = R.filter(r => cur === 'all' || r[1] === cur); ix.innerHTML = rows.map(([n, a, d, s]) => `<div class="row"><a href="${GH}${n}">${n}</a><p>${esc(d)}</p><span class="${/Negative|Limiting/.test(s) ? 'neg' : ''}">${esc(s)}</span></div>`).join(''); ct.textContent = `${rows.length} of ${R.length} repositories`; }
   chips(); list();
+})();
+
+/* chapter bar */
+(() => {
+  const bar = $('cbar'), secs = [...document.querySelectorAll('section[data-title]')];
+  const ob = new IntersectionObserver(es => es.forEach(e => { if (e.isIntersecting) { const id = e.target.id; $('cbn').textContent = id.startsWith('ch') ? id.slice(2).padStart(2, '0') : '—'; $('cbt').textContent = e.target.dataset.title; } }), { rootMargin: '-45% 0px -50% 0px' });
+  secs.forEach(s => ob.observe(s));
+  new IntersectionObserver(es => bar.classList.toggle('on', !es[0].isIntersecting), { threshold: 0.05 }).observe($('top'));
+})();
+
+addEventListener('load', () => { if (window.renderMathInElement) renderMathInElement(document.body, { delimiters: [{ left: '$$', right: '$$', display: true }, { left: '\\(', right: '\\)', display: false }], throwOnError: false }); });
+
+setTheta(theta);
+if (document.fonts) document.fonts.ready.then(() => { setTheta(theta); dispatchEvent(new Event('resize')); });
 })();
 </script>
 </body>
