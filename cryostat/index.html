@@ -11,7 +11,7 @@
 <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230a0a0a'/%3E%3Cg fill='%23f2f2f0'%3E%3Ccircle cx='9' cy='11' r='1.8'/%3E%3Ccircle cx='16' cy='11' r='1.8'/%3E%3Ccircle cx='23' cy='11' r='1.8'/%3E%3Ccircle cx='12.5' cy='17' r='1.8'/%3E%3Ccircle cx='19.5' cy='17' r='1.8'/%3E%3Ccircle cx='9' cy='23' r='1.8'/%3E%3Ccircle cx='16' cy='23' r='1.8'/%3E%3Ccircle cx='23' cy='23' r='1.8'/%3E%3C/g%3E%3C/svg%3E">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500;600&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,62..125,100..900&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
 <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
@@ -23,10 +23,10 @@
 </script>
 <style>
 :root{
-  --sans:"IBM Plex Sans",-apple-system,"Segoe UI",Helvetica,Arial,sans-serif;
-  --serif:"Source Serif 4",Georgia,"Times New Roman",serif;
-  --mono:"IBM Plex Mono",ui-monospace,Consolas,Menlo,monospace;
-  --bg:#f4f4f1;--fg:#121212;--muted:#5c5c57;--faint:#93938d;--line:#dbdbd5;--line2:#c4c4bd;--accent:#cf1f25;--stage:#e9e9e4;
+  --sans:"Archivo",-apple-system,"Segoe UI",Helvetica,Arial,sans-serif;
+  --serif:"Archivo",Georgia,"Times New Roman",serif;
+  --mono:"Archivo",ui-monospace,Consolas,Menlo,monospace;
+  --bg:#f4f4f1;--fg:#121212;--muted:#5c5c57;--faint:#93938d;--line:#dbdbd5;--line2:#c4c4bd;--accent:#da291c;--stage:#e9e9e4;
 }
 *{box-sizing:border-box}
 html{background:var(--bg);scroll-behavior:smooth}
@@ -130,6 +130,23 @@ footer .r{text-align:right}
   footer .r{text-align:left}
 }
 @media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+
+/* ---- Typography system (Archivo, Ferrari-like restraint) ---- */
+:root{--rosso:#da291c}
+.light,.dark,:root{--accent:#da291c}
+body{font-family:"Archivo",-apple-system,"Segoe UI",Helvetica,Arial,sans-serif;font-stretch:100%;font-weight:400;font-variant-numeric:lining-nums tabular-nums;letter-spacing:.003em}
+h1{font-weight:300!important;font-stretch:112%!important;letter-spacing:-.025em!important}
+h2{font-weight:350!important;font-stretch:108%!important;letter-spacing:-.018em!important}
+h3{font-weight:500!important;font-stretch:104%!important;letter-spacing:-.005em!important}
+.label,.top,.cbar,nav,summary,.eyebrow,.kicker{font-stretch:125%!important;letter-spacing:.2em!important}
+.label{font-size:11px!important;font-weight:500!important}
+.top,.cbar{font-size:11px!important;font-weight:500!important}
+.chead .n,.num,.contents .num{font-weight:200!important;font-stretch:100%!important}
+output,dd,.mono,code,kbd{font-family:"Archivo",sans-serif!important;font-variant-numeric:lining-nums tabular-nums;letter-spacing:.01em}
+figcaption,.links,.row p,.ctl label{font-stretch:100%}
+.prose p,article p{font-weight:400}
+.top a,.top span{white-space:nowrap}
+@media (max-width:900px){.top span a:not(:last-child){display:none}}
 </style>
 </head>
 <body>
@@ -372,7 +389,7 @@ window.CRYO = CRYO;
 const $ = id => document.getElementById(id);
 const RM = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
 const COL = { fg: '#121212', mu: '#5c5c57', fa: '#93938d', li: '#dbdbd5', l2: '#c4c4bd', ac: '#cf1f25', st: '#e9e9e4', bg: '#f4f4f1' };
-const MONO = '"IBM Plex Mono", ui-monospace, monospace', SANS = '"IBM Plex Sans", system-ui, sans-serif';
+const MONO = '"Archivo", ui-monospace, monospace', SANS = '"Archivo", system-ui, sans-serif';
 function fit(cv) {
   const dpr = Math.min(window.devicePixelRatio || 1, 2), r = cv.getBoundingClientRect();
   const w = Math.max(1, Math.round(r.width * dpr)), h = Math.max(1, Math.round(r.height * dpr));
@@ -680,7 +697,7 @@ function scaleBar(pxPerUnit, unitToCm, W, H) {
   const bl = len * pxPerUnit, x0 = 18, y0 = H - 20;
   return `<g><line x1="${x0}" y1="${y0}" x2="${(x0 + bl).toFixed(1)}" y2="${y0}" stroke="#121212" stroke-width="1.5"/>` +
     `<line x1="${x0}" y1="${y0 - 5}" x2="${x0}" y2="${y0 + 5}" stroke="#121212"/><line x1="${(x0 + bl).toFixed(1)}" y1="${y0 - 5}" x2="${(x0 + bl).toFixed(1)}" y2="${y0 + 5}" stroke="#121212"/>` +
-    `<text x="${x0}" y="${y0 - 10}" style="font-family:'IBM Plex Mono',monospace;fill:#121212">${lenText(len * unitToCm)}</text></g>`;
+    `<text x="${x0}" y="${y0 - 10}" style="font-family:'Archivo',monospace;fill:#121212">${lenText(len * unitToCm)}</text></g>`;
 }
 
 /* ---------- the sample package (millimetres; PCB top at y = 0, box centred on the origin) ---------- */
