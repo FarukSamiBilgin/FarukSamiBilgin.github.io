@@ -1,0 +1,1088 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Josephson junction — Faruk Sami Bilgin</title>
+<meta name="description" content="An interactive long read on the Josephson junction and the transmon qubit: phase, the Josephson relations, the tilted washboard, quantised levels and Rabi oscillations, each with a figure computed in the browser.">
+<meta property="og:title" content="The Josephson junction">
+<meta property="og:description" content="How two films of aluminium and a nanometre of oxide become the heart of a superconducting qubit, with figures you can move.">
+<meta name="color-scheme" content="light">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230a0a0a'/%3E%3Cg fill='%23f2f2f0'%3E%3Ccircle cx='9' cy='11' r='1.8'/%3E%3Ccircle cx='16' cy='11' r='1.8'/%3E%3Ccircle cx='23' cy='11' r='1.8'/%3E%3Ccircle cx='12.5' cy='17' r='1.8'/%3E%3Ccircle cx='19.5' cy='17' r='1.8'/%3E%3Ccircle cx='9' cy='23' r='1.8'/%3E%3Ccircle cx='16' cy='23' r='1.8'/%3E%3Ccircle cx='23' cy='23' r='1.8'/%3E%3C/g%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500;600&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
+<style>
+:root{
+  --sans:"IBM Plex Sans",-apple-system,"Segoe UI",Helvetica,Arial,sans-serif;
+  --serif:"Source Serif 4",Georgia,"Times New Roman",serif;
+  --mono:"IBM Plex Mono",ui-monospace,Consolas,Menlo,monospace;
+  --bg:#f4f4f1;--fg:#121212;--muted:#5c5c57;--faint:#93938d;--line:#dbdbd5;--line2:#c4c4bd;--accent:#cf1f25;--stage:#e9e9e4;
+}
+*{box-sizing:border-box}
+html{background:var(--bg);scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);font:400 19px/1.65 var(--serif);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+a{color:inherit;text-decoration-color:var(--line2);text-underline-offset:3px}
+a:hover{text-decoration-color:var(--accent)}
+
+.top{position:fixed;inset:0 0 auto 0;z-index:20;height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 40px;font:500 12px var(--sans);letter-spacing:.16em;text-transform:uppercase;color:#f2f2f0;background:#0a0a0a;border-bottom:1px solid #262626}
+.top a{text-decoration:none}
+
+.col{max-width:728px;margin:0 auto;padding:0 24px}
+.head{padding-top:148px;padding-bottom:28px}
+.kicker{font:500 12px/1.4 var(--sans);letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+h1{font:600 clamp(42px,8.4vw,64px)/1.02 var(--sans);letter-spacing:-.035em;margin:22px 0 22px}
+.dek{font-size:21px;line-height:1.5;color:var(--muted);margin:0 0 26px}
+.by{font:400 15px var(--sans);color:var(--muted);padding-bottom:30px;border-bottom:1px solid var(--line)}
+.by b{font-weight:500;color:var(--fg)}
+
+article p{margin:0 0 1.05em}
+h2{font:600 30px/1.15 var(--sans);letter-spacing:-.02em;margin:76px 0 20px}
+.katex{font-size:1.04em}
+.katex-display{margin:1.15em 0 1.35em;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+sub{line-height:0}
+
+figure.fig{max-width:1028px;margin:44px auto 52px;padding:0 24px;scroll-margin-top:68px}
+h2{scroll-margin-top:68px}
+.stage{position:relative;background:var(--stage);border:1px solid var(--line)}
+.stage canvas{display:block;width:100%;touch-action:auto}
+.ov{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+.ov text{font:400 13px var(--sans);fill:var(--muted)}
+.ov .k{font:400 17px var(--serif);fill:var(--fg)}
+#f1{height:470px;cursor:grab}
+#f1:active{cursor:grabbing}
+#f2{height:340px}
+.split{display:grid;grid-template-columns:minmax(0,1fr) 300px}
+.split > :last-child{border-left:1px solid var(--line)}
+#f3{height:340px}
+#f3iv{height:340px}
+#f4{height:450px}
+#f5{height:420px;cursor:grab}
+#f5:active{cursor:grabbing}
+#f5t{height:132px;border-top:1px solid var(--line)}
+.nogl{display:grid;place-items:center;min-height:200px;padding:24px;font:400 15px var(--sans);color:var(--muted);text-align:center}
+
+.controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px 36px;margin-top:16px}
+.ctl{display:grid;grid-template-columns:1fr auto;gap:2px 12px;align-items:center}
+.ctl label{font:400 14px var(--sans);color:var(--muted)}
+.ctl output{font:500 15px var(--mono);color:var(--accent)}
+.ctl input{grid-column:1/-1;width:100%;accent-color:var(--accent);margin:6px 0 2px}
+.ctl.off output,.ctl.off label{color:var(--faint)}
+.row{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;margin-top:14px}
+.btn{font:500 13px/1 var(--sans);letter-spacing:.02em;color:var(--fg);background:transparent;border:1px solid var(--line2);border-radius:999px;padding:8px 15px;cursor:pointer}
+.btn:hover{border-color:var(--fg)}
+.btn:focus-visible,.ctl input:focus-visible,.check input:focus-visible{outline:2px solid var(--fg);outline-offset:2px}
+.btn[aria-pressed=true]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.btn:disabled{opacity:.4;cursor:default;border-color:var(--line2)}
+.check{display:inline-flex;align-items:center;gap:8px;font:400 14px var(--sans);color:var(--muted);margin-left:6px}
+.check input{accent-color:var(--accent);width:16px;height:16px;margin:0}
+.readouts{display:flex;flex-wrap:wrap;gap:6px 28px;margin-top:14px;font:400 14px var(--sans);color:var(--muted)}
+.readouts output{font:500 14.5px var(--mono);color:var(--fg);margin-left:6px}
+figcaption{font:400 14.5px/1.55 var(--sans);color:var(--muted);margin-top:16px;max-width:54em}
+figcaption b{color:var(--fg);font-weight:500}
+
+.further{margin-top:64px;border-top:1px solid var(--line2);padding-top:22px}
+.further h3{font:500 12px/1.4 var(--sans);letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+.further ul{list-style:none;margin:0;padding:0}
+.further li{padding:11px 0;border-bottom:1px solid var(--line);font:400 15.5px/1.5 var(--sans);color:var(--muted)}
+.further li a{color:var(--fg);font-weight:500;text-decoration:none;border-bottom:1px solid var(--line2)}
+.further li a:hover{border-color:var(--accent)}
+.further .m{font:400 14px var(--mono)}
+
+footer{margin-top:110px;background:#0a0a0a;color:#9b9b96;font:400 14.5px/1.6 var(--sans);padding:60px 0 90px;border-top:1px solid #262626}
+footer .in{max-width:1028px;margin:0 auto;padding:0 24px;display:grid;grid-template-columns:1fr auto;gap:24px 48px}
+footer p{margin:0 0 8px;max-width:40em}
+footer a{color:#f2f2f0;text-decoration-color:#3a3a38}
+footer .r{text-align:right}
+
+@media (max-width:820px){
+  .split{grid-template-columns:1fr}
+  .split > :last-child{border-left:0;border-top:1px solid var(--line)}
+  #f3iv{height:230px}
+}
+@media (max-width:640px){
+  body{font-size:18px}
+  .top{padding:0 16px;letter-spacing:.1em}
+  .top .long{display:none}
+  .col,figure.fig{padding-left:16px;padding-right:16px}
+  .head{padding-top:110px}
+  .dek{font-size:19px}
+  h2{font-size:26px;margin-top:60px}
+  #f1{height:350px}
+  #f2{height:310px}
+  #f3{height:270px}
+  #f4{height:380px}
+  #f5{height:330px}
+  #f5t{height:120px}
+  .controls{gap:10px 24px}
+  footer .in{grid-template-columns:1fr}
+  footer .r{text-align:left}
+}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<div class="top"><a href="../">Faruk Sami Bilgin</a><a href="../#contents">Notes<span class="long"> on quantum devices</span></a></div>
+
+<article>
+<header class="head col">
+  <div class="kicker">A long read · Notes on quantum devices</div>
+  <h1>The Josephson junction</h1>
+  <p class="dek">How two films of aluminium separated by a nanometre of oxide become the heart of a superconducting qubit, explained with figures you can move.</p>
+  <div class="by"><b>Faruk Sami Bilgin</b> · November 2026</div>
+</header>
+
+<div class="col">
+<p>A superconducting quantum processor is, at first sight, an unremarkable object: a square of silicon a few millimetres across, patterned with metal films a few hundred nanometres thick. Nothing is trapped inside it and no laser points at it. Its qubits are electrical circuits, made of capacitors, inductors and wires, cooled to about ten millikelvin, where the metal superconducts and the electrical oscillations of each circuit behave quantum mechanically.</p>
+<p>Capacitors and wires alone are not enough. A circuit built only from them is a harmonic oscillator, whose energy levels are evenly spaced like the rungs of a ladder. A microwave pulse that lifts it from the first rung to the second lifts it from the second to the third just as well, so there is no way to keep it inside two levels and use it as a qubit. What breaks the even spacing is a single nonlinear element: the Josephson junction, two superconductors separated by an insulating barrier one or two nanometres thick.</p>
+<p>In this article I'll explain what a Josephson junction does, why it behaves like an inductor unlike any coil, and how a junction and a capacitor together make the transmon, the most widely used superconducting qubit today. Each idea comes with a figure you can drag or slide. Let me start with the object itself, a transmon of the kind made in many laboratories. Drag it to change the viewing angle; the first slider takes you from the whole chip down to the junction, and the second pulls the junction apart:</p>
+</div>
+
+<figure class="fig" id="fig1">
+  <div class="stage">
+    <canvas id="f1" role="img" aria-label="Three-dimensional model of a transmon chip: two aluminium capacitor pads on a silicon substrate, thin leads meeting at a Josephson junction in the gap between them, and a meandered readout resonator next to a feedline. Zooming in shows the junction as two crossing aluminium strips with an aluminium-oxide barrier where they overlap."></canvas>
+    <svg class="ov" id="f1-ov" aria-hidden="true"></svg>
+  </div>
+  <div class="controls">
+    <div class="ctl"><label for="s1z">Zoom</label><output id="o1z" for="s1z">—</output><input id="s1z" type="range" min="0" max="1" step="0.001" value="0"></div>
+    <div class="ctl"><label for="s1s">Separate the layers</label><output id="o1s" for="s1s">0.00</output><input id="s1s" type="range" min="0" max="1" step="0.01" value="0"></div>
+  </div>
+  <figcaption><b>Figure 1.</b> A transmon, drawn to show its parts rather than to scale. Drag to rotate. Thicknesses are exaggerated, and by different amounts at different zoom levels: real capacitor pads are a few hundred micrometres across and some 100–200 nm thick, the junction is roughly 100–200 nm across, and its oxide barrier is only 1–2 nm thick. In a real device the whole surface of the bottom film oxidises; only the part between the two films, which forms the barrier, is drawn. The ground plane and wiring around a real qubit are left out. The scale bar applies at the centre of the view.</figcaption>
+</figure>
+
+<div class="col">
+<p>The two large rectangles are the capacitor pads. Each is a few hundred micrometres across, and together they form a capacitor of about 80 femtofarads. In the middle of the gap between them, a thin lead from each pad reaches the junction, which is a thousand times smaller than the pads. The meandering line on the right is a readout resonator, a length of superconducting transmission line whose resonant frequency shifts slightly with the state of the qubit; probing it through the straight feedline beside it is how the qubit is measured.</p>
+<p>At the highest zoom you can see how the junction is made. A narrow strip of aluminium is deposited first, and its surface is oxidised in a controlled amount of oxygen, which grows a layer of amorphous aluminium oxide, AlO<sub>x</sub>. A second strip is then deposited across the first, usually without breaking vacuum, by evaporating from a second angle through the same resist mask. Everything in the rest of this article happens in the small patch where the two strips overlap, across a barrier only a few atoms thick.</p>
+
+<h2 id="phase">Superconductors and phase</h2>
+<p>In an ordinary metal each conduction electron goes its own way, scattering off impurities and lattice vibrations; that scattering is electrical resistance. Below its critical temperature, about 1.2 kelvin for aluminium, a superconductor is different. Its electrons bind into Cooper pairs, which all condense into one quantum state extending through the whole piece of metal. That state can be described by a single macroscopic wavefunction,</p>
+$$\Psi(\mathbf r) = \sqrt{n_s}\;e^{i\theta(\mathbf r)},$$
+<p>where \(n_s\) is the density of Cooper pairs and \(\theta\) is the phase of the wavefunction. In a piece of superconductor at rest, the phase is the same everywhere. You can picture it as a clock hand that points in the same direction throughout the metal.</p>
+<p>Now bring two superconductors close together with a thin insulator between them. Each has its own phase, \(\theta_L\) on the left and \(\theta_R\) on the right. Classically no charge can cross the insulator, but quantum mechanically a Cooper pair can tunnel through it. In 1962 Brian Josephson predicted that this tunnelling carries a current with no voltage across the junction, and that the current depends only on the phase difference \(\varphi = \theta_L - \theta_R\):</p>
+$$I = I_c\sin\varphi .$$
+<p>The critical current \(I_c\) is the largest supercurrent the junction can carry. It grows with the area of the overlap and falls exponentially with the thickness of the barrier. In the figure below each clock is one superconductor, and its hand shows that side's phase. Drag either hand and watch the current between them:</p>
+</div>
+
+<figure class="fig" id="fig2">
+  <div class="stage">
+    <canvas id="f2" role="img" aria-label="Two clock dials represent the left and right superconductors; each hand shows a phase. Between them a junction symbol with an arrow whose length and direction show the supercurrent I equals I_c sine of the phase difference. A strip at the bottom records the current over time."></canvas>
+  </div>
+  <div class="controls">
+    <div class="ctl"><label for="s2l">Left phase θ<sub>L</sub></label><output id="o2l" for="s2l">—</output><input id="s2l" type="range" min="-180" max="180" step="1" value="69"></div>
+    <div class="ctl"><label for="s2r">Right phase θ<sub>R</sub></label><output id="o2r" for="s2r">—</output><input id="s2r" type="range" min="-180" max="180" step="1" value="11"></div>
+    <div class="ctl"><label for="s2v">Voltage V</label><output id="o2v" for="s2v">0.0 µV</output><input id="s2v" type="range" min="0" max="10" step="0.1" value="0"></div>
+  </div>
+  <div class="row">
+    <button class="btn" id="b2p" type="button" aria-pressed="true">Pause</button>
+    <div class="readouts" style="margin-top:0">
+      <span>φ = θ<sub>L</sub> − θ<sub>R</sub><output id="r2p">—</output></span>
+      <span>I / I<sub>c</sub><output id="r2i">—</output></span>
+      <span>f<sub>J</sub> = 2eV/h<output id="r2f">—</output></span>
+    </div>
+  </div>
+  <figcaption><b>Figure 2.</b> Two superconductors drawn as clocks whose hands are their phases, measured anticlockwise from three o'clock as for a complex number \(e^{i\theta}\). The arrow shows the supercurrent \(I = I_c\sin\varphi\), positive to the right; the strip below records it. With a voltage applied the phases wind apart, slowed down four billion times so that you can follow them.</figcaption>
+</figure>
+
+<div class="col">
+<p>Turning both hands together changes nothing: only the difference between them is physical. The current is largest when the hands are a quarter of a turn apart, and it reverses when the difference passes half a turn.</p>
+<p>Now apply a voltage \(V\) across the junction with the last slider. A Cooper pair carries charge \(2e\), where \(e\) is the electron charge, so the pairs on the two sides now differ in energy by \(2eV\), and in quantum mechanics an energy difference makes the phase difference wind steadily in time:</p>
+$$\frac{d\varphi}{dt} = \frac{2eV}{\hbar},$$
+<p>where \(\hbar\) is the reduced Planck constant. A constant voltage therefore produces an alternating current, at the frequency \(f_J = 2eV/h\). The constant \(2e/h\) is 483.6 GHz per millivolt, so even the largest voltage on the slider, 10 µV, makes the current oscillate 4.8 billion times per second. I have let each hand take half of the winding; again, only the difference can be measured.</p>
+
+<h2 id="relations">The Josephson relations</h2>
+<p>The two equations we have met are the Josephson relations, and together they contain everything about the junction we will need:</p>
+$$I = I_c\sin\varphi,\qquad V=\frac{\hbar}{2e}\frac{d\varphi}{dt}.$$
+<p>Combine them and something familiar appears. If the current through the junction changes, the phase must change, and a changing phase is a voltage. Differentiating the first relation in time and substituting the second gives \(V = L_J\,dI/dt\), the defining equation of an inductor, with inductance</p>
+$$L_J = \frac{\hbar}{2e\,I_c\cos\varphi}.$$
+<p>So a junction is an inductor, but an unusual one: its inductance depends on the phase across it, and therefore on the current through it. A junction with \(I_c = 25\) nA, typical for a transmon, has \(L_J \approx 13\) nH at zero current, and its inductance grows without limit as the current approaches \(I_c\). This is the nonlinearity a qubit needs, and it comes without dissipation. In practice \(I_c\) is checked through the junction's room-temperature resistance \(R_n\): for a tunnel junction \(I_cR_n = \pi\Delta/2e\), with \(\Delta \approx 0.18\) meV the energy gap of aluminium, so 25 nA corresponds to \(R_n \approx 11\) kΩ.</p>
+<p>There is a useful mechanical picture of a junction. A real junction also has a capacitance \(C\), from the two films facing each other across the barrier and anything connected in parallel, and some resistance \(R\) to its surroundings. Write Kirchhoff's law for a bias current \(I\) shared between these three elements and you get an equation for the phase that is Newton's law for a ball, of mass proportional to \(C\) and with friction proportional to \(1/R\), rolling on the potential</p>
+$$U(\varphi) = -E_J\cos\varphi - \frac{\hbar I}{2e}\,\varphi .$$
+<p>Here \(E_J = \hbar I_c/2e\) is the Josephson energy, the depth of the cosine wells. The bias current tilts the potential, which is why it is called the tilted washboard. Measure time in units of \(1/\omega_p\), where \(\omega_p = \sqrt{2eI_c/\hbar C}\) is the plasma frequency at which the ball oscillates at the bottom of a well, and current in units of \(I_c\). The equation of motion becomes</p>
+$$\ddot\varphi + \gamma\,\dot\varphi + \sin\varphi = i ,$$
+<p>where the dots are derivatives with respect to this dimensionless time, \(i = I/I_c\) is the bias and \(\gamma = 1/(\omega_p R C)\) is the damping. This is the resistively and capacitively shunted junction model. The figure below integrates it as you watch. The voltage across the junction is proportional to how fast the ball moves, \(V = (\hbar/2e)\,\dot\varphi\).</p>
+</div>
+
+<figure class="fig" id="fig3">
+  <div class="stage split">
+    <canvas id="f3" role="img" aria-label="Side view of a tilted washboard potential with a shaded ball representing the phase. The ball rests in a dip when the bias is below the critical current and rolls down the slope when it is above."></canvas>
+    <canvas id="f3iv" role="img" aria-label="Current-voltage panel: bias current against time-averaged voltage, accumulating points as the bias changes, with the ohmic line dashed. Sweeping the bias up and down at small damping traces a hysteresis loop."></canvas>
+  </div>
+  <div class="controls">
+    <div class="ctl"><label for="s3i">Bias i = I / I<sub>c</sub></label><output id="o3i" for="s3i">—</output><input id="s3i" type="range" min="0" max="1.6" step="0.005" value="0.6"></div>
+    <div class="ctl"><label for="s3g">Damping γ</label><output id="o3g" for="s3g">—</output><input id="s3g" type="range" min="0" max="1" step="0.001" value="0.188"></div>
+  </div>
+  <div class="row">
+    <button class="btn" id="b3p" type="button" aria-pressed="true">Pause</button>
+    <button class="btn" id="b3s" type="button">Sweep up and down</button>
+    <button class="btn" id="b3c" type="button">Clear points</button>
+    <div class="readouts" style="margin-top:0;margin-left:8px">
+      <span>V / I<sub>c</sub>R = γ⟨dφ/dt⟩<output id="r3v">—</output></span>
+      <span>4γ/π<output id="r3r">—</output></span>
+    </div>
+  </div>
+  <figcaption><b>Figure 3.</b> Left: the phase as a ball on the washboard \(U(\varphi)/E_J = -\cos\varphi - i\varphi\), moved by the equation above; the dashed red line is the average tilt, \(-i\varphi\). When the ball moves fast the bumps are drawn blurred, as a camera would record them. Right: bias against time-averaged voltage, with the ohmic line \(V = IR\) dashed. Raise the bias past 1 and lower it again slowly, or press the sweep button, which takes about a minute. Any sweep of finite speed lets the ball run on a little below the quasi-static retrapping point, by more at smaller γ. Moving the slider abruptly can also throw the ball out of its well.</figcaption>
+</figure>
+
+<div class="col">
+<p>While \(i &lt; 1\) the washboard still has dips, and the ball settles into one of them. The phase is then constant, so by the second Josephson relation there is no voltage: this is the supercurrent. Raise \(i\) past 1 and the dips disappear; the ball rolls, \(\varphi\) grows steadily, and a voltage appears. The panel on the right records the bias against the average voltage, in units of \(I_cR\). At large bias the ball's speed is limited only by friction, and the junction behaves like the resistor \(R\), along the dashed line.</p>
+<p>Now lower the bias with small damping. A rolling ball carries momentum, and it keeps rolling long after the dips have returned. It is caught only when the energy it gains from the tilt over one period of the washboard no longer makes up for what friction takes, which for small damping happens at \(i \approx 4\gamma/\pi\). Between that retrapping current and \(i = 1\) the junction has two possible states, and which one you find depends on its history: the current–voltage curve is hysteretic. Increase \(\gamma\) and the loop closes. Aluminium tunnel junctions at millikelvin temperatures are strongly underdamped and their current–voltage curves are strongly hysteretic, although the resistance of a real tunnel junction is itself far from constant.</p>
+
+<h2 id="levels">From a ball to a wave</h2>
+<p>A transmon is a junction shunted by a capacitor, the two pads of Figure 1, with no bias current at all. The washboard is flat, \(i = 0\), and the ball sits in a cosine well. Classically it could rest perfectly still at the bottom, or oscillate with any amplitude.</p>
+<p>Quantum mechanically it can do neither. The phase \(\varphi\) and the number \(n\) of Cooper pairs that have tunnelled through the junction are conjugate variables, like the position and momentum of a particle, and they obey an uncertainty relation. The energy stored in the capacitor plays the role of kinetic energy and the junction's \(-E_J\cos\varphi\) that of potential energy, and the Hamiltonian is</p>
+$$H = 4E_C\,(n-n_g)^2 - E_J\cos\varphi .$$
+<p>Here \(E_C = e^2/2C\) is the charging energy, the cost of putting one extra electron on the capacitor (a Cooper pair costs \(4E_C\)), and \(n_g\) is an offset charge, in units of \(2e\), induced by stray electric fields around the device. I'll set \(n_g = 0\) for now. With \(E_C/h = 0.25\) GHz, which corresponds to \(C \approx 78\) fF, and the 25 nA junction from above, \(E_J/h \approx 12.4\) GHz, we have \(E_J/E_C \approx 50\): a typical transmon.</p>
+<p>The figure solves this Hamiltonian as you move the slider. It writes \(H\) as a matrix in the basis of definite Cooper-pair number, \(n = -25, \dots, 25\), in which the charging term is diagonal and \(\cos\varphi\) moves one pair across the junction. It finds the eigenvalues and eigenvectors of that 51 × 51 matrix and turns each eigenvector back into a wavefunction of the phase, \(\psi(\varphi) = \sum_n c_n e^{in\varphi}\).</p>
+</div>
+
+<figure class="fig" id="fig4">
+  <div class="stage">
+    <canvas id="f4" role="img" aria-label="Cosine potential well with the five lowest energy levels of the transmon drawn as horizontal lines, each carrying its wavefunction, and dashed ticks marking the evenly spaced levels of the harmonic approximation."></canvas>
+  </div>
+  <div class="controls">
+    <div class="ctl"><label for="s4">E<sub>J</sub> / E<sub>C</sub></label><output id="o4" for="s4">—</output><input id="s4" type="range" min="0" max="1" step="0.0005" value="0.8495"></div>
+  </div>
+  <div class="readouts">
+    <span>f<sub>01</sub><output id="r4a">—</output></span>
+    <span>f<sub>12</sub><output id="r4b">—</output></span>
+    <span>α = f<sub>12</sub> − f<sub>01</sub><output id="r4c">—</output></span>
+    <span>√(8E<sub>J</sub>E<sub>C</sub>)/h<output id="r4d">—</output></span>
+    <span>Shift of f<sub>01</sub> from n<sub>g</sub> = 0 to ½<output id="r4e">—</output></span>
+  </div>
+  <figcaption><b>Figure 4.</b> The five lowest eigenstates of \(H = 4E_C n^2 - E_J\cos\varphi\) at \(n_g = 0\), from diagonalising \(H\) in the charge basis. Red: the potential \(-E_J\cos\varphi\). Each level is drawn at its energy with its wavefunction \(\psi_k(\varphi)\) on top, scaled for visibility. Dashed ticks on the right, marked HO: the harmonic-oscillator approximation, \(-E_J + \sqrt{8E_JE_C}\,(k+\tfrac12)\). Energies are \(E/h\) in GHz for \(E_C/h = 0.25\) GHz.</figcaption>
+</figure>
+
+<div class="col">
+<p>Each line is an allowed energy, with its wavefunction drawn on top of it. The dashed ticks on the right show where the levels of a harmonic oscillator with the same curvature at the bottom would be, evenly spaced by \(\hbar\omega_p = \sqrt{8E_JE_C}\). The real levels fall progressively below them, because a cosine well widens faster than a parabola as you go up.</p>
+<p>The two lowest levels are the qubit, and the frequency of the transition between them, \(f_{01}\), is the qubit frequency. The next gap, \(f_{12}\), is smaller, and the difference \(\alpha = f_{12} - f_{01}\) is the anharmonicity. For a deep well \(f_{01} \approx \sqrt{8E_JE_C}/h - E_C/h\), and \(\alpha\) approaches \(-E_C/h\). At \(E_J/E_C = 50\) the computed values are \(f_{01} = 4.74\) GHz and \(\alpha = -0.29\) GHz: small compared with the qubit frequency, but enough for a microwave pulse at \(f_{01}\) to leave the 1→2 transition alone, as long as the pulse is not too short.</p>
+<p>Slide \(E_J/E_C\) down towards 1 and the picture changes. The levels rise far above the top of the well, the wavefunctions spread over all phases, and each state comes close to a state of definite charge. This is the regime of the Cooper-pair box, the earliest superconducting qubit. Its anharmonicity is large, but as we'll see, its frequency depends strongly on the stray charge \(n_g\). The transmon gives up some anharmonicity in exchange for living at large \(E_J/E_C\).</p>
+
+<h2 id="drive">Talking to the qubit</h2>
+<p>Restricted to its two lowest levels, the transmon is a qubit. Its state \(c_0|0\rangle + c_1|1\rangle\) can be drawn as a point on a sphere, the Bloch sphere, with \(|0\rangle\) at the north pole, \(|1\rangle\) at the south pole and equal superpositions on the equator, where the longitude is the relative phase of \(c_0\) and \(c_1\).</p>
+<p>To control the qubit we send it a microwave pulse at an angular frequency \(\omega_d\) close to its own, \(\omega_q = 2\pi f_{01}\). Seen from a frame that rotates at the drive frequency, and neglecting terms that oscillate at \(2\omega_d\) (the rotating-wave approximation), the Hamiltonian becomes</p>
+$$\frac{H}{\hbar} = \frac{\Delta}{2}\,\sigma_z + \frac{\Omega}{2}\,\sigma_x ,$$
+<p>where \(\sigma_x\) and \(\sigma_z\) are Pauli matrices, \(\Delta = \omega_d - \omega_q\) is the detuning of the drive from the qubit, and \(\Omega\), the Rabi frequency, is proportional to the drive amplitude. In this frame the state does something simple: it precesses about the axis \((\Omega, 0, \Delta)\) at the rate \(\sqrt{\Omega^2+\Delta^2}\). The figure integrates the equations of motion of the Bloch vector \((x, y, z)\),</p>
+$$\dot x = -\Delta\,y - \frac{x}{T_2},\qquad \dot y = \Delta\,x - \Omega\,z - \frac{y}{T_2},\qquad \dot z = \Omega\,y - \frac{z-1}{T_1},$$
+<p>in which the terms with \(T_1\) and \(T_2\) describe relaxation; they are switched off until you tick the box. Press play:</p>
+</div>
+
+<figure class="fig" id="fig5">
+  <div class="stage">
+    <canvas id="f5" role="img" aria-label="Bloch sphere drawn with thin latitude and longitude lines, the state vector as a red arrow with a fading trail, and a dashed line showing the axis it precesses about. Labels mark the states zero at the top, one at the bottom, plus and plus-i on the equator."></canvas>
+    <svg class="ov" id="f5-ov" aria-hidden="true"></svg>
+    <canvas id="f5t" role="img" aria-label="Probability of finding the qubit in state one plotted against time, showing Rabi oscillations."></canvas>
+  </div>
+  <div class="controls">
+    <div class="ctl"><label for="s5o">Rabi rate Ω / 2π</label><output id="o5o" for="s5o">—</output><input id="s5o" type="range" min="0" max="20" step="0.1" value="4"></div>
+    <div class="ctl"><label for="s5d">Detuning Δ / 2π</label><output id="o5d" for="s5d">—</output><input id="s5d" type="range" min="-20" max="20" step="0.1" value="0"></div>
+    <div class="ctl"><label for="s5t1">T<sub>1</sub></label><output id="o5t1" for="s5t1">—</output><input id="s5t1" type="range" min="0.2" max="10" step="0.1" value="1.5"></div>
+    <div class="ctl"><label for="s5t2">T<sub>2</sub> (at most 2T<sub>1</sub>)</label><output id="o5t2" for="s5t2">—</output><input id="s5t2" type="range" min="0.1" max="20" step="0.1" value="1"></div>
+  </div>
+  <div class="row">
+    <button class="btn" id="b5p" type="button" aria-pressed="false">Play</button>
+    <button class="btn" id="b5r" type="button">Reset to |0⟩</button>
+    <button class="btn" id="b5pi" type="button">π pulse</button>
+    <label class="check"><input type="checkbox" id="c5r"> Relaxation</label>
+    <div class="readouts" style="margin-top:0;margin-left:8px">
+      <span>P(|1⟩) = (1 − z)/2<output id="r5p">—</output></span>
+      <span>t<output id="r5t">—</output></span>
+    </div>
+  </div>
+  <figcaption><b>Figure 5.</b> The qubit state in the frame rotating with the drive, from the Bloch equations above. Drag the sphere to rotate it. The grey dashed line is the axis the state precesses about. Below: the probability of finding the qubit in \(|1\rangle\) against time; the dashed line marks the largest value a detuned drive reaches, \(\Omega^2/(\Omega^2+\Delta^2)\). The π pulse drives for exactly \(\pi/\Omega\) from the current state and then stops; set Ω to zero and press play to watch the qubit evolve freely. Time runs five million times slower than in a real device, and the relaxation times are chosen short enough to see.</figcaption>
+</figure>
+
+<div class="col">
+<p>On resonance, \(\Delta = 0\), the state turns about the \(x\) axis, from \(|0\rangle\) through the equator to \(|1\rangle\) and back. These are Rabi oscillations: the probability of finding the qubit in \(|1\rangle\), \(P_1 = (1-z)/2\), swings between 0 and 1. Driving for exactly \(t = \pi/\Omega\), a π pulse, takes \(|0\rangle\) to \(|1\rangle\), the quantum version of a NOT gate; half as long makes an equal superposition. Detune the drive and the rotation axis tilts towards the pole, so the state no longer reaches \(|1\rangle\): the largest \(P_1\) falls to \(\Omega^2/(\Omega^2+\Delta^2)\).</p>
+<p>This is where the anharmonicity of Figure 4 earns its keep. A short pulse contains a spread of frequencies, roughly the inverse of its length. If that spread reaches \(f_{12}\), part of the population leaks into \(|2\rangle\), outside the qubit. With \(|\alpha| \approx 0.3\) GHz this keeps single-qubit gates longer than several nanoseconds; in practice they take some tens of nanoseconds, with pulse shapes designed to suppress the leakage.</p>
+
+<h2 id="wrong">What goes wrong</h2>
+<p>Tick the relaxation box in Figure 5 and the trajectory spirals inwards. Two processes are at work. Energy relaxation, with time constant \(T_1\), is the qubit giving its energy to the environment and falling back to \(|0\rangle\). Dephasing scrambles the relative phase between \(|0\rangle\) and \(|1\rangle\) without any exchange of energy, because the qubit frequency fluctuates slightly. The phase memory \(T_2\) combines both, \(1/T_2 = 1/2T_1 + 1/T_\varphi\), where \(T_\varphi\) is the time for pure dephasing; this is why \(T_2\) can never exceed \(2T_1\). In the figure both are a microsecond or two so that you can watch them. The best transmons today keep their energy for hundreds of microseconds, and a few for more than a millisecond.</p>
+<p>Where does the energy go? Largely into defects. The amorphous oxide of the junction barrier, and the thin oxides and residues on every surface and interface of the chip, contain microscopic two-level systems, atoms or charges that can tunnel between two configurations, and these absorb energy at microwave frequencies. Because the qubit's electric field is strongest near the surfaces, a few nanometres of material can dominate the loss. Much of the progress in coherence has come from spreading the field out, one reason the pads of Figure 1 are so large, and from cleaner interfaces and better materials. Other channels include quasiparticles (broken Cooper pairs) tunnelling through the junction, radiation, and decay through the readout resonator.</p>
+<p>Dephasing comes from anything that moves the qubit frequency: magnetic flux noise in tunable designs, stray photons in the readout resonator, and charge noise. Charge noise is where \(E_J/E_C\) matters. Go back to Figure 4: the last readout under it gives how far \(f_{01}\) moves when the offset charge goes from \(n_g = 0\) to \(\tfrac12\), the largest shift a stray charge can cause. At \(E_J/E_C = 1\) it is almost 0.8 GHz; at 50 it is about 10 kHz. It falls exponentially, roughly as \(e^{-\sqrt{8E_J/E_C}}\), while the anharmonicity falls only slowly towards \(-E_C/h\). That trade is the idea of the transmon.</p>
+<p>Finally, the \(\sin\varphi\) we started from is itself an idealisation. It holds for tunnel barriers, in which a very large number of conduction channels each transmit with a small probability. In junctions made of graphene, semiconductor nanowires or other weak links, a few channels can transmit with probability \(\tau\) close to one, and the current–phase relation becomes skewed towards \(\varphi = \pi\). Such a junction still makes a qubit, one whose \(E_J\) can be tuned with a gate voltage, but its anharmonicity is smaller, by a factor of about \(1 - 3\tau/4\) for a single channel.</p>
+
+<section class="further" aria-labelledby="further-h">
+  <h3 id="further-h">Further in my notes</h3>
+  <ul>
+    <li><a href="../#ch2">A junction is a nonlinear inductor</a> — the current–phase relation, and how transparency reshapes it.</li>
+    <li><a href="../#ch3">Listening to a junction with microwaves</a> — Shapiro steps, and what a half step tells you.</li>
+    <li><a href="../#ch4">A qubit is the bottom of a ladder</a> — the levels against offset charge, from charge qubit to transmon.</li>
+    <li><a href="../#ch5">What a qubit forgets, and how fast</a> — relaxation, dephasing and coherence budgets.</li>
+    <li><a href="https://github.com/FarukSamiBilgin/josim-cpr-bridge" class="m">josim-cpr-bridge</a> — carries a junction's current–phase relation from the JoSIM circuit simulator to the qubit spectrum.</li>
+    <li><a href="https://github.com/FarukSamiBilgin/superconducting-qubit-chip-design" class="m">superconducting-qubit-chip-design</a> — a transmon design flow, from layout and readout to gates and a repetition code.</li>
+    <li><a href="https://github.com/FarukSamiBilgin/jjqubit-studio" class="m">jjqubit-studio</a> — a schematic-to-solver simulator for superconducting circuits.</li>
+  </ul>
+</section>
+</div>
+</article>
+
+<footer>
+  <div class="in">
+    <div>
+      <p>Faruk Sami Bilgin — independent researcher in quantum devices.</p>
+      <p>Every figure on this page is computed in your browser from the equations shown next to it.</p>
+    </div>
+    <div class="r">
+      <p><a href="../">Notes on quantum devices</a></p>
+      <p><a href="https://orcid.org/0009-0001-9064-4410">ORCID 0009-0001-9064-4410</a></p>
+      <p><a href="https://github.com/FarukSamiBilgin">github.com/FarukSamiBilgin</a></p>
+    </div>
+  </div>
+</footer>
+<noscript><p style="text-align:center;font:400 15px sans-serif">The figures on this page need JavaScript.</p></noscript>
+
+<script>
+/* ---------- numerics (tested in node against independent calculations) ---------- */
+const JJ = (() => {
+  /* Symmetric tridiagonal eigensolver: implicit QL with shifts (Numerical Recipes tqli).
+     d: diagonal (n), e: e[i] couples i and i+1. Eigenvalues ascending, vectors[k][i]. */
+  function tridiagEig(dIn, eIn) {
+    const n = dIn.length, d = Float64Array.from(dIn), e = new Float64Array(n);
+    for (let i = 0; i < n - 1; i++) e[i] = eIn[i];
+    const z = []; for (let i = 0; i < n; i++) { z.push(new Float64Array(n)); z[i][i] = 1; }
+    const pyth = (a, b) => Math.hypot(a, b), EPS = 2.220446049250313e-16;
+    for (let l = 0; l < n; l++) {
+      let iter = 0, m;
+      do {
+        for (m = l; m < n - 1; m++) { const dd = Math.abs(d[m]) + Math.abs(d[m + 1]); if (Math.abs(e[m]) <= EPS * dd) break; }
+        if (m !== l) {
+          if (iter++ === 60) throw new Error('tqli: no convergence');
+          let g = (d[l + 1] - d[l]) / (2 * e[l]), r = pyth(g, 1);
+          g = d[m] - d[l] + e[l] / (g + (g >= 0 ? Math.abs(r) : -Math.abs(r)));
+          let s = 1, c = 1, p = 0, i;
+          for (i = m - 1; i >= l; i--) {
+            let f = s * e[i]; const b = c * e[i];
+            e[i + 1] = (r = pyth(f, g));
+            if (r === 0) { d[i + 1] -= p; e[m] = 0; break; }
+            s = f / r; c = g / r; g = d[i + 1] - p; r = (d[i] - g) * s + 2 * c * b;
+            d[i + 1] = g + (p = s * r); g = c * r - b;
+            for (let k = 0; k < n; k++) { f = z[k][i + 1]; z[k][i + 1] = s * z[k][i] + c * f; z[k][i] = c * z[k][i] - s * f; }
+          }
+          if (r === 0 && i >= l) continue;
+          d[l] -= p; e[l] = g; e[m] = 0;
+        }
+      } while (m !== l);
+    }
+    const idx = [...Array(n).keys()].sort((a, b) => d[a] - d[b]);
+    return { values: idx.map(k => d[k]), vectors: idx.map(k => Float64Array.from({ length: n }, (_, i) => z[i][k])) };
+  }
+  /* H = 4 EC (n - ng)^2 - (EJ/2)(|n><n+1| + h.c.), n = -N..N */
+  function transmon(EJ, EC, ng = 0, N = 25) {
+    const n = 2 * N + 1, d = new Float64Array(n), e = new Float64Array(n);
+    for (let i = 0; i < n; i++) { const q = i - N - ng; d[i] = 4 * EC * q * q; e[i] = -EJ / 2; }
+    const r = tridiagEig(d, e); r.N = N; return r;
+  }
+  /* psi(phi) = sum_n c_n e^{i n phi}; at ng = 0 each state is purely real (even) or imaginary (odd) */
+  function wavefunction(c, N, phis) {
+    const re = new Float64Array(phis.length), im = new Float64Array(phis.length);
+    for (let j = 0; j < phis.length; j++) {
+      let a = 0, b = 0;
+      for (let i = 0; i < c.length; i++) { const k = i - N; a += c[i] * Math.cos(k * phis[j]); b += c[i] * Math.sin(k * phis[j]); }
+      re[j] = a; im[j] = b;
+    }
+    let nr = 0, ni = 0; for (let j = 0; j < phis.length; j++) { nr += re[j] * re[j]; ni += im[j] * im[j]; }
+    const psi = nr >= ni ? re : im;
+    let mx = 0; for (const v of psi) mx = Math.max(mx, Math.abs(v));
+    let s = 1;   // sign: outermost lobe on the phi > 0 side drawn positive
+    for (let j = phis.length - 1; j >= 0; j--) if (phis[j] > 0 && Math.abs(psi[j]) >= 0.3 * mx) { s = psi[j] > 0 ? 1 : -1; break; }
+    for (let j = 0; j < psi.length; j++) psi[j] = s * psi[j] / mx;
+    return psi;
+  }
+  /* RCSJ, time in 1/omega_p, current in I_c: phi'' + gamma phi' + sin phi = i. RK4 step; s = [phi, phi'] */
+  function rcsjStep(s, i, gamma, h) {
+    const f = (p, w) => i - gamma * w - Math.sin(p);
+    const p = s[0], w = s[1];
+    const k1p = w, k1w = f(p, w);
+    const k2p = w + 0.5 * h * k1w, k2w = f(p + 0.5 * h * k1p, w + 0.5 * h * k1w);
+    const k3p = w + 0.5 * h * k2w, k3w = f(p + 0.5 * h * k2p, w + 0.5 * h * k2w);
+    const k4p = w + h * k3w, k4w = f(p + h * k3p, w + h * k3w);
+    s[0] = p + h / 6 * (k1p + 2 * k2p + 2 * k3p + k4p);
+    s[1] = w + h / 6 * (k1w + 2 * k2w + 2 * k3w + k4w);
+    return s;
+  }
+  /* Bloch equations, rotating frame, precession vector (Omega, 0, Delta), z_eq = +1.
+     Rates in rad/us, times in us; T1 = T2 = Infinity switches relaxation off. */
+  function blochDeriv(v, Om, De, T1, T2, out) {
+    const [x, y, z] = v, g2 = 1 / T2, g1 = 1 / T1;
+    out[0] = -De * y - g2 * x;
+    out[1] = De * x - Om * z - g2 * y;
+    out[2] = Om * y - g1 * (z - 1);
+    return out;
+  }
+  function blochStep(v, Om, De, T1, T2, h) {
+    const k1 = blochDeriv(v, Om, De, T1, T2, [0, 0, 0]);
+    const a = v.map((x, j) => x + 0.5 * h * k1[j]);
+    const k2 = blochDeriv(a, Om, De, T1, T2, [0, 0, 0]);
+    const b = v.map((x, j) => x + 0.5 * h * k2[j]);
+    const k3 = blochDeriv(b, Om, De, T1, T2, [0, 0, 0]);
+    const c = v.map((x, j) => x + h * k3[j]);
+    const k4 = blochDeriv(c, Om, De, T1, T2, [0, 0, 0]);
+    for (let j = 0; j < 3; j++) v[j] += h / 6 * (k1[j] + 2 * k2[j] + 2 * k3[j] + k4[j]);
+    return v;
+  }
+  function blochAdvance(v, Om, De, T1, T2, T, hmax) {
+    const n = Math.max(1, Math.ceil(T / hmax)), h = T / n;
+    for (let k = 0; k < n; k++) blochStep(v, Om, De, T1, T2, h);
+    return v;
+  }
+  return { tridiagEig, transmon, wavefunction, rcsjStep, blochStep, blochAdvance };
+})();
+window.JJ = JJ;
+
+/* ---------- shared helpers ---------- */
+const $ = id => document.getElementById(id);
+const RM = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+const COL = { fg: '#121212', mu: '#5c5c57', fa: '#93938d', li: '#dbdbd5', l2: '#c4c4bd', ac: '#cf1f25', st: '#e9e9e4', bg: '#f4f4f1' };
+const MONO = '"IBM Plex Mono", ui-monospace, monospace', SANS = '"IBM Plex Sans", system-ui, sans-serif', SERIF = '"Source Serif 4", Georgia, serif';
+const TAU = 2 * Math.PI;
+function fit(cv) {
+  const dpr = Math.min(window.devicePixelRatio || 1, 2), r = cv.getBoundingClientRect();
+  const w = Math.max(1, Math.round(r.width * dpr)), h = Math.max(1, Math.round(r.height * dpr));
+  if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; }
+  const ctx = cv.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  return { ctx, W: r.width, H: r.height };
+}
+function watchVisible(el, cb) { new IntersectionObserver(es => cb(es[es.length - 1].isIntersecting), { rootMargin: '80px' }).observe(el); }
+function watchSize(el, cb) { let w0 = -1, h0 = -1; new ResizeObserver(() => { const r = el.getBoundingClientRect(); if (r.width !== w0 || r.height !== h0) { w0 = r.width; h0 = r.height; cb(); } }).observe(el); }
+/* requestAnimationFrame loop that only runs while wanted() is true and the figure is on screen */
+function Loop(step, wanted) {
+  let vis = false, raf = 0, last = 0;
+  const tick = t => {
+    raf = 0; if (!(vis && wanted())) { last = 0; return; }
+    const dt = last ? Math.min(0.05, (t - last) / 1000) : 1 / 60; last = t;
+    step(dt); raf = requestAnimationFrame(tick);
+  };
+  const kick = () => { if (vis && wanted() && !raf) { last = 0; raf = requestAnimationFrame(tick); } };
+  return { kick, setVisible(v) { vis = v; kick(); } };
+}
+const mn = s => String(s).replace(/-/g, '−');            // typographic minus for displayed numbers
+const nz = (x, d) => { const s = x.toFixed(d); return mn(/^-0\.?0*$/.test(s) ? s.slice(1) : s); };
+function fmtHz(gHz) {
+  const a = Math.abs(gHz);
+  if (a >= 1) return a.toFixed(3) + ' GHz';
+  if (a >= 1e-3) return (a * 1e3).toPrecision(3) + ' MHz';
+  if (a >= 1e-6) return (a * 1e6).toPrecision(3) + ' kHz';
+  return (a * 1e9).toPrecision(2) + ' Hz';
+}
+function setBtn(b, playing) { b.textContent = playing ? 'Pause' : 'Play'; b.setAttribute('aria-pressed', playing ? 'true' : 'false'); }
+function arrowHead(ctx, x, y, dir, size) {
+  ctx.beginPath(); ctx.moveTo(x, y); ctx.lineTo(x - dir * size, y - size * 0.55); ctx.lineTo(x - dir * size, y + size * 0.55); ctx.closePath(); ctx.fill();
+}
+
+/* ---------- Figure 2: two clocks ---------- */
+(function clocks() {
+  const cv = $('f2'), sL = $('s2l'), sR = $('s2r'), sV = $('s2v'), bP = $('b2p');
+  const SLOW = 4e9, KJ = 483.5979;            // 2e/h in GHz per mV
+  let thL = 69 * Math.PI / 180, thR = 11 * Math.PI / 180, V = 0, drag = null, playing = !RM, tNow = 0;
+  const hist = [], HT = 6;
+  const wrap = a => { a = (a + Math.PI) % TAU; if (a < 0) a += TAU; return a - Math.PI; };
+  const degN = a => Math.round(wrap(a) * 180 / Math.PI), deg = a => mn(degN(a));
+  let G = null;
+  function layout(W, H) {
+    const stripH = 74, cy = (H - stripH) / 2 + 6;
+    const R = Math.max(36, Math.min(92, (W - 32 - 110) / 4, (H - stripH - 64) / 2));
+    const D = Math.min(W * 0.3, W / 2 - R - 16);
+    return { W, H, cy, R, cxL: W / 2 - D, cxR: W / 2 + D, stripTop: H - stripH + 10, narrow: W < 560 };
+  }
+  function dial(ctx, cx, cy, R, th, title, sym) {
+    ctx.fillStyle = COL.bg; ctx.strokeStyle = COL.l2; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.arc(cx, cy, R, 0, TAU); ctx.fill(); ctx.stroke();
+    ctx.strokeStyle = COL.fa; ctx.lineWidth = 1;
+    for (let k = 0; k < 12; k++) {
+      const a = k * Math.PI / 6, L = k % 3 === 0 ? 9 : 5;
+      ctx.beginPath(); ctx.moveTo(cx + (R - 3) * Math.cos(a), cy - (R - 3) * Math.sin(a)); ctx.lineTo(cx + (R - 3 - L) * Math.cos(a), cy - (R - 3 - L) * Math.sin(a)); ctx.stroke();
+    }
+    const hx = cx + 0.78 * R * Math.cos(th), hy = cy - 0.78 * R * Math.sin(th);
+    ctx.strokeStyle = COL.fg; ctx.lineWidth = 3; ctx.lineCap = 'round';
+    ctx.beginPath(); ctx.moveTo(cx, cy); ctx.lineTo(hx, hy); ctx.stroke(); ctx.lineCap = 'butt';
+    ctx.fillStyle = COL.fg; ctx.beginPath(); ctx.arc(hx, hy, 6, 0, TAU); ctx.fill();
+    ctx.beginPath(); ctx.arc(cx, cy, 3.5, 0, TAU); ctx.fill();
+    ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+    ctx.font = `400 13px ${SANS}`; ctx.fillStyle = COL.mu; ctx.fillText(title, cx, cy - R - 12);
+    ctx.font = `400 13px ${MONO}`; ctx.fillStyle = COL.fg; ctx.fillText(`${sym} = ${deg(th)}°`, cx, cy + R + 22);
+  }
+  function draw() {
+    const { ctx, W, H } = fit(cv); const g = G = layout(W, H); const { cy, R, cxL, cxR } = g;
+    ctx.clearRect(0, 0, W, H);
+    const phi = wrap(thL - thR), I = Math.sin(phi);
+    // wire and junction symbol
+    ctx.strokeStyle = COL.l2; ctx.lineWidth = 1.5;
+    ctx.beginPath(); ctx.moveTo(cxL + R, cy); ctx.lineTo(cxR - R, cy); ctx.stroke();
+    ctx.strokeStyle = COL.fg; ctx.lineWidth = 2; const s = 8;
+    ctx.beginPath(); ctx.moveTo(W / 2 - s, cy - s); ctx.lineTo(W / 2 + s, cy + s); ctx.moveTo(W / 2 - s, cy + s); ctx.lineTo(W / 2 + s, cy - s); ctx.stroke();
+    dial(ctx, cxL, cy, R, thL, g.narrow ? 'Left' : 'Left superconductor', 'θL');
+    dial(ctx, cxR, cy, R, thR, g.narrow ? 'Right' : 'Right superconductor', 'θR');
+    // current arrow
+    const Lmax = Math.max(20, Math.min(150, (cxR - cxL - 2 * R) / 2 - 16)), L = I * Lmax, ay = cy - 30;
+    ctx.fillStyle = COL.fg; ctx.strokeStyle = COL.fg; ctx.lineWidth = 2.5;
+    if (Math.abs(L) > 3) {
+      const dir = Math.sign(L), x0 = W / 2 - L / 2, x1 = W / 2 + L / 2;
+      ctx.beginPath(); ctx.moveTo(x0, ay); ctx.lineTo(x1 - dir * 9, ay); ctx.stroke(); arrowHead(ctx, x1, ay, dir, 11);
+    } else { ctx.beginPath(); ctx.arc(W / 2, ay, 2, 0, TAU); ctx.fill(); }
+    ctx.textAlign = 'center'; ctx.font = `400 13px ${MONO}`; ctx.fillText(`I = ${nz(I, 2)} Ic`, W / 2, ay - 14);
+    // phase difference
+    const pr = Math.min(20, R * 0.35), py = cy + 30 + pr;
+    ctx.strokeStyle = COL.l2; ctx.lineWidth = 1; ctx.beginPath(); ctx.arc(W / 2, py, pr, 0, TAU); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(W / 2, py); ctx.lineTo(W / 2 + pr, py); ctx.stroke();
+    ctx.strokeStyle = COL.ac; ctx.lineWidth = 2;
+    if (Math.abs(phi) > 1e-3) { ctx.beginPath(); ctx.arc(W / 2, py, pr * 0.62, 0, -phi, phi > 0); ctx.stroke(); }
+    ctx.beginPath(); ctx.moveTo(W / 2, py); ctx.lineTo(W / 2 + pr * Math.cos(phi), py - pr * Math.sin(phi)); ctx.stroke();
+    ctx.fillStyle = COL.ac; ctx.font = `400 13px ${MONO}`; ctx.fillText(`φ = ${deg(phi)}°`, W / 2, py + pr + 18);
+    // strip chart of I(t)
+    const x0 = 16, x1 = W - 16, ym = g.stripTop + 28, A = 22;
+    ctx.strokeStyle = COL.li; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(x0, ym + 0.5); ctx.lineTo(x1, ym + 0.5); ctx.moveTo(x0, ym - A + 0.5); ctx.lineTo(x1, ym - A + 0.5); ctx.moveTo(x0, ym + A + 0.5); ctx.lineTo(x1, ym + A + 0.5); ctx.stroke();
+    ctx.font = `400 11px ${MONO}`; ctx.fillStyle = COL.fa; ctx.textAlign = 'left';
+    ctx.fillText('+Ic', x0 + 2, ym - A - 4); ctx.fillText('−Ic', x0 + 2, ym + A + 13);
+    ctx.textAlign = 'right'; ctx.fillText('current, last 6 s', x1, ym - A - 4);
+    ctx.strokeStyle = COL.fg; ctx.lineWidth = 1.25; ctx.beginPath();
+    if (hist.length > 1) hist.forEach((p, k) => { const x = x1 - (tNow - p[0]) / HT * (x1 - x0), y = ym - A * p[1]; k ? ctx.lineTo(x, y) : ctx.moveTo(x, y); });
+    else { ctx.moveTo(x0, ym - A * I); ctx.lineTo(x1, ym - A * I); }   // nothing has changed yet: a constant current
+    ctx.stroke();
+    // readouts
+    $('r2p').textContent = `${deg(phi)}° = ${nz(phi / Math.PI, 2)}π`;
+    $('r2i').textContent = nz(I, 3);
+    $('r2f').textContent = V > 0 ? (KJ * V / 1000).toFixed(3) + ' GHz' : '0 (no voltage)';
+  }
+  function sync() { sL.value = degN(thL); sR.value = degN(thR); $('o2l').textContent = deg(thL) + '°'; $('o2r').textContent = deg(thR) + '°'; }
+  const running = () => (playing && V > 0) || !!drag;
+  const loop = Loop(dt => {
+    tNow += dt;
+    if (playing && V > 0) { const w = TAU * KJ * V / 1000 * 1e9 / SLOW; thL += w * dt / 2; thR -= w * dt / 2; sync(); }
+    hist.push([tNow, Math.sin(thL - thR)]); while (hist.length && hist[0][0] < tNow - HT) hist.shift();
+    draw();
+  }, running);
+  function hit(x, y) {
+    if (!G) return null;
+    for (const [side, cx] of [['L', G.cxL], ['R', G.cxR]]) if (Math.hypot(x - cx, y - G.cy) < G.R * 1.15) return side;
+    return null;
+  }
+  const local = e => { const r = cv.getBoundingClientRect(); return [e.clientX - r.left, e.clientY - r.top]; };
+  cv.addEventListener('pointerdown', e => {
+    const [x, y] = local(e), side = hit(x, y); if (!side) return;
+    const cx = side === 'L' ? G.cxL : G.cxR;
+    drag = { side, last: Math.atan2(G.cy - y, x - cx), id: e.pointerId };
+    cv.setPointerCapture(e.pointerId); cv.style.cursor = 'grabbing'; e.preventDefault(); loop.kick();
+  });
+  cv.addEventListener('pointermove', e => {
+    const [x, y] = local(e);
+    if (!drag) { cv.style.cursor = hit(x, y) ? 'grab' : 'default'; return; }
+    const cx = drag.side === 'L' ? G.cxL : G.cxR, a = Math.atan2(G.cy - y, x - cx), da = wrap(a - drag.last); drag.last = a;
+    if (drag.side === 'L') thL += da; else thR += da;
+    sync(); if (!running()) draw();
+  });
+  const end = () => { if (drag) { drag = null; cv.style.cursor = 'grab'; draw(); } };
+  cv.addEventListener('pointerup', end); cv.addEventListener('pointercancel', end);
+  cv.addEventListener('touchstart', e => { const t = e.touches[0], r = cv.getBoundingClientRect(); if (hit(t.clientX - r.left, t.clientY - r.top)) e.preventDefault(); }, { passive: false });
+  sL.addEventListener('input', () => { thL = +sL.value * Math.PI / 180; sync(); draw(); });
+  sR.addEventListener('input', () => { thR = +sR.value * Math.PI / 180; sync(); draw(); });
+  sV.addEventListener('input', () => { V = +sV.value; $('o2v').textContent = V.toFixed(1) + ' µV'; draw(); loop.kick(); });
+  bP.addEventListener('click', () => { playing = !playing; setBtn(bP, playing); loop.kick(); });
+  setBtn(bP, playing); sync();
+  watchVisible(cv, v => loop.setVisible(v)); watchSize(cv, draw);
+})();
+
+/* ---------- Figure 3: tilted washboard ---------- */
+(function washboard() {
+  const cv = $('f3'), iv = $('f3iv'), sI = $('s3i'), sG = $('s3g'), bP = $('b3p'), bS = $('b3s'), bC = $('b3c');
+  // time units (1/omega_p) per second of animation; the sweep runs faster so that it stays quasi-static
+  const RATE = 10, RATE_SWEEP = 16, HMAX = 0.02, TW = 10, SWEEP_TOP = 1.4;
+  // bias change per time unit: slower near switching and retrapping, where the ball needs ~1/gamma to settle
+  const sweepRate = () => (sweep < 0 && i < Math.max(0.35, 4 * gam / Math.PI + 0.2)) || (sweep > 0 && i > 0.9 && i < 1.1) ? 0.0012 : 0.004;
+  const gOf = x => 0.05 * Math.pow(40, x);
+  let i = +sI.value, gam = gOf(+sG.value), playing = !RM, sweep = 0;
+  const s = [0, 0]; let t = 0, lastSample = -1, lastTrail = -1, vAvg = 0, iAvg = i;
+  const q = [], trail = [];
+  let phc = 0, blur = 0;
+  function readouts() {
+    $('o3i').textContent = i.toFixed(3); $('o3g').textContent = gam.toFixed(gam < 0.1 ? 3 : 2);
+    $('r3v').textContent = nz(vAvg, 3) + (vAvg > 0.02 ? '  running' : '  trapped');
+    $('r3r').textContent = (4 * gam / Math.PI).toFixed(3);
+  }
+  function simulate(dt) {
+    const T = (sweep ? RATE_SWEEP : RATE) * dt, n = Math.max(1, Math.ceil(T / HMAX)), h = T / n;
+    for (let k = 0; k < n; k++) {
+      if (sweep) {
+        i += sweep * sweepRate() * h;
+        if (i >= SWEEP_TOP) { i = SWEEP_TOP; sweep = -1; }
+        if (i <= 0) { i = 0; sweep = 0; bS.textContent = 'Sweep up and down'; }
+      }
+      JJ.rcsjStep(s, i, gam, h); t += h;
+      if (t - lastSample >= 0.1) { q.push([t, s[0], i]); lastSample = t; while (q.length && q[0][0] < t - TW) q.shift(); }
+    }
+    if (q.length > 2 && t - q[0][0] > 0.5 * TW) {
+      vAvg = Math.max(0, gam * (s[0] - q[0][1]) / (t - q[0][0]));
+      let si = 0; for (const e of q) si += e[2]; iAvg = si / q.length;
+    }
+    if (t - lastTrail >= 0.25) { trail.push([vAvg, iAvg]); if (trail.length > 4000) trail.shift(); lastTrail = t; }
+    if (sweep) { sI.value = i.toFixed(3); }
+    // camera: follow with a dead zone, re-centre gently on the current well
+    const prev = phc, Wphi = phiWindow(), Z = 0.18 * Wphi;
+    if (s[0] > phc + Z) phc = s[0] - Z; else if (s[0] < phc - Z) phc = s[0] + Z;
+    if (i < 1 && Math.abs(s[1]) < 0.5) {
+      const m0 = Math.asin(i), k = Math.round((s[0] - m0) / TAU), target = m0 + TAU * k;
+      phc += (target - phc) * (1 - Math.exp(-dt * 1.5));
+    }
+    blur += (Math.abs(phc - prev) - blur) * 0.3;
+  }
+  let Wcss = 600;
+  const phiWindow = () => (Wcss < 600 ? 3.2 : 5) * Math.PI;
+  function drawBoard() {
+    const { ctx, W, H } = fit(cv); Wcss = W; ctx.clearRect(0, 0, W, H);
+    const Wphi = phiWindow(), kx = W / Wphi, ky = 0.5 * kx, y0 = H * 0.5;
+    const amp = blur > 1e-3 ? Math.sin(blur / 2) / (blur / 2) : 1;
+    const X = p => W / 2 + (p - phc) * kx, Y = u => y0 - (u + i * phc) * ky, U = p => -amp * Math.cos(p) - i * p;
+    // board
+    ctx.beginPath();
+    for (let px = -2; px <= W + 2; px += 2) { const p = phc + (px - W / 2) / kx, y = Y(U(p)); px === -2 ? ctx.moveTo(px, y) : ctx.lineTo(px, y); }
+    ctx.lineTo(W + 2, H + 2); ctx.lineTo(-2, H + 2); ctx.closePath();
+    ctx.fillStyle = '#dcdbd4'; ctx.fill();
+    ctx.beginPath();
+    for (let px = -2; px <= W + 2; px += 2) { const p = phc + (px - W / 2) / kx, y = Y(U(p)); px === -2 ? ctx.moveTo(px, y) : ctx.lineTo(px, y); }
+    ctx.strokeStyle = COL.mu; ctx.lineWidth = 1.5; ctx.stroke();
+    // tilt line
+    ctx.save(); ctx.setLineDash([5, 5]); ctx.strokeStyle = COL.ac; ctx.lineWidth = 1;
+    ctx.beginPath(); ctx.moveTo(0, Y(-i * (phc - W / 2 / kx))); ctx.lineTo(W, Y(-i * (phc + W / 2 / kx))); ctx.stroke(); ctx.restore();
+    // phase ticks
+    ctx.font = `400 11px ${MONO}`; ctx.fillStyle = COL.fa; ctx.strokeStyle = COL.fa; ctx.textAlign = 'center'; ctx.lineWidth = 1;
+    const k0 = Math.ceil((phc - Wphi / 2) / TAU), k1 = Math.floor((phc + Wphi / 2) / TAU);
+    for (let k = k0; k <= k1; k++) {
+      const x = Math.round(X(TAU * k)) + 0.5; if (x < 30) continue;
+      ctx.beginPath(); ctx.moveTo(x, H - 22); ctx.lineTo(x, H - 16); ctx.stroke();
+      ctx.fillText(k === 0 ? '0' : mn(`${2 * k}π`), x, H - 5);
+    }
+    ctx.textAlign = 'left'; ctx.fillText('φ', 8, H - 5);
+    // ball
+    const pb = s[0], up = amp * Math.sin(pb) - i, rB = W < 600 ? 7.5 : 9.5;
+    let nx = -up * ky, ny = -kx; const nn = Math.hypot(nx, ny); nx /= nn; ny /= nn;
+    const bx = X(pb) + nx * rB, by = Y(U(pb)) + ny * rB;
+    const gr = ctx.createRadialGradient(bx - 0.35 * rB, by - 0.4 * rB, 0.1 * rB, bx, by, rB);
+    gr.addColorStop(0, '#fbfbf9'); gr.addColorStop(1, '#8c8c87');
+    ctx.fillStyle = gr; ctx.beginPath(); ctx.arc(bx, by, rB, 0, TAU); ctx.fill();
+    ctx.strokeStyle = '#4a4a46'; ctx.lineWidth = 1; ctx.stroke();
+  }
+  function drawIV() {
+    const { ctx, W, H } = fit(iv); ctx.clearRect(0, 0, W, H);
+    const m = { l: 46, r: 14, t: 16, b: 36 }, bw = W - m.l - m.r, bh = H - m.t - m.b, VM = 1.7, IM = 1.7;
+    const X = v => m.l + v / VM * bw, Y = c => m.t + bh - c / IM * bh;
+    ctx.font = `400 11px ${MONO}`; ctx.lineWidth = 1;
+    for (const v of [0, 0.5, 1, 1.5]) {
+      ctx.strokeStyle = COL.li; ctx.beginPath(); ctx.moveTo(m.l, Math.round(Y(v)) + 0.5); ctx.lineTo(m.l + bw, Math.round(Y(v)) + 0.5); ctx.stroke();
+      ctx.fillStyle = COL.mu; ctx.textAlign = 'right'; ctx.textBaseline = 'middle'; ctx.fillText(v.toString(), m.l - 8, Y(v));
+      ctx.strokeStyle = COL.l2; ctx.beginPath(); ctx.moveTo(Math.round(X(v)) + 0.5, m.t + bh); ctx.lineTo(Math.round(X(v)) + 0.5, m.t + bh + 5); ctx.stroke();
+      ctx.textAlign = 'center'; ctx.textBaseline = 'top'; ctx.fillText(v.toString(), X(v), m.t + bh + 8);
+    }
+    ctx.strokeStyle = COL.l2; ctx.beginPath(); ctx.moveTo(m.l, m.t + bh + 0.5); ctx.lineTo(m.l + bw, m.t + bh + 0.5); ctx.moveTo(m.l - 0.5, m.t); ctx.lineTo(m.l - 0.5, m.t + bh); ctx.stroke();
+    ctx.save(); ctx.setLineDash([4, 4]); ctx.strokeStyle = COL.fa; ctx.beginPath(); ctx.moveTo(X(0), Y(0)); ctx.lineTo(X(1.7), Y(1.7)); ctx.stroke(); ctx.restore();
+    const ir = 4 * gam / Math.PI;
+    if (ir < IM) {
+      ctx.strokeStyle = COL.fa; ctx.beginPath(); ctx.moveTo(m.l - 4, Math.round(Y(ir)) + 0.5); ctx.lineTo(m.l + 6, Math.round(Y(ir)) + 0.5); ctx.stroke();
+      ctx.fillStyle = COL.fa; ctx.textAlign = 'left'; ctx.textBaseline = 'middle'; ctx.fillText('4γ/π', m.l + 9, Y(ir));
+    }
+    ctx.fillStyle = 'rgba(92,92,87,0.55)';
+    for (const [v, c] of trail) ctx.fillRect(X(Math.min(v, VM)) - 1, Y(c) - 1, 2, 2);
+    ctx.fillStyle = COL.ac; ctx.beginPath(); ctx.arc(X(Math.min(vAvg, VM)), Y(i), 4, 0, TAU); ctx.fill();
+    ctx.font = `400 12px ${SANS}`; ctx.fillStyle = COL.mu;
+    ctx.textAlign = 'right'; ctx.textBaseline = 'alphabetic'; ctx.fillText('V / IcR', m.l + bw, H - 4);
+    ctx.textAlign = 'left'; ctx.textBaseline = 'top'; ctx.fillText('I / Ic', 6, 2);
+  }
+  const draw = () => { drawBoard(); drawIV(); readouts(); };
+  const loop = Loop(dt => { simulate(dt); draw(); }, () => playing);
+  sI.addEventListener('input', () => { i = +sI.value; if (sweep) { sweep = 0; bS.textContent = 'Sweep up and down'; } readouts(); if (!playing) draw(); });
+  sG.addEventListener('input', () => { gam = gOf(+sG.value); readouts(); if (!playing) draw(); });
+  bP.addEventListener('click', () => { playing = !playing; setBtn(bP, playing); loop.kick(); });
+  bS.addEventListener('click', () => {
+    if (sweep) { sweep = 0; bS.textContent = 'Sweep up and down'; return; }
+    sweep = i >= SWEEP_TOP ? -1 : 1; bS.textContent = 'Stop sweep';
+    if (!playing) { playing = true; setBtn(bP, true); } loop.kick();
+  });
+  bC.addEventListener('click', () => { trail.length = 0; if (!playing) draw(); });
+  setBtn(bP, playing); readouts();
+  watchVisible(cv, v => loop.setVisible(v)); watchSize(cv, draw); watchSize(iv, draw);
+})();
+
+/* ---------- Figure 4: quantised levels ---------- */
+(function levels() {
+  const cv = $('f4'), sl = $('s4');
+  const EC = 0.25, N = 25, K = 5, NP = 241;
+  const phis = Float64Array.from({ length: NP }, (_, j) => -Math.PI + TAU * j / (NP - 1));
+  let R, res, psis;
+  function compute() {
+    R = Math.pow(10, 2 * +sl.value); const EJ = R * EC;
+    res = JJ.transmon(EJ, EC, 0, N); const half = JJ.transmon(EJ, EC, 0.5, N);
+    psis = []; for (let k = 0; k < K; k++) psis.push(JJ.wavefunction(res.vectors[k], N, phis));
+    const E = res.values, f01 = E[1] - E[0], f12 = E[2] - E[1], H = half.values;
+    $('o4').textContent = R < 10 ? R.toFixed(2) : R.toFixed(1);
+    $('r4a').textContent = f01.toFixed(3) + ' GHz';
+    $('r4b').textContent = f12.toFixed(3) + ' GHz';
+    $('r4c').textContent = mn(((f12 - f01) * 1000).toFixed(0)) + ' MHz';
+    $('r4d').textContent = Math.sqrt(8 * EJ * EC).toFixed(3) + ' GHz';
+    $('r4e').textContent = fmtHz(Math.abs((H[1] - H[0]) - f01));
+    draw();
+  }
+  function niceStep(span, n) { const raw = span / n, p = Math.pow(10, Math.floor(Math.log10(raw))), r = raw / p; return (r < 1.5 ? 1 : r < 3.5 ? 2 : r < 7.5 ? 5 : 10) * p; }
+  function draw() {
+    const { ctx, W, H } = fit(cv); ctx.clearRect(0, 0, W, H);
+    const narrow = W < 560, m = { l: narrow ? 46 : 64, r: narrow ? 40 : 58, t: 16, b: 40 }, bw = W - m.l - m.r, bh = H - m.t - m.b;
+    const EJ = R * EC, E = res.values, hp = Math.sqrt(8 * EJ * EC);
+    const lo = -EJ, hi = Math.max(EJ, E[K - 1] + 0.55 * (E[K - 1] - E[K - 3]) / 2 + 0.05), pad = 0.05 * (hi - lo);
+    const y0 = lo - pad, y1 = hi + pad;
+    const X = p => m.l + (p + Math.PI) / TAU * bw, Y = e => m.t + bh - (e - y0) / (y1 - y0) * bh;
+    // axes
+    ctx.lineWidth = 1; ctx.font = `400 12px ${MONO}`;
+    const st = niceStep(y1 - y0, 6);
+    for (let v = Math.ceil(y0 / st) * st; v <= y1; v += st) {
+      const y = Math.round(Y(v)) + 0.5;
+      ctx.strokeStyle = COL.li; ctx.beginPath(); ctx.moveTo(m.l, y); ctx.lineTo(m.l + bw, y); ctx.stroke();
+      ctx.fillStyle = COL.mu; ctx.textAlign = 'right'; ctx.textBaseline = 'middle'; ctx.fillText(nz(v, st < 1 ? (st < 0.1 ? 2 : 1) : 0), m.l - 8, y);
+    }
+    const xt = [[-Math.PI, '−π'], [-Math.PI / 2, '−π/2'], [0, '0'], [Math.PI / 2, 'π/2'], [Math.PI, 'π']];
+    ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+    for (const [p, s] of xt) { const x = Math.round(X(p)) + 0.5; ctx.strokeStyle = COL.l2; ctx.beginPath(); ctx.moveTo(x, m.t + bh); ctx.lineTo(x, m.t + bh + 5); ctx.stroke(); ctx.fillStyle = COL.mu; ctx.fillText(s, x, m.t + bh + 9); }
+    ctx.strokeStyle = COL.l2; ctx.beginPath(); ctx.moveTo(m.l, m.t + bh + 0.5); ctx.lineTo(m.l + bw, m.t + bh + 0.5); ctx.stroke();
+    ctx.font = `400 13px ${SANS}`; ctx.fillStyle = COL.mu; ctx.textAlign = 'right'; ctx.textBaseline = 'alphabetic'; ctx.fillText('φ', m.l + bw, H - 4);
+    ctx.save(); ctx.translate(14, m.t + bh / 2); ctx.rotate(-Math.PI / 2); ctx.textAlign = 'center'; ctx.fillText('E / h  (GHz)', 0, 0); ctx.restore();
+    // potential
+    ctx.strokeStyle = COL.ac; ctx.lineWidth = 2; ctx.beginPath();
+    for (let j = 0; j <= 200; j++) { const p = -Math.PI + TAU * j / 200, x = X(p), y = Y(-EJ * Math.cos(p)); j ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }
+    ctx.stroke();
+    // harmonic ticks in the right margin
+    ctx.save(); ctx.setLineDash([4, 3]); ctx.strokeStyle = COL.fa; ctx.lineWidth = 1.25;
+    for (let k = 0; k < K; k++) { const y = Y(-EJ + hp * (k + 0.5)); if (y < m.t - 2) continue; ctx.beginPath(); ctx.moveTo(m.l + bw + 6, y); ctx.lineTo(W - 6, y); ctx.stroke(); }
+    ctx.restore();
+    ctx.font = `400 11px ${SANS}`; ctx.fillStyle = COL.fa; ctx.textAlign = 'center'; ctx.textBaseline = 'alphabetic';
+    ctx.fillText('HO', m.l + bw + (W - m.l - bw) / 2 + 2, m.t + 10);
+    // levels and wavefunctions
+    const pxPer = bh / (y1 - y0), A = Math.max(9, Math.min(32, 0.36 * (E[K - 1] - E[0]) / (K - 1) * pxPer));
+    let lastLabelY = 1e9, shift = 0;
+    for (let k = 0; k < K; k++) {
+      const yk = Y(E[k]), ratio = -E[k] / EJ, pt = ratio <= -1 ? Math.PI : ratio >= 1 ? 0 : Math.acos(ratio);
+      ctx.strokeStyle = COL.fg; ctx.lineWidth = k < 2 ? 1.5 : 1;
+      ctx.beginPath(); ctx.moveTo(X(-pt), Math.round(yk) + 0.5); ctx.lineTo(X(pt), Math.round(yk) + 0.5); ctx.stroke();
+      const ps = psis[k];
+      ctx.beginPath(); ctx.moveTo(X(phis[0]), yk);
+      for (let j = 0; j < NP; j++) ctx.lineTo(X(phis[j]), yk - A * ps[j]);
+      ctx.lineTo(X(phis[NP - 1]), yk); ctx.closePath();
+      ctx.fillStyle = 'rgba(18,18,18,0.07)'; ctx.fill();
+      ctx.beginPath(); for (let j = 0; j < NP; j++) { const x = X(phis[j]), y = yk - A * ps[j]; j ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }
+      ctx.strokeStyle = 'rgba(18,18,18,0.75)'; ctx.lineWidth = 1.25; ctx.stroke();
+      ctx.fillStyle = COL.fg; ctx.font = `400 12px ${MONO}`; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+      shift = Math.abs(lastLabelY - yk) < 12 ? shift + 11 : 0; lastLabelY = yk;   // near-degenerate pairs side by side
+      ctx.fillText(String(k), Math.min(X(pt) + 6, m.l + bw - 4) + shift, yk);
+    }
+  }
+  sl.addEventListener('input', compute);
+  watchSize(cv, () => { if (res) draw(); });
+  compute();
+})();
+
+addEventListener('load', () => {
+  if (window.renderMathInElement) renderMathInElement(document.body, { delimiters: [{ left: '$$', right: '$$', display: true }, { left: '\\(', right: '\\)', display: false }], throwOnError: false });
+});
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+const $ = id => document.getElementById(id);
+const RM = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+const JJ = window.JJ;
+const sstep = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
+const fade = (z, [a, b, c, d]) => (a < 0 ? 1 : sstep(a, b, z)) * (d > 1 ? 1 : 1 - sstep(c, d, z));
+const STAGE = 0xe9e9e4;
+
+function makeRenderer(cv) {
+  const r = new THREE.WebGLRenderer({ canvas: cv, antialias: true });
+  r.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  return r;
+}
+function noGL(cv) {
+  const d = document.createElement('div'); d.className = 'nogl';
+  d.textContent = 'This figure needs WebGL, which is not available in this browser.';
+  cv.replaceWith(d);
+}
+function lenText(um) {
+  if (um >= 1000) return +(um / 1000).toPrecision(2) + ' mm';
+  if (um >= 1) return +um.toPrecision(2) + ' µm';
+  return Math.round(um * 1000) + ' nm';
+}
+function svgLabel(x, y, dx, dy, text, op, W, H) {
+  const tw = 7 * text.length + 8;                       // keep the label inside the stage
+  if (dx > 0 && x + dx + tw > W - 6) dx = -dx; else if (dx < 0 && x + dx - tw < 6) dx = -dx;
+  if (y + dy < 16) dy = -dy; else if (y + dy > H - 40) dy = -dy;
+  const x2 = x + dx, y2 = y + dy, anchor = dx < 0 ? 'end' : 'start', tx = x2 + (dx < 0 ? -5 : 5);
+  return `<g opacity="${op.toFixed(3)}"><line x1="${x.toFixed(1)}" y1="${y.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="#93938d" stroke-width="1"/>` +
+    `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="2.5" fill="#121212"/>` +
+    `<text x="${tx.toFixed(1)}" y="${(y2 + 4).toFixed(1)}" text-anchor="${anchor}" stroke="#e9e9e4" stroke-width="4" paint-order="stroke" stroke-linejoin="round">${text}</text></g>`;
+}
+
+/* ---------- Figure 1: anatomy of a transmon ---------- */
+(function chip() {
+  const cv = $('f1'), ov = $('f1-ov'), sZ = $('s1z'), sS = $('s1s');
+  let renderer; try { renderer = makeRenderer(cv); } catch (e) { noGL(cv); return; }
+  const scene = new THREE.Scene(); scene.background = new THREE.Color(STAGE);
+  const pmrem = new THREE.PMREMGenerator(renderer);
+  scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+  scene.add(new THREE.HemisphereLight(0xffffff, 0xa6a6a0, 1.1));
+  const sun = new THREE.DirectionalLight(0xffffff, 1.5); sun.position.set(-0.9, 2.2, 1.3); scene.add(sun);
+
+  const al = new THREE.MeshStandardMaterial({ color: 0xc9ccd1, metalness: 0.6, roughness: 0.45, envMapIntensity: 0.7 });
+  const si = new THREE.MeshStandardMaterial({ color: 0x8d97a6, metalness: 0, roughness: 0.85, envMapIntensity: 0.5 });
+  const ox = new THREE.MeshStandardMaterial({ color: 0xd9a441, metalness: 0, roughness: 0.6, transparent: true, opacity: 0.6, envMapIntensity: 0.5 });
+
+  const box = (x0, x1, y0, y1, z0, z1, m) => { const me = new THREE.Mesh(new THREE.BoxGeometry(x1 - x0, y1 - y0, z1 - z0), m); me.position.set((x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2); return me; };
+  const prism = (pts, m) => { // polygon in the (x, z) plane, unit height
+    const g = new THREE.ExtrudeGeometry(new THREE.Shape(pts.map(([x, z]) => new THREE.Vector2(x, -z))), { depth: 1, bevelEnabled: false });
+    g.rotateX(-Math.PI / 2); return new THREE.Mesh(g, m);
+  };
+  // units: micrometres; substrate top at y = 0, junction at the origin
+  scene.add(box(-650, 1200, -250, 0, -700, 700, si));
+  const metal = new THREE.Group(); scene.add(metal);
+  const M = (x0, x1, z0, z1) => metal.add(box(x0, x1, 0, 1, z0, z1, al));
+  M(-425, -25, -300, 300); M(25, 425, -300, 300);                 // capacitor pads, 400 x 600 um, 50 um gap
+  M(445, 475, -120, 120); M(475, 605, -5, 5);                      // coupling pad and connector
+  const xs = k => 600 + 50 * k;
+  for (let k = 0; k <= 6; k++) M(xs(k) - 5, xs(k) + 5, -305, k === 0 ? 5 : 305);   // meander runs
+  for (let k = 0; k < 6; k++) { const zc = k % 2 === 0 ? -300 : 300; M(xs(k) - 5, xs(k + 1) + 5, zc - 5, zc + 5); }
+  M(895, 980, 295, 305);                                           // open end towards the feedline
+  M(1000, 1020, -680, 680);                                        // feedline
+  // leads: tapered from 4 um at the pad to the 0.2 um junction fingers
+  const a = [Math.SQRT1_2, Math.SQRT1_2], b = [-Math.SQRT1_2, Math.SQRT1_2], w = 0.2;
+  const Sb = [-2 * a[0], -2 * a[1]], St = [-2 * b[0], -2 * b[1]];
+  function lead(P0, P1, w0, w1) {
+    const dx = P1[0] - P0[0], dz = P1[1] - P0[1], L = Math.hypot(dx, dz), d = [dx / L, dz / L], n = [-d[1], d[0]];
+    const E = [P1[0] + d[0] * 0.06, P1[1] + d[1] * 0.06];
+    return prism([[P0[0] + n[0] * w0 / 2, P0[1] + n[1] * w0 / 2], [E[0] + n[0] * w1 / 2, E[1] + n[1] * w1 / 2], [E[0] - n[0] * w1 / 2, E[1] - n[1] * w1 / 2], [P0[0] - n[0] * w0 / 2, P0[1] - n[1] * w0 / 2]], al);
+  }
+  metal.add(lead([-25.5, 0], Sb, 4, w), lead([25.5, 0], St, 4, w));
+  // the junction itself (display thicknesses: bottom 35 nm, oxide 12 nm, top 50 nm)
+  const t1 = 0.035, tox = 0.012, t2 = 0.05, ramp = 0.04;
+  const psiA = Math.atan2(-a[1], a[0]), psiB = Math.atan2(-b[1], b[0]);
+  const bottom = new THREE.Mesh(new THREE.BoxGeometry(2.38, t1, w).translate((-2.08 + 0.3) / 2, t1 / 2, 0), al); bottom.rotation.y = psiA; scene.add(bottom);
+  const e = t1 + tox + 0.001;
+  const prof = [[-2.08, 0], [-w / 2 - ramp, 0], [-w / 2, e], [w / 2, e], [w / 2 + ramp, 0], [0.3, 0], [0.3, t2], [w / 2 + ramp, t2], [w / 2, e + t2], [-w / 2, e + t2], [-w / 2 - ramp, t2], [-2.08, t2]];
+  const topG = new THREE.ExtrudeGeometry(new THREE.Shape(prof.map(([u, v]) => new THREE.Vector2(u, v))), { depth: w, bevelEnabled: false }).translate(0, 0, -w / 2);
+  const top = new THREE.Mesh(topG, al); top.rotation.y = psiB; scene.add(top);
+  const oxide = new THREE.Mesh(new THREE.BoxGeometry(w, tox, w).translate(0, t1 + tox / 2, 0), ox); oxide.rotation.y = psiA; scene.add(oxide);
+
+  const FOV = 35, tanH = Math.tan(FOV * Math.PI / 360);
+  const camera = new THREE.PerspectiveCamera(FOV, 2, 0.1, 1e5);
+  const dir = new THREE.Vector3(-0.35, 0.95, 1).normalize();
+  camera.position.copy(dir).multiplyScalar(2000);
+  const controls = new OrbitControls(camera, cv);
+  controls.enableZoom = false; controls.enablePan = false; controls.enableDamping = false;
+  controls.rotateSpeed = 0.7; controls.minPolarAngle = 0.12; controls.maxPolarAngle = 1.32;
+  cv.style.touchAction = 'pan-y';
+  const T0 = new THREE.Vector3(275, 0, 0);
+  let d0 = 2000, d1 = 1.5, zoom = 0, sep = 0, W = 1, H = 1, dist = 2000;
+  function ranges() { const asp = W / H; d0 = Math.max(1180 / (tanH * asp), 660 / tanH); d1 = 1.3 / (tanH * Math.min(asp, 1.6)); }
+  function hChip(z) { const s = sstep(0.12, 0.62, z); return Math.exp(Math.log(10) * (1 - s) + Math.log(0.04) * s); }
+  function place() {
+    dist = d0 * Math.pow(d1 / d0, zoom);
+    const tg = T0.clone().multiplyScalar((dist - d1) / (d0 - d1));
+    const cur = camera.position.clone().sub(controls.target); if (cur.lengthSq() > 0) dir.copy(cur.normalize());
+    controls.target.copy(tg); camera.position.copy(tg).addScaledVector(dir, dist); controls.update();
+    metal.scale.y = hChip(zoom);
+    top.position.y = sep * 0.3; oxide.position.y = sep * 0.14;
+  }
+  const hm = () => metal.scale.y;
+  const LABELS = [
+    { t: 'Capacitor pad', p: () => [-225, hm(), -170], o: [-46, -38], z: [-1, 0, 0.2, 0.32] },
+    { t: 'Capacitor pad', p: () => [225, hm(), -170], o: [40, -38], z: [-1, 0, 0.2, 0.32] },
+    { t: 'Readout resonator', p: () => [750, hm(), -300], o: [36, -34], z: [-1, 0, 0.2, 0.32] },
+    { t: 'Feedline', p: () => [1010, hm(), 480], o: [30, -26], z: [-1, 0, 0.2, 0.32] },
+    { t: 'Junction', p: () => [0, hm(), 0], o: [-36, 54], z: [-1, 0, 0.58, 0.7] },
+    { t: 'Leads', p: () => [12, hm(), -0.8], o: [40, -40], z: [0.36, 0.44, 0.6, 0.7] },
+    { t: 'Bottom electrode, Al', p: () => [-0.6 * a[0], t1, -0.6 * a[1]], o: [-44, 46], z: [0.74, 0.86, 2, 2] },
+    { t: 'Top electrode, Al', p: () => [-0.6 * b[0], t2 + sep * 0.3, -0.6 * b[1]], o: [44, -46], z: [0.74, 0.86, 2, 2] },
+    { t: 'AlOx barrier, 1–2 nm thick', p: () => [0, t1 + tox + sep * 0.14, 0], o: [-60, -62], z: [0.8, 0.9, 2, 2] }
+  ];
+  const v3 = new THREE.Vector3();
+  function overlay() {
+    let s = '';
+    for (const L of LABELS) {
+      const op = fade(zoom, L.z); if (op < 0.01) continue;
+      const [x, y, z] = L.p(); v3.set(x, y, z).project(camera);
+      if (v3.z > 1 || Math.abs(v3.x) > 1.2 || Math.abs(v3.y) > 1.2) continue;
+      s += svgLabel((v3.x + 1) / 2 * W, (1 - v3.y) / 2 * H, L.o[0], L.o[1], L.t, op, W, H);
+    }
+    // scale bar at the centre of view
+    const pxPerUm = H / (2 * dist * tanH);
+    let len = 1; const want = 110 / pxPerUm, p = Math.pow(10, Math.floor(Math.log10(want)));
+    for (const m of [1, 2, 5, 10]) if (m * p <= want) len = m * p;
+    const bl = len * pxPerUm, x0 = 18, y0 = H - 20;
+    s += `<g><line x1="${x0}" y1="${y0}" x2="${(x0 + bl).toFixed(1)}" y2="${y0}" stroke="#121212" stroke-width="1.5"/>` +
+      `<line x1="${x0}" y1="${y0 - 5}" x2="${x0}" y2="${y0 + 5}" stroke="#121212"/><line x1="${(x0 + bl).toFixed(1)}" y1="${y0 - 5}" x2="${(x0 + bl).toFixed(1)}" y2="${y0 + 5}" stroke="#121212"/>` +
+      `<text x="${x0}" y="${y0 - 10}" style="font-family:'IBM Plex Mono',monospace;fill:#121212">${lenText(len)}</text></g>`;
+    ov.innerHTML = s;
+  }
+  function render() {
+    camera.near = dist * 0.01; camera.far = dist * 30 + 6000; camera.updateProjectionMatrix();
+    renderer.render(scene, camera); overlay();
+  }
+  function resize() {
+    W = cv.clientWidth; H = cv.clientHeight; if (!W || !H) return;
+    renderer.setSize(W, H, false); camera.aspect = W / H; ranges(); place(); render();
+  }
+  function outputs() {
+    $('o1z').textContent = 'view ' + lenText(2 * dist * tanH * W / H);
+    $('o1s').textContent = sep.toFixed(2);
+  }
+  controls.addEventListener('change', render);
+  sZ.addEventListener('input', () => { zoom = +sZ.value; place(); outputs(); render(); });
+  sS.addEventListener('input', () => { sep = +sS.value; place(); outputs(); render(); });
+  new ResizeObserver(() => { resize(); outputs(); }).observe(cv);
+})();
+
+/* ---------- Figure 5: Bloch sphere ---------- */
+(function bloch() {
+  const cv = $('f5'), ov = $('f5-ov'), tr = $('f5t');
+  const sO = $('s5o'), sD = $('s5d'), sT1 = $('s5t1'), sT2 = $('s5t2'), cR = $('c5r'), bP = $('b5p'), bR = $('b5r'), bPi = $('b5pi');
+  let renderer; try { renderer = makeRenderer(cv); } catch (e) { noGL(cv); return; }
+  const B = (x, y, z) => new THREE.Vector3(x, z, -y);          // Bloch (x, y, z) -> three.js, z up
+  const scene = new THREE.Scene(); scene.background = new THREE.Color(STAGE);
+  scene.add(new THREE.HemisphereLight(0xffffff, 0xa6a6a0, 2.0));
+  const sun = new THREE.DirectionalLight(0xffffff, 1.6); sun.position.set(2, 3, 1.5); scene.add(sun);
+  const camera = new THREE.PerspectiveCamera(30, 2, 0.1, 100);
+  camera.position.copy(B(3.0, 1.15, 1.45).normalize().multiplyScalar(5.6));
+  const controls = new OrbitControls(camera, cv);
+  controls.enableZoom = false; controls.enablePan = false; controls.rotateSpeed = 0.8;
+  cv.style.touchAction = 'pan-y';
+
+  scene.add(new THREE.Mesh(new THREE.SphereGeometry(1, 64, 32), new THREE.MeshStandardMaterial({ color: 0xffffff, roughness: 0.95, metalness: 0, transparent: true, opacity: 0.35, side: THREE.BackSide, depthWrite: false })));
+  const light = new THREE.LineBasicMaterial({ color: 0xc4c4bd }), dark = new THREE.LineBasicMaterial({ color: 0x9a9a94 });
+  const loop3 = (f, mat) => { const pts = []; for (let k = 0; k <= 128; k++) pts.push(f(k / 128 * Math.PI * 2)); return new THREE.Line(new THREE.BufferGeometry().setFromPoints(pts), mat); };
+  const R1 = 1.002;
+  for (const lat of [-60, -30, 0, 30, 60]) { const r = Math.cos(lat * Math.PI / 180) * R1, y = Math.sin(lat * Math.PI / 180) * R1; scene.add(loop3(t => new THREE.Vector3(r * Math.cos(t), y, r * Math.sin(t)), lat === 0 ? dark : light)); }
+  for (const az of [0, 30, 60, 90, 120, 150]) { const c = Math.cos(az * Math.PI / 180), s = Math.sin(az * Math.PI / 180); scene.add(loop3(t => new THREE.Vector3(R1 * Math.cos(t) * c, R1 * Math.sin(t), R1 * Math.cos(t) * s), az % 90 === 0 ? dark : light)); }
+  for (const [p, q] of [[B(-1.3, 0, 0), B(1.3, 0, 0)], [B(0, -1.3, 0), B(0, 1.3, 0)], [B(0, 0, -1.3), B(0, 0, 1.3)]]) scene.add(new THREE.Line(new THREE.BufferGeometry().setFromPoints([p, q]), dark));
+  // state arrow
+  const red = new THREE.MeshStandardMaterial({ color: 0xcf1f25, roughness: 0.5, metalness: 0 });
+  const shaft = new THREE.Mesh(new THREE.CylinderGeometry(0.017, 0.017, 1, 16).translate(0, 0.5, 0), red);
+  const head = new THREE.Mesh(new THREE.ConeGeometry(0.05, 0.14, 24).translate(0, -0.07, 0), red);
+  const arrow = new THREE.Group(); arrow.add(shaft, head); scene.add(arrow);
+  const UP = new THREE.Vector3(0, 1, 0);
+  // trail
+  const NT = 700, tPos = new Float32Array(NT * 3), tCol = new Float32Array(NT * 3), pts = [];
+  const tGeo = new THREE.BufferGeometry(); tGeo.setAttribute('position', new THREE.BufferAttribute(tPos, 3)); tGeo.setAttribute('color', new THREE.BufferAttribute(tCol, 3));
+  scene.add(new THREE.Line(tGeo, new THREE.LineBasicMaterial({ vertexColors: true })));
+  const cBg = new THREE.Color(STAGE), cRed = new THREE.Color(0xcf1f25);
+  // precession axis
+  const axGeo = new THREE.BufferGeometry().setFromPoints([new THREE.Vector3(), new THREE.Vector3(0, 1, 0)]);
+  const axLine = new THREE.Line(axGeo, new THREE.LineDashedMaterial({ color: 0x6f6f69, dashSize: 0.06, gapSize: 0.045 })); scene.add(axLine);
+
+  const SPEED = 0.2, HMAX = 0.0005, TWIN = 3;              // 0.2 us of qubit time per second; trace window 3 us
+  let v = [0, 0, 1], t = 0, mode = 'idle', angleLeft = 0, Om = 0, De = 0, T1 = 1.5, T2 = 1, relax = false, visible = false, autoplayed = false;
+  const trace = [];
+  function readParams() {
+    Om = 2 * Math.PI * +sO.value; De = 2 * Math.PI * +sD.value; T1 = +sT1.value;
+    if (+sT2.value > 2 * T1) sT2.value = (2 * T1).toFixed(1);
+    T2 = +sT2.value; relax = cR.checked;
+    $('o5o').textContent = (+sO.value).toFixed(1) + ' MHz'; $('o5d').textContent = nz(+sD.value, 1) + ' MHz';
+    $('o5t1').textContent = T1.toFixed(1) + ' µs'; $('o5t2').textContent = T2.toFixed(1) + ' µs';
+    sT1.disabled = sT2.disabled = !relax; bPi.disabled = Om <= 0;
+    for (const el of [sT1, sT2]) el.parentElement.classList.toggle('off', !relax);
+    const n = Math.hypot(Om, De);
+    if (n > 0) { const u = B(Om / n, 0, De / n); axGeo.setFromPoints([u.clone().multiplyScalar(-1.3), u.clone().multiplyScalar(1.3)]); axLine.computeLineDistances(); axLine.visible = true; } else axLine.visible = false;
+  }
+  function nz(x, d) { const s = x.toFixed(d); return (/^-0\.?0*$/.test(s) ? s.slice(1) : s).replace(/-/g, '−'); }
+  function pushTrail() {
+    const p = B(v[0], v[1], v[2]);
+    if (pts.length && pts[pts.length - 1].distanceToSquared(p) < 1e-5) return;
+    pts.push(p); if (pts.length > NT) pts.shift();
+    const n = pts.length, c = new THREE.Color();
+    for (let k = 0; k < n; k++) { tPos[3 * k] = pts[k].x; tPos[3 * k + 1] = pts[k].y; tPos[3 * k + 2] = pts[k].z; c.copy(cBg).lerp(cRed, Math.pow((k + 1) / n, 1.5)); tCol[3 * k] = c.r; tCol[3 * k + 1] = c.g; tCol[3 * k + 2] = c.b; }
+    tGeo.setDrawRange(0, n); tGeo.attributes.position.needsUpdate = true; tGeo.attributes.color.needsUpdate = true; tGeo.computeBoundingSphere();
+  }
+  function setArrow() {
+    const p = B(v[0], v[1], v[2]), L = p.length();
+    if (L < 1e-3) { arrow.visible = false; return; }
+    arrow.visible = true; arrow.quaternion.setFromUnitVectors(UP, p.clone().divideScalar(L));
+    const hl = Math.min(0.14, L); head.scale.setScalar(hl / 0.14); head.position.y = L; shaft.scale.y = Math.max(L - hl * 0.9, 1e-4);
+  }
+  const v3 = new THREE.Vector3();
+  const LBL = [['|0⟩', B(0, 0, 1.2), 10, -6], ['|1⟩', B(0, 0, -1.2), 10, 14], ['|+⟩', B(1.3, 0, 0), -4, 18], ['|+i⟩', B(0, 1.3, 0), 6, 5]];
+  function overlay() {
+    const W = cv.clientWidth, H = cv.clientHeight; let s = '';
+    for (const [txt, p, dx, dy] of LBL) {
+      v3.copy(p).project(camera); const x = (v3.x + 1) / 2 * W, y = (1 - v3.y) / 2 * H;
+      s += `<text class="k" x="${(x + dx).toFixed(1)}" y="${(y + dy).toFixed(1)}" stroke="#e9e9e4" stroke-width="4" paint-order="stroke">${txt}</text>`;
+    }
+    ov.innerHTML = s;
+  }
+  function render() { setArrow(); renderer.render(scene, camera); overlay(); }
+  function drawTrace() {
+    const r = tr.getBoundingClientRect(), dpr = Math.min(window.devicePixelRatio || 1, 2);
+    const w = Math.round(r.width * dpr), h = Math.round(r.height * dpr); if (tr.width !== w || tr.height !== h) { tr.width = w; tr.height = h; }
+    const ctx = tr.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    const W = r.width, H = r.height, m = { l: 58, r: 14, t: 12, b: 26 }, bw = W - m.l - m.r, bh = H - m.t - m.b;
+    ctx.clearRect(0, 0, W, H);
+    const tmin = Math.max(0, t - TWIN), X = s => m.l + (s - tmin) / TWIN * bw, Y = p => m.t + bh - p * bh;
+    ctx.font = `400 11px "IBM Plex Mono", monospace`; ctx.lineWidth = 1;
+    for (const p of [0, 0.5, 1]) { const y = Math.round(Y(p)) + 0.5; ctx.strokeStyle = '#dbdbd5'; ctx.beginPath(); ctx.moveTo(m.l, y); ctx.lineTo(m.l + bw, y); ctx.stroke(); ctx.fillStyle = '#5c5c57'; ctx.textAlign = 'right'; ctx.textBaseline = 'middle'; ctx.fillText(p.toString(), m.l - 8, y); }
+    ctx.textAlign = 'center'; ctx.textBaseline = 'top';
+    for (let s = Math.ceil(tmin * 2) / 2; s <= tmin + TWIN + 1e-9; s += 0.5) { const x = Math.round(X(s)) + 0.5; ctx.strokeStyle = '#c4c4bd'; ctx.beginPath(); ctx.moveTo(x, m.t + bh); ctx.lineTo(x, m.t + bh + 4); ctx.stroke(); if (x > W - 56) continue; ctx.fillStyle = '#5c5c57'; ctx.fillText(s.toFixed(1), x, m.t + bh + 7); }
+    ctx.font = `400 12px "IBM Plex Sans", sans-serif`; ctx.textAlign = 'right'; ctx.textBaseline = 'alphabetic'; ctx.fillStyle = '#5c5c57'; ctx.fillText('t (µs)', W - 6, H - 5);
+    ctx.save(); ctx.translate(14, m.t + bh / 2); ctx.rotate(-Math.PI / 2); ctx.textAlign = 'center'; ctx.fillText('P(|1⟩)', 0, 0); ctx.restore();
+    if (Om > 0) {
+      const pm = Om * Om / (Om * Om + De * De); ctx.save(); ctx.setLineDash([4, 4]); ctx.strokeStyle = '#93938d';
+      ctx.beginPath(); ctx.moveTo(m.l, Math.round(Y(pm)) + 0.5); ctx.lineTo(m.l + bw, Math.round(Y(pm)) + 0.5); ctx.stroke(); ctx.restore();
+    }
+    if (trace.length > 1) {
+      ctx.strokeStyle = '#121212'; ctx.lineWidth = 1.25; ctx.beginPath(); let first = true;
+      for (const [s, p] of trace) { if (s < tmin) continue; const x = X(s), y = Y(p); first ? ctx.moveTo(x, y) : ctx.lineTo(x, y); first = false; }
+      ctx.stroke();
+    }
+    const p1 = (1 - v[2]) / 2; ctx.fillStyle = '#cf1f25'; ctx.beginPath(); ctx.arc(X(t), Y(p1), 3.5, 0, Math.PI * 2); ctx.fill();
+  }
+  function outputs() { $('r5p').textContent = ((1 - v[2]) / 2).toFixed(3); $('r5t').textContent = (t * 1000).toFixed(0) + ' ns'; }
+  function advance(T, drive) { JJ.blochAdvance(v, drive, De, relax ? T1 : Infinity, relax ? T2 : Infinity, T, HMAX); t += T; trace.push([t, (1 - v[2]) / 2]); while (trace.length && trace[0][0] < t - TWIN - 0.2) trace.shift(); }
+  function setMode(m) { mode = m; bP.textContent = m === 'drive' ? 'Pause' : 'Play'; bP.setAttribute('aria-pressed', m === 'drive' ? 'true' : 'false'); kick(); }
+  let raf = 0, last = 0;
+  function tick(now) {
+    raf = 0; if (!(visible && mode !== 'idle')) { last = 0; return; }
+    const dt = last ? Math.min(0.05, (now - last) / 1000) : 1 / 60; last = now;
+    let T = SPEED * dt; const nsub = Math.max(1, Math.ceil(T / 0.002)), h = T / nsub;
+    for (let k = 0; k < nsub; k++) {
+      if (mode === 'pulse') {
+        const need = angleLeft / Om;
+        if (need <= h) { advance(need, Om); angleLeft = 0; pushTrail(); setMode('idle'); break; }
+        advance(h, Om); angleLeft -= Om * h;
+      } else advance(h, Om);
+      pushTrail();
+    }
+    render(); drawTrace(); outputs();
+    raf = requestAnimationFrame(tick);
+  }
+  function kick() { if (visible && mode !== 'idle' && !raf) { last = 0; raf = requestAnimationFrame(tick); } }
+  function reset() { v = [0, 0, 1]; t = 0; trace.length = 0; pts.length = 0; tGeo.setDrawRange(0, 0); if (mode === 'pulse') setMode('idle'); pushTrail(); render(); drawTrace(); outputs(); }
+  for (const el of [sO, sD, sT1, sT2, cR]) el.addEventListener('input', () => { readParams(); if (Om <= 0 && mode === 'pulse') setMode('idle'); render(); drawTrace(); });
+  bP.addEventListener('click', () => setMode(mode === 'drive' ? 'idle' : 'drive'));
+  bR.addEventListener('click', reset);
+  bPi.addEventListener('click', () => { if (Om <= 0) return; angleLeft = Math.PI; setMode('pulse'); });
+  controls.addEventListener('change', render);
+  function resize() { const W = cv.clientWidth, H = cv.clientHeight; if (!W || !H) return; renderer.setSize(W, H, false); camera.aspect = W / H; camera.updateProjectionMatrix(); render(); drawTrace(); }
+  new ResizeObserver(resize).observe(cv);
+  new ResizeObserver(drawTrace).observe(tr);
+  new IntersectionObserver(es => {
+    visible = es[es.length - 1].isIntersecting;
+    if (visible && !autoplayed && !RM) { autoplayed = true; setMode('drive'); }
+    kick();
+  }, { rootMargin: '80px' }).observe(cv);
+  readParams(); reset(); setMode('idle');
+})();
+</script>
+</body>
+</html>
