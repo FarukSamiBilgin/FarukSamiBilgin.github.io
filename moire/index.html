@@ -1,0 +1,1980 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Inside a moiré qubit — Faruk Sami Bilgin</title>
+<meta name="description" content="A three-dimensional teardown of a gated, hBN-encapsulated twisted bilayer, from the chip on its carrier down to the moiré potential a single hole feels, followed by models of six device concepts from my research, each tied to the numbers that decided it.">
+<meta property="og:title" content="Inside a moiré qubit">
+<meta property="og:description" content="A gated moiré device taken apart from millimetres to ångströms, and six model devices built from the geometries in my manuscripts.">
+<meta name="color-scheme" content="light">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230a0a0a'/%3E%3Cg fill='%23f2f2f0'%3E%3Ccircle cx='9' cy='11' r='1.8'/%3E%3Ccircle cx='16' cy='11' r='1.8'/%3E%3Ccircle cx='23' cy='11' r='1.8'/%3E%3Ccircle cx='12.5' cy='17' r='1.8'/%3E%3Ccircle cx='19.5' cy='17' r='1.8'/%3E%3Ccircle cx='9' cy='23' r='1.8'/%3E%3Ccircle cx='16' cy='23' r='1.8'/%3E%3Ccircle cx='23' cy='23' r='1.8'/%3E%3C/g%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:ital,wdth,wght@0,62..125,100..900;1,62..125,100..900&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
+<style>
+:root{
+  --sans:"Archivo",-apple-system,"Segoe UI",Helvetica,Arial,sans-serif;
+  --serif:"Archivo",Georgia,"Times New Roman",serif;
+  --mono:"Archivo",ui-monospace,Consolas,Menlo,monospace;
+  --bg:#f4f4f1;--fg:#121212;--muted:#5c5c57;--faint:#93938d;--line:#dbdbd5;--line2:#c4c4bd;--accent:#da291c;--stage:#e9e9e4;
+  --ink:#0a0a0a;--dfg:#ecebe6;--dmu:#a6a59e;--dfa:#6c6b66;--dline:#262624;--gold:#e2b65c;
+  --bar:52px;
+}
+*{box-sizing:border-box}
+html{background:var(--bg)}
+body{margin:0;background:var(--bg);color:var(--fg);font:400 19px/1.65 var(--serif);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+a{color:inherit;text-decoration-color:var(--line2);text-underline-offset:3px}
+a:hover{text-decoration-color:var(--accent)}
+.sr{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+sub{line-height:0}
+.katex{font-size:1.04em}
+.katex-display{margin:1.1em 0 1.3em;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+
+.top{position:fixed;inset:0 0 auto 0;z-index:20;height:var(--bar);display:flex;align-items:center;justify-content:space-between;padding:0 40px;font:500 12px var(--sans);letter-spacing:.16em;text-transform:uppercase;color:#f2f2f0;background:#0a0a0a;border-bottom:1px solid #262626}
+.top a{text-decoration:none}
+
+.col{max-width:728px;margin:0 auto;padding:0 24px}
+.wrap{max-width:1180px;margin:0 auto;padding:0 40px}
+.head{padding-top:148px;padding-bottom:20px}
+.kicker{font:500 12px/1.4 var(--sans);letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+.label{font:500 12px/1 var(--sans);letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+h1{font:600 clamp(40px,8.2vw,64px)/1.02 var(--sans);letter-spacing:-.035em;margin:22px 0 22px}
+.dek{font-size:21px;line-height:1.5;color:var(--muted);margin:0 0 26px}
+.by{font:400 15px var(--sans);color:var(--muted);padding-bottom:30px;border-bottom:1px solid var(--line)}
+.by b{font-weight:500;color:var(--fg)}
+article p{margin:0 0 1.05em}
+.intro{padding-top:28px;padding-bottom:12px}
+.hint{font:400 15px/1.55 var(--sans);color:var(--muted)}
+.hint kbd{font:500 12.5px var(--mono);border:1px solid var(--line2);border-bottom-width:2px;border-radius:4px;padding:0 5px;background:#fff;color:var(--fg)}
+.part{padding-top:56px;padding-bottom:30px}
+.part h2{font:600 clamp(32px,4.4vw,48px)/1.06 var(--sans);letter-spacing:-.025em;margin:16px 0 20px}
+.note{font:400 15px/1.55 var(--sans);color:var(--muted);border-left:2px solid var(--accent);padding:2px 0 2px 14px;margin:22px 0 0}
+
+/* ---------- Part I: the teardown stage ---------- */
+.tear{position:relative;background:var(--ink)}
+.stage{position:sticky;top:var(--bar);height:calc(100vh - var(--bar));height:calc(100svh - var(--bar));overflow:hidden;color:var(--dfg);
+  background:radial-gradient(110% 85% at 40% 42%,#151514 0%,#0d0d0c 55%,#0a0a0a 100%)}
+.stage canvas{position:absolute;inset:0;width:100%;height:100%;display:block;cursor:grab;touch-action:pan-y;outline:none}
+.stage canvas:active{cursor:grabbing}
+.ov{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+.ov text{font:400 12.5px var(--sans);fill:#e9e8e2}
+.ov .g{fill:var(--gold)}
+.ov .b{font-weight:500;fill:#fbfaf6}
+.ov .t{font:500 12.5px var(--sans);fill:var(--gold)}
+.ov .r{fill:#ff6a5c;font-weight:500}
+.nogl{position:absolute;inset:0;display:grid;place-items:center;padding:24px;font:400 15px var(--sans);color:var(--dmu);text-align:center}
+.scale{position:absolute;left:22px;top:18px;font:500 12px var(--sans);color:#dcdad3;pointer-events:none;letter-spacing:.02em}
+.scale .sb{display:block;height:7px;border:1.5px solid #dcdad3;border-top:0;margin-top:5px;width:80px;transition:width .12s linear}
+.scale .sl{font:500 10.5px var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--dfa);display:block;margin-bottom:3px}
+.hud{position:absolute;left:22px;top:80px;font:500 13px var(--sans);color:var(--gold);pointer-events:none;opacity:0;transition:opacity .25s;font-variant-numeric:tabular-nums}
+.hud span{color:var(--dmu);font-weight:400}
+.steps{position:absolute;top:14px;right:14px;bottom:76px;width:262px;display:flex;flex-direction:column;pointer-events:none}
+.steps .sh{font:500 10.5px var(--sans);letter-spacing:.16em;text-transform:uppercase;color:var(--dfa);padding:6px 10px 6px;pointer-events:auto}
+.stoggle{display:none}
+.steps ol{list-style:none;margin:0;padding:4px;overflow:auto;pointer-events:auto;background:rgba(12,12,11,.62);border:1px solid var(--dline);border-radius:10px;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);scrollbar-width:thin;scrollbar-color:#333 transparent}
+.sbtn{display:flex;align-items:baseline;gap:10px;width:100%;text-align:left;background:none;border:0;border-radius:6px;color:var(--dmu);font:400 13px/1.3 var(--sans);padding:5.5px 9px;cursor:pointer}
+.sbtn .n{font:500 11px var(--sans);color:var(--dfa);min-width:1.7em}
+.sbtn:hover{color:#f5f4ef;background:rgba(255,255,255,.04)}
+.sbtn.done{color:#cfcdc6}
+.sbtn[aria-current=step]{background:rgba(226,182,92,.14);color:#fbfaf6}
+.sbtn[aria-current=step] .n{color:var(--gold)}
+.sbtn:focus-visible,.dbtn:focus-visible,.stoggle:focus-visible{outline:2px solid var(--gold);outline-offset:1px}
+.cap{position:absolute;left:18px;bottom:76px;width:min(420px,calc(100% - 320px));background:rgba(12,12,11,.74);border:1px solid var(--dline);border-radius:10px;padding:14px 17px 15px;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.cap .ck{font:500 11px/1.3 var(--sans);letter-spacing:.05em;color:var(--gold)}
+.cap .ck span{color:var(--dfa)}
+.cap h2{font:600 19px/1.22 var(--sans);letter-spacing:-.012em;margin:5px 0 6px;color:#fbfaf6}
+.cap p{font:400 14.2px/1.52 var(--sans);color:#cbc9c2;margin:0}
+.tbar{position:absolute;left:0;right:0;bottom:0;height:62px;display:flex;align-items:center;gap:12px;padding:0 18px;background:linear-gradient(to top,rgba(10,10,10,.96),rgba(10,10,10,.78));border-top:1px solid #1d1d1b}
+.tbar .lab{font:500 11.5px var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--dmu);white-space:nowrap}
+.tbar input[type=range]{flex:1;min-width:60px;accent-color:var(--gold);height:22px;margin:0}
+.tbar input[type=range]:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+.tbar .pos{font:500 12px var(--sans);color:var(--gold);min-width:4.6em;text-align:right}
+.dbtn{font:500 13px/1 var(--sans);color:#ecebe6;background:transparent;border:1px solid #3a3a37;border-radius:999px;padding:8px 14px;cursor:pointer;white-space:nowrap}
+.dbtn:hover{border-color:#8d8b84}
+.dbtn:disabled{opacity:.35;cursor:default;border-color:#3a3a37}
+.after{padding-top:56px;padding-bottom:20px}
+
+/* ---------- Part II: chapters ---------- */
+.chapter{padding:120px 0 104px;border-top:1px solid var(--line)}
+.chead{display:grid;grid-template-columns:auto 1fr;align-items:end;gap:28px;border-bottom:1px solid var(--line);padding-bottom:26px;margin-bottom:56px}
+.chead .n{font:300 clamp(64px,9vw,128px)/.8 var(--sans);letter-spacing:-.05em;color:var(--fg)}
+.chead h2{font:600 clamp(30px,3.6vw,48px)/1.06 var(--sans);letter-spacing:-.025em;margin:10px 0 0;max-width:17em}
+.badge{display:inline-block;margin-top:16px;font:500 10.5px/1 var(--sans);letter-spacing:.18em;text-transform:uppercase;color:var(--accent);border:1px solid currentColor;border-radius:999px;padding:6px 11px}
+.cbody{display:grid;grid-template-columns:minmax(0,34em) 1fr;gap:72px;align-items:start}
+.prose p{margin:0 0 1.05em}
+.side{position:sticky;top:90px}
+.side .label{display:block;margin-bottom:14px}
+.side dl{margin:0;display:grid;grid-template-columns:1fr auto;border-top:1px solid var(--line)}
+.side dt,.side dd{padding:12px 0;border-bottom:1px solid var(--line);margin:0}
+.side dt{font:400 14px/1.4 var(--sans);color:var(--muted)}
+.side dd{font:500 15px/1.4 var(--mono);text-align:right;padding-left:14px}
+.side dd small{display:block;font-weight:400;font-size:12.5px;color:var(--faint)}
+.side dd.acc{color:var(--accent)}
+.verdict{margin:24px 0 0;padding-top:14px;border-top:2px solid var(--fg);font:400 15.5px/1.5 var(--sans)}
+.verdict .label{display:block;color:var(--accent);margin-bottom:9px}
+figure.dfig{margin:64px 0 0}
+.dstage{position:relative;background:var(--stage);border:1px solid var(--line);overflow:hidden}
+.dstage canvas{display:block;width:100%;height:540px;cursor:grab;touch-action:pan-y;outline:none}
+.dstage canvas:active{cursor:grabbing}
+.dov{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+.dov text{font:400 13px var(--sans);fill:#4a4a46}
+.dov .b{font-weight:500;fill:var(--fg)}
+.dov .a{font-weight:500;fill:var(--accent)}
+.dstage .tag{position:absolute;left:14px;top:12px;font:500 10px/1 var(--sans);letter-spacing:.18em;text-transform:uppercase;color:var(--accent);background:rgba(244,244,241,.88);border:1px solid rgba(218,41,28,.5);padding:6px 10px;border-radius:999px;pointer-events:none}
+.dstage .nogl{position:static;min-height:240px;color:var(--muted)}
+.controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:14px 40px;margin-top:18px;align-items:end}
+.ctl{display:grid;grid-template-columns:1fr auto;gap:2px 12px;align-items:center}
+.ctl label,.ctl .lbl{font:400 14px var(--sans);color:var(--muted)}
+.ctl output{font:500 15px var(--mono);color:var(--accent)}
+.ctl input{grid-column:1/-1;width:100%;accent-color:var(--accent);margin:6px 0 2px}
+.ctl.off output,.ctl.off label{color:var(--faint)}
+.seg{display:flex;flex-wrap:wrap;gap:8px}
+.btn{font:500 13px/1 var(--sans);letter-spacing:.02em;color:var(--fg);background:transparent;border:1px solid var(--line2);border-radius:999px;padding:9px 15px;cursor:pointer}
+.btn:hover{border-color:var(--fg)}
+.btn[aria-pressed=true]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.btn:focus-visible,.ctl input:focus-visible{outline:2px solid var(--fg);outline-offset:2px}
+.readouts{display:flex;flex-wrap:wrap;gap:6px 28px;margin-top:16px;font:400 14px var(--sans);color:var(--muted)}
+.readouts output{font:500 14.5px var(--mono);color:var(--fg);margin-left:6px}
+.readouts output.acc{color:var(--accent)}
+figcaption{font:400 14.5px/1.55 var(--sans);color:var(--muted);margin-top:16px;max-width:56em}
+figcaption b{color:var(--fg);font-weight:500}
+.mplot{display:block;width:100%;height:150px;margin-top:16px;border-top:1px solid var(--line)}
+.mplot text{font:400 11.5px var(--sans);fill:var(--muted)}
+details.more{margin-top:56px;border-top:1px solid var(--line2);border-bottom:1px solid var(--line2)}
+details.more summary{list-style:none;cursor:pointer;display:flex;align-items:center;gap:14px;padding:18px 0;font:500 13px var(--sans);letter-spacing:.16em;text-transform:uppercase}
+details.more summary::-webkit-details-marker{display:none}
+details.more summary .pm{display:inline-grid;place-items:center;width:30px;height:30px;border:1px solid var(--fg);border-radius:50%;font:400 16px var(--sans);letter-spacing:0;transition:transform .25s;flex:none}
+details.more[open] summary .pm{transform:rotate(45deg)}
+details.more summary .sub{margin-left:auto;font:400 14px var(--sans);letter-spacing:0;text-transform:none;color:var(--muted);text-align:right}
+.mbody{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:48px;padding:10px 0 40px;align-items:start}
+.mbody p{margin:0 0 .9em;font-size:17px}
+.links{display:flex;flex-wrap:wrap;gap:6px 22px;font:500 14px var(--sans);margin-top:6px}
+.links a{text-decoration:none;border-bottom:1px solid var(--line2);padding-bottom:2px}
+.links a:hover{border-color:var(--accent)}
+.further{margin-top:48px;border-top:1px solid var(--line2);padding-top:22px}
+.further h3{font:500 12px/1.4 var(--sans);letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+.further ul{list-style:none;margin:0;padding:0}
+.further li{padding:11px 0;border-bottom:1px solid var(--line);font:400 15.5px/1.5 var(--sans);color:var(--muted)}
+.further li a{color:var(--fg);font-weight:500;text-decoration:none;border-bottom:1px solid var(--line2)}
+.further li a:hover{border-color:var(--accent)}
+
+footer{margin-top:90px;background:#0a0a0a;color:#9b9b96;font:400 14.5px/1.6 var(--sans);padding:60px 0 90px;border-top:1px solid #262626}
+footer .in{max-width:1180px;margin:0 auto;padding:0 40px;display:grid;grid-template-columns:1fr auto;gap:24px 48px}
+footer p{margin:0 0 8px;max-width:46em}
+footer a{color:#f2f2f0;text-decoration-color:#3a3a38}
+footer .r{text-align:right}
+
+@media (max-width:980px){
+  .steps{width:224px}
+  .cap{width:min(380px,calc(100% - 272px))}
+  .cbody{grid-template-columns:1fr;gap:36px}
+  .side{position:static}
+  .mbody{grid-template-columns:1fr}
+  .dstage canvas{height:480px}
+}
+@media (max-width:720px){
+  .top{padding:0 16px;letter-spacing:.1em}
+  .top .long{display:none}
+  body{font-size:18px}
+  .col{padding-left:16px;padding-right:16px}
+  .wrap{padding-left:16px;padding-right:16px}
+  .head{padding-top:110px}
+  .dek{font-size:19px}
+  .scale{left:14px;top:58px}
+  .hud{left:14px;top:104px;font-size:12px}
+  .steps{left:10px;right:10px;top:10px;bottom:auto;width:auto;max-height:calc(100% - 90px)}
+  .steps .sh{display:none}
+  .stoggle{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;pointer-events:auto;font:500 13px/1.2 var(--sans);color:#f3f2ed;background:rgba(12,12,11,.8);border:1px solid var(--dline);border-radius:10px;padding:9px 12px;cursor:pointer;text-align:left;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+  .stoggle .n{font:500 11.5px var(--sans);color:var(--gold);margin-right:8px}
+  .stoggle .chev{font:500 12px var(--sans);color:var(--dmu)}
+  .steps ol{display:none;margin-top:6px;max-height:min(58vh,440px);background:rgba(12,12,11,.92)}
+  .steps.open ol{display:block}
+  .cap{left:8px;right:8px;bottom:60px;width:auto;padding:8px 11px 9px}
+  .cap .ck{font-size:10.5px}
+  .cap h2{font-size:15px;margin:2px 0 3px}
+  .cap p{font-size:12.5px;line-height:1.42}
+  .ov text{font-size:11px}
+  .ov .t{font-size:10.5px}
+  .tbar{height:56px;gap:7px;padding:0 10px}
+  .tbar .lab,.tbar .pos{display:none}
+  .dbtn{padding:8px 11px}
+  .dbtn .w{display:none}
+  .chapter{padding:84px 0 72px}
+  .chead{gap:16px}
+  .dstage canvas{height:400px}
+  .dov text{font-size:11.5px}
+  details.more summary .sub{display:none}
+  footer .in{grid-template-columns:1fr;padding:0 16px}
+  footer .r{text-align:left}
+}
+@media (max-width:420px){.dstage canvas{height:360px}}
+@media (prefers-reduced-motion:reduce){details.more summary .pm{transition:none}.hud{transition:none}}
+
+/* ---- Typography system (Archivo, Ferrari-like restraint) ---- */
+:root{--rosso:#da291c}
+.light,.dark,:root{--accent:#da291c}
+body{font-family:"Archivo",-apple-system,"Segoe UI",Helvetica,Arial,sans-serif;font-stretch:100%;font-weight:400;font-variant-numeric:lining-nums tabular-nums;letter-spacing:.003em}
+h1{font-weight:300!important;font-stretch:112%!important;letter-spacing:-.025em!important}
+h2{font-weight:350!important;font-stretch:108%!important;letter-spacing:-.018em!important}
+h3{font-weight:500!important;font-stretch:104%!important;letter-spacing:-.005em!important}
+.label,.top,.cbar,nav,summary,.eyebrow,.kicker{font-stretch:125%!important;letter-spacing:.2em!important}
+.label{font-size:11px!important;font-weight:500!important}
+.top,.cbar{font-size:11px!important;font-weight:500!important}
+.chead .n,.num,.contents .num{font-weight:200!important;font-stretch:100%!important}
+output,dd,.mono,code,kbd{font-family:"Archivo",sans-serif!important;font-variant-numeric:lining-nums tabular-nums;letter-spacing:.01em}
+figcaption,.links,.row p,.ctl label{font-stretch:100%}
+.prose p,article p{font-weight:400}
+.top a,.top span{white-space:nowrap}
+@media (max-width:900px){.top span a:not(:last-child){display:none}}
+</style>
+</head>
+<body>
+
+<div class="top"><a href="../">Faruk Sami Bilgin</a><a href="../#contents">Notes<span class="long"> on quantum devices</span></a></div>
+
+<article>
+<header class="head col">
+  <div class="kicker">A teardown · Notes on quantum devices</div>
+  <h1>Inside a moiré qubit</h1>
+  <p class="dek">Two crystals a few atoms thick, stacked with a small twist, make a lattice of identical traps for single electrons; here one such device comes apart from the chip down to the trap, followed by six devices from my own calculations and the numbers that decided them.</p>
+  <div class="by"><b>Faruk Sami Bilgin</b> · November 2026</div>
+</header>
+
+<div class="col intro">
+  <p>A moiré material is two atomically thin crystals laid on top of each other with a small twist. Across the stack, the places where the atoms of the two sheets line up and the places where they fall between each other alternate slowly, and that slow alternation, the moiré pattern, repeats over a distance far larger than the spacing of the atoms (the geometry is in <a href="../#ch1">chapter 1 of my notes</a>). To an electron the pattern is a superlattice of identical wells, each several nanometres across. Each well can hold one electron or hole, and a trapped carrier is a candidate qubit: a quantum dot made by the crystal rather than by lithography.</p>
+  <p>The first part of this page takes a typical gated moiré device apart, from the chip on its carrier to the potential that a single hole feels. The second part builds six specific devices from my research, each with the computed numbers that decided whether it works.</p>
+  <p class="note">Every device on this page is a model built from the geometries in my manuscripts, not a picture of fabricated hardware. None of them has been made. Where a dimension is not in my sources it is drawn at a generic value and marked <i>illustrative</i>.</p>
+</div>
+
+<div class="col part">
+  <div class="label">Part I</div>
+  <h2>The common device</h2>
+  <p>A twisted bilayer of molybdenum disulfide, encapsulated in hexagonal boron nitride and gated from above and below, on a silicon chip. Twelve steps take it from millimetres to ångströms. The layer order is the usual one for such devices; the thicknesses, except where a step says otherwise, are generic.</p>
+  <p class="hint">Scroll, drag the slider at the bottom of the figure, or use <kbd>←</kbd> <kbd>→</kbd> to step. Drag the model to turn it.</p>
+</div>
+
+<section class="tear" id="tear" aria-label="Interactive teardown of a gated moiré device">
+  <div class="stage" id="stage">
+    <canvas id="cv" role="img" aria-label="Three-dimensional model of a gated moiré device: a silicon chip in a ceramic carrier."></canvas>
+    <svg class="ov" id="ov" aria-hidden="true"></svg>
+    <div class="scale" id="scale" aria-hidden="true"><span class="sl">Scale</span><span id="scaleT">1 mm</span><span class="sb" id="scaleB"></span></div>
+    <div class="hud" id="hud" aria-hidden="true"></div>
+    <nav class="steps" id="steps" aria-label="Teardown steps">
+      <div class="sh">Steps</div>
+      <button class="stoggle" id="stoggle" type="button" aria-expanded="false" aria-controls="slist"><span><span class="n" id="stogN">01</span><span id="stogT">The chip on its carrier</span></span><span class="chev" aria-hidden="true">▾</span></button>
+      <ol id="slist"></ol>
+    </nav>
+    <div class="cap" id="cap" aria-live="polite">
+      <div class="ck" id="capK">Step 1 of 12</div>
+      <h2 id="capT">The chip on its carrier</h2>
+      <p id="capP"></p>
+    </div>
+    <div class="tbar">
+      <button class="dbtn" id="prev" type="button" aria-label="Previous step"><span aria-hidden="true">←</span><span class="w"> Previous</span></button>
+      <label class="lab" for="master">Take it apart</label>
+      <input type="range" id="master" min="0" max="1" step="0.0005" value="0" aria-label="Take it apart">
+      <output class="pos" id="pos" for="master">1 / 12</output>
+      <button class="dbtn" id="next" type="button" aria-label="Next step"><span class="w">Next </span><span aria-hidden="true">→</span></button>
+      <button class="dbtn" id="reset" type="button">Reset<span class="w"> view</span></button>
+    </div>
+  </div>
+</section>
+
+<div class="col after">
+  <p>Going back up, the order of the layers is the logic of the device. Everything above and below the bilayer is there to shape the landscape of the last step or to keep it clean: boron nitride because it is flat and nearly free of charged defects, graphite because it screens the charges in the oxide, metal gates because a voltage on them can deepen or tilt the wells beneath. The landscape itself comes from the twist alone. That is the promise of moiré qubits, and, as the six devices below show, also where the difficulties begin.</p>
+</div>
+
+<div class="col part">
+  <div class="label">Part II</div>
+  <h2>Six devices</h2>
+  <p>Each of the following is a device concept from my research, drawn as a model and tied to what I computed about it. The badge says whether the device is my own proposal or a published proposal that I analysed; all of them are computed, none fabricated. Each figure can be turned by dragging, and each has one control that changes the quantity that decided the verdict.</p>
+</div>
+</article>
+
+<main>
+<!-- ======================= 01 twisted hBN ======================= -->
+<section class="chapter light" id="d1">
+  <div class="wrap">
+    <div class="chead"><div class="n">01</div><div><div class="label">Twisted hBN</div><h2>Artificial atoms in twisted boron nitride</h2><span class="badge">Analysed device · computed</span></div></div>
+    <div class="cbody">
+      <div class="prose">
+        <p>Twist two sheets of hexagonal boron nitride and the moiré makes a triangular array of identical wells, one per cell. A recent proposal (Song, Xu and Chang) treats each well as an artificial atom: an electron trapped at the AA site would have a ladder of levels 77.8 meV apart, a "magic angle" at 1.69°, and linewidths below 10 MHz up to 254 K.</p>
+        <p>Everything in that picture follows from one object, the moiré potential, so I computed it directly, with density-functional theory at 21 stacking registries. Toggle the figure between the two. The computed well sits where the proposal puts it, at AA, and has the same symmetry, but its equivalent amplitude is \(V_0 = 40\) meV instead of 160 meV, three to four times shallower, and the functional form the proposal uses is forbidden by the symmetry of the stack. The level spacing falls to 26–40 meV, and there is no magic angle.</p>
+        <p>A shallow well decides how long an excited electron stays excited. To fall from the first excited level (E) to the ground level (A₁) it must hand about 32 meV to the lattice. A single phonon with that energy carries more momentum than the smooth trapped wavefunction can easily take up, so it couples only weakly; two phonons sharing the energy, each with less momentum, escape that suppression. With them included, \(T_1 \approx 6\)–11 ps. A logical qubit needs about 30 ns.</p>
+        <p>What survives is still useful: the wells exist, they are identical, and the A₁→E transition carries a giant dipole, so the array remains interesting as an infrared emitter. As an orbital qubit it does not work.</p>
+      </div>
+      <aside class="side">
+        <span class="label">Computed</span>
+        <dl>
+          <dt>Equivalent well amplitude V₀</dt><dd>40 meV<small>proposed: 160 meV</small></dd>
+          <dt>Level spacing E₂₁ at 1.09°</dt><dd>26–40 meV<small>best 32; proposed 77.8</small></dd>
+          <dt>Orbital T₁, two-phonon limited</dt><dd class="acc">≈ 6–11 ps</dd>
+          <dt>Needed for a logical qubit</dt><dd>≳ 30 ns</dd>
+        </dl>
+        <p class="verdict"><span class="label">Verdict</span>Ruled out as an orbital qubit: T₁ falls short of the target by a factor of about 2600–5000 at the central estimates, and no available knob closes the gap.</p>
+      </aside>
+    </div>
+    <figure class="dfig">
+      <div class="dstage"><canvas id="d1cv" role="img" aria-label="Height map of the moiré potential of twisted hBN over three moiré cells, showing the proposed potential, with an electron in the AA well and rings marking its two lowest levels."></canvas><svg class="dov" id="d1cv-ov" aria-hidden="true"></svg><span class="tag">Analysed device · computed</span></div>
+      <div class="controls">
+        <div class="ctl"><span class="lbl" id="d1-l">Moiré potential</span><span></span><div class="seg" role="group" aria-labelledby="d1-l" style="grid-column:1/-1;margin-top:6px"><button class="btn" id="d1p" type="button" aria-pressed="true">Proposed</button><button class="btn" id="d1c" type="button" aria-pressed="false">Computed (DFT)</button></div></div>
+      </div>
+      <div class="readouts" aria-live="polite">
+        <span>Peak to peak<output id="d1-pp">1136 meV</output></span>
+        <span>E₂₁ of the drawn rings<output id="d1-e">79.5 meV</output></span>
+        <span>Orbital T₁<output id="d1-t" class="acc">not computed for this well</output></span>
+      </div>
+      <figcaption><b>Figure 1.</b> Potential energy of an electron over a few moiré cells of twisted bilayer hBN at θ = 1.09° (moiré period 13.2 nm), drawn as height; both surfaces share one vertical and one colour scale. <i>Proposed:</i> Eq. 1 of the proposal, V₀ = 160 meV, with the sign that puts the well at AA (the repository notes that the sign is a convention). <i>Computed:</i> the three-star cosine fit to registry-resolved DFT, P₁ = −56.6, P₂ = +17.6, P₃ = +3.6 meV. Rings: the A₁ ground level and the E doublet solved on each surface in the repository, 79.5 meV apart on the proposed surface and 25.8 meV on the three-star fit (the curvature-constrained four-star fit gives 32.4 meV). The wave packets leaving the computed well are a cartoon of two-phonon emission.</figcaption>
+    </figure>
+    <details class="more">
+      <summary><span class="pm">+</span>More — in my work<span class="sub">Preprint and two repositories</span></summary>
+      <div class="mbody">
+        <div>
+          <p>The registry calculation, the symmetry argument against the proposed functional form, the levels and the absence of a magic angle are in the preprint. The relaxation budget is a separate study: one-phonon, two-phonon, flexural and sequential channels in two independent implementations, calibrated against the measured lifetime of phosphorus donors in silicon. An earlier internal draft that concluded the opposite rested on a one-phonon budget; its errors are documented in the repository.</p>
+        </div>
+        <div class="links"><a href="https://doi.org/10.5281/zenodo.24201814">Preprint · Zenodo</a><a href="https://www.alphaxiv.org/abs/2611.twisted-hbn-artificial-atoms-registry-dft">alphaXiv</a><a href="https://github.com/FarukSamiBilgin/twisted-hbn-artificial-atoms">twisted-hbn-artificial-atoms</a><a href="https://github.com/FarukSamiBilgin/twisted-hbn-orbital-qubit-limit">twisted-hbn-orbital-qubit-limit</a></div>
+      </div>
+    </details>
+  </div>
+</section>
+
+<!-- ======================= 02 twisted MoS2 ======================= -->
+<section class="chapter light" id="d2">
+  <div class="wrap">
+    <div class="chead"><div class="n">02</div><div><div class="label">Twisted MoS₂</div><h2>A hole spin in twisted MoS₂</h2><span class="badge">Proposed device · computed</span></div></div>
+    <div class="cbody">
+      <div class="prose">
+        <p>Twisted bilayer MoS₂ is dark. Its valence band peaks at Γ and its conduction band at K, so for the lowest excitons to emit light the moiré would have to supply about 16 of its reciprocal vectors at 2°; it supplies about one. It cannot be an optical qubit. But the same band structure puts the top of the valence band where a hole has no valley and no spin–orbit coupling: a plain spin ½ in every moiré well, a natural quantum dot whose envelope, about 1.2 nm in radius, covers about 320 nuclei.</p>
+        <p>Those nuclei are the problem. A quarter of natural molybdenum atoms carry a nuclear spin (⁹⁵Mo and ⁹⁷Mo), and their random sum acts on the hole as a magnetic field it cannot tell from a real one: \(T_2^* \approx 42\) ns. Isotope purification, ⁹⁸Mo and ³²S, which have no nuclear spin, removes them. Move the slider: \(T_2^*\) grows as one over the square root of the fraction that remains.</p>
+        <p>It grows until the encapsulation takes over. Boron and nitrogen have no spin-free isotope, so the hBN nuclei just outside the bilayer set a floor: 0.79 µs with the field perpendicular to the plane, 1.3 µs with it in plane. Independent noise sources add as</p>
+        $$\frac{1}{T_2^{*2}} = \frac{1}{T_{2,\mathrm{MoS_2}}^{*2}} + \frac{1}{T_{2,\mathrm{hBN}}^{*2}},$$
+        <p>so a highly enriched, hBN-encapsulated device reaches 0.7–1.0 µs, the level of natural silicon. Going further would need a spinless spacer between the bilayer and the hBN.</p>
+      </div>
+      <aside class="side">
+        <span class="label">Computed, θ = 2°</span>
+        <dl>
+          <dt>Natural MoS₂</dt><dd>T₂* ≈ 42 ns</dd>
+          <dt>⁹⁸Mo³²S₂, f = 2 × 10⁻⁴, MoS₂ nuclei only</dt><dd>1.5 µs</dd>
+          <dt>hBN floor, field ⊥ / in plane</dt><dd>0.79 / 1.3 µs</dd>
+          <dt>Enriched and encapsulated</dt><dd class="acc">0.70–0.98 µs</dd>
+        </dl>
+        <p class="verdict"><span class="label">Verdict</span>A spin memory, not an optical qubit; its coherence is capped near 1 µs by the hBN nuclei. Absolute T₂* is trusted to within a factor of 2.</p>
+      </aside>
+    </div>
+    <figure class="dfig">
+      <div class="dstage"><canvas id="d2cv" role="img" aria-label="Atoms of one moiré well of twisted bilayer MoS2 between two hBN layers, with a red hole spin at the centre and small arrows on the nuclei that carry spin."></canvas><svg class="dov" id="d2cv-ov" aria-hidden="true"></svg><span class="tag">Proposed device · computed</span></div>
+      <div class="controls">
+        <div class="ctl"><label for="d2f">Isotope purification: residual spinful fraction f</label><output id="d2fo" for="d2f">0.25 (natural)</output><input id="d2f" type="range" min="0" max="1000" step="1" value="0"></div>
+        <div class="ctl"><span class="lbl" id="d2b-l">Magnetic field</span><span></span><div class="seg" role="group" aria-labelledby="d2b-l" style="grid-column:1/-1;margin-top:6px"><button class="btn" id="d2bz" type="button" aria-pressed="true">Perpendicular</button><button class="btn" id="d2bx" type="button" aria-pressed="false">In plane</button><button class="btn" id="d2pur" type="button">Set ⁹⁸Mo³²S₂</button></div></div>
+      </div>
+      <div class="readouts" aria-live="polite">
+        <span>Spinful host nuclei drawn<output id="d2-n">—</output></span>
+        <span>T₂*, MoS₂ nuclei<output id="d2-t1">—</output></span>
+        <span>T₂*, with hBN<output id="d2-t2" class="acc">—</output></span>
+      </div>
+      <figcaption><b>Figure 2.</b> One Bernal well of twisted bilayer MoS₂ at θ = 2°: the atoms within 4.5 nm of its centre, Mo teal and S yellow, with one hBN layer drawn on each side (B pink, N blue; the top one cut away over the front half); vertical distances stretched 2.5 times. The red arrow is the hole spin, the red cloud its envelope, |ψ|² ∝ exp(−r²/ℓ²) with ℓ = 1.22 nm. Small arrows mark nuclei with spin: each host nucleus is drawn spinful at random with the probability set by the slider (Mo: f; S: f × 0.0076/0.2547, the scaling of the repository's scan); every hBN nucleus has spin. T₂* is the repository's quasi-static estimate, 42.4 ns × (0.2547/f)^½ for the MoS₂ nuclei, combined in quadrature with the hBN floor.</figcaption>
+    </figure>
+    <details class="more">
+      <summary><span class="pm">+</span>More — in my work<span class="sub">Preprint · Twisted MoS₂ cannot talk to light</span></summary>
+      <div class="mbody">
+        <div>
+          <p>The preprint establishes the momentum-dark band character from four independent lines of evidence, including my own DFT (the Γ valence maximum lies 0.477 eV above K), solves the moiré dot (barrier 77.4 meV, ħω = 57.0 meV) and builds the coherence budget, with a GaAs probe test of the same formula (6.5 ns against about 10 ns measured). It predicts a 17–23-fold Ramsey contrast between natural and highly enriched devices.</p>
+          <p>The Γ-valley hyperfine constant was not computed directly; published K-valley constants were transferred through DFT orbital weights, and a deliberately pessimistic case gives 0.14 µs.</p>
+        </div>
+        <div class="links"><a href="https://www.alphaxiv.org/abs/2611.twisted-mos2-hole-spin-coherence">Preprint · alphaXiv</a><a href="https://github.com/FarukSamiBilgin/twisted-mos2-hole-spin-coherence">twisted-mos2-hole-spin-coherence</a></div>
+      </div>
+    </details>
+  </div>
+</section>
+
+<!-- ======================= 03 twisted WSe2 ======================= -->
+<section class="chapter light" id="d3">
+  <div class="wrap">
+    <div class="chead"><div class="n">03</div><div><div class="label">Twisted WSe₂</div><h2>Valley qubits: by wire or by light</h2><span class="badge">Analysed devices · computed</span></div></div>
+    <div class="cbody">
+      <div class="prose">
+        <p>In twisted WSe₂ the qubit can live in the valley of a hole, which of two corners of the Brillouin zone it occupies. There are two ways to control it. A gate-defined dot, proposed by Saleem and co-workers, confines a hole under electrodes; the dot's lowest level splits into a valley doublet, and gate voltages drive it. The alternative uses light: at small twist one hole sits in each moiré cell (a Mott insulator), and two laser beams rotate its spin–valley state through a trapped trion, a Raman gate.</p>
+        <p>I compared both in the same material on one pipeline, checked against the magic angle (1.42° predicted, 1.43° published) and against the proposal's own ladder of valley splittings. The comparison is not symmetric in angle: each paradigm works at a different twist of the same crystal. The gate dot sits at 5.08°; the Mott insulator needs small angles, where the ratio of interaction to bandwidth reaches 10²–10³, and at 5.08° that ratio has collapsed to 2.7. Toggle the figure between the two.</p>
+        <p>Electrically, the doublet splitting depends steeply on the size of the dot: 382, 55.3 and 3.41 µeV for radii of 5, 7 and 10 moiré periods. Optically, a π gate takes 0.22 ns at an error of 4 × 10⁻³, but only if the branching ratio β, the fraction of trion decays that return to the other qubit state, is near one; spin–valley locking keeps it small, and no knob is known that makes it large. The lasers need 0.02–11 mW per site.</p>
+        <p>Twist disorder hits both. At a specification of σθ = 0.036°, the electrical dots spread by 4.5 % and need per-site calibration; the optical sites spread over about 17 frequency channels. At the disorder actually measured in twisted WSe₂, more than 1° over micrometres, both budgets fail.</p>
+      </div>
+      <aside class="side">
+        <span class="label">Computed</span>
+        <dl>
+          <dt>Valley splitting Δ₁S, dot radius 5 / 7 / 10 a<sub>M</sub></dt><dd>382 / 55.3 / 3.41 µeV</dd>
+          <dt>Optical π gate, β = 1</dt><dd>0.22 ns<small>error 4 × 10⁻³</small></dd>
+          <dt>Laser power per site</dt><dd>0.02–11 mW</dd>
+          <dt>Twist disorder σθ = 0.036°</dt><dd class="acc">4.5 % spread / ~17 channels</dd>
+        </dl>
+        <p class="verdict"><span class="label">Verdict</span>Electrical control wins today, on maturity and robustness to disorder. Light wins the wiring at 10²–10³ qubits only if β, single-shot readout and σθ ≲ 0.05° are all solved.</p>
+      </aside>
+    </div>
+    <figure class="dfig">
+      <div class="dstage"><canvas id="d3cv" role="img" aria-label="A gate-defined dot in twisted WSe2: gold split, barrier and plunger gates above a dense lattice of moiré sites, with the dot glowing in the opening."></canvas><svg class="dov" id="d3cv-ov" aria-hidden="true"></svg><span class="tag">Analysed devices · computed</span></div>
+      <div class="controls">
+        <div class="ctl"><span class="lbl" id="d3m-l">Control</span><span></span><div class="seg" role="group" aria-labelledby="d3m-l" style="grid-column:1/-1;margin-top:6px"><button class="btn" id="d3e" type="button" aria-pressed="true">Electrical · 5.08°</button><button class="btn" id="d3o" type="button" aria-pressed="false">Optical · 1.43°</button></div></div>
+        <div class="ctl" id="d3w-c"><label for="d3w">Dot radius</label><output id="d3wo" for="d3w">5 a<sub>M</sub> = 18.7 nm</output><input id="d3w" type="range" min="0" max="2" step="1" value="0"></div>
+        <div class="ctl off" id="d3b-c"><label for="d3b">Branching ratio β</label><output id="d3bo" for="d3b">1</output><input id="d3b" type="range" min="0" max="2" step="1" value="0" disabled></div>
+      </div>
+      <div class="readouts" aria-live="polite">
+        <span>Twist<output id="d3-th">5.08°</output></span>
+        <span>Moiré period<output id="d3-am">3.74 nm</output></span>
+        <span id="d3-r1l">Valley splitting Δ₁S<output id="d3-r1" class="acc">382 µeV</output></span>
+        <span id="d3-r2l">At σθ = 0.036°<output id="d3-r2">4.5 % spread</output></span>
+      </div>
+      <figcaption><b>Figure 3.</b> <i>Electrical:</i> a gate-defined dot at θ = 5.08° (moiré period 3.74 nm), drawn with split gates, two barriers and a plunger leaving an opening of the computed dot radius; the glow is a schematic 1S envelope. <i>Optical:</i> the ν = 1 Mott lattice at θ = 1.43° (period 13.3 nm), one hole per site, under a pair of focused Raman beams; the spot covers many sites, and the red one is the site resonant with the beams. Gate shapes, gate height (10 nm), beam size and the boron nitride, which is not drawn, are illustrative. Δ₁S and the Raman gate times and errors are from the repository (trion linewidth 50 µeV, corrected AC-Stark sign).</figcaption>
+    </figure>
+    <details class="more">
+      <summary><span class="pm">+</span>More — in my work<span class="sub">Two repositories, one in revision</span></summary>
+      <div class="mbody">
+        <div>
+          <p>An internal audit found a sign error in the AC-Stark term of the Raman budget; every optical number here is from the corrected budget, and the earlier ones are withdrawn. Neither side's T₂ is measured or reliably computable, which bounds what the comparison can claim.</p>
+          <p>A processor architecture built on the electrical dots (singlet–triplet pairs at a 40 nm pitch, exchange 1.6–63 µeV in the target window) is in revision; only its audited results are public.</p>
+        </div>
+        <div class="links"><a href="https://github.com/FarukSamiBilgin/twse2-valley-qubit-control">twse2-valley-qubit-control</a><a href="https://github.com/FarukSamiBilgin/twse2-valley-spin-processor">twse2-valley-spin-processor (in revision)</a></div>
+      </div>
+    </details>
+  </div>
+</section>
+
+<!-- ======================= 04 IX emitter ======================= -->
+<section class="chapter light" id="d4">
+  <div class="wrap">
+    <div class="chead"><div class="n">04</div><div><div class="label">MoSe₂ / WSe₂</div><h2>An exciton emitter in a nanobeam cavity</h2><span class="badge">Analysed device · computed</span></div></div>
+    <div class="cbody">
+      <div class="prose">
+        <p>In a heterobilayer of two different crystals, MoSe₂ on WSe₂, an electron in one layer and a hole in the other bind into an interlayer exciton. The moiré traps it, and each trapped exciton is a quantum emitter. On its own it is slow: 139 ns in my calibrated pipeline, against about 200 ns measured. A cavity can speed it up, the Purcell effect, by giving the photon a resonant mode to go into.</p>
+        <p>In the textbook, the enhancement grows with the cavity's quality factor \(Q\). A real emitter, though, has a linewidth \(\gamma\), and once the cavity line \(E/Q\) is narrower than the emitter's, more \(Q\) buys nothing. The dephasing-corrected budget is</p>
+        $$F_\mathrm{eff} = \frac{3}{4\pi^2}\,\frac{\xi}{V}\,\frac{E}{E/Q + \gamma},$$
+        <p>which saturates at \(Q_{1/2} = E/\gamma \approx 1.4\times10^4\) for the best linewidth reported, 100 µeV, and at \(2.1\times10^3\) for the 640 µeV line measured in a cavity at 10 K. Slide \(Q\) and watch the curve flatten.</p>
+        <p>So the currency is not \(Q\) but the mode volume \(V\) and the overlap \(\xi\), the share of the peak field the emitter actually sits in. My 3D FDTD computation of a suspended silicon-nitride nanobeam gives \(Q = 7.9\times10^3\) and \(V = 0.19\,(\lambda/n)^3\), but a crystal laid on top sees only \(\xi = 0.032\): a tenfold penalty for sitting on the surface, which the small volume only partly repays.</p>
+      </div>
+      <aside class="side">
+        <span class="label">Computed</span>
+        <dl>
+          <dt>Q, 3D FDTD, mirror-limited</dt><dd>7.9 × 10³</dd>
+          <dt>Mode volume V</dt><dd>0.19 (λ/n)³</dd>
+          <dt>Field overlap ξ, layer on top</dt><dd>0.032</dd>
+          <dt>Q₁/₂ = E/γ at 100 / 640 µeV</dt><dd class="acc">1.4 × 10⁴ / 2.1 × 10³</dd>
+        </dl>
+        <p class="verdict"><span class="label">Verdict</span>Raising Q past E/γ buys almost nothing; mode volume and overlap are the design currency. Transform-limited emission is out of reach of any realistic cavity until the linewidth falls to about 10 µeV.</p>
+      </aside>
+    </div>
+    <figure class="dfig">
+      <div class="dstage"><canvas id="d4cv" role="img" aria-label="A suspended silicon-nitride nanobeam with a row of holes, a heterobilayer flake on top and an emitter at the cavity centre radiating upwards."></canvas><svg class="dov" id="d4cv-ov" aria-hidden="true"></svg><span class="tag">Analysed device · computed</span></div>
+      <div class="controls">
+        <div class="ctl"><label for="d4q">Cavity quality factor Q</label><output id="d4qo" for="d4q">7.9 × 10³</output><input id="d4q" type="range" min="2" max="6" step="0.01" value="3.897"></div>
+        <div class="ctl"><span class="lbl" id="d4g-l">Emitter linewidth γ</span><span></span><div class="seg" role="group" aria-labelledby="d4g-l" style="grid-column:1/-1;margin-top:6px"><button class="btn" id="d4g1" type="button" aria-pressed="true">100 µeV</button><button class="btn" id="d4g2" type="button" aria-pressed="false">640 µeV</button><button class="btn" id="d4fd" type="button">FDTD Q</button></div></div>
+      </div>
+      <div class="readouts" aria-live="polite">
+        <span>F<sub>eff</sub><output id="d4-f" class="acc">—</output></span>
+        <span>Lifetime 139 ns / F<sub>eff</sub><output id="d4-t">—</output></span>
+        <span>Q / Q₁/₂<output id="d4-r">—</output></span>
+      </div>
+      <svg class="mplot" id="d4plot" role="img" aria-label="Effective Purcell factor against Q on a logarithmic axis for the two linewidths, with the current Q marked."></svg>
+      <figcaption><b>Figure 4.</b> The silicon-nitride nanobeam of the FDTD computation: 500 nm wide and 200 nm thick, holes at a period of 290 nm with radius 0.28 of the period, tapering over six holes to radius 0.19 and period 0.86 at the centre, ten mirror holes on each side. The supports and the trench below are illustrative, as are the lateral size and thickness of the hBN / MoSe₂–WSe₂ / hBN flake on top. The mode glow is schematic. F<sub>eff</sub>, the emission cone and the plot are evaluated in your browser from the budget formula with E = 1.37 eV, V = 0.19 (λ/n)³ and ξ = 0.032.</figcaption>
+    </figure>
+    <details class="more">
+      <summary><span class="pm">+</span>More — in my work<span class="sub">Calibration, disorder, and two studies in revision</span></summary>
+      <div class="mbody">
+        <div>
+          <p>The same pipeline passes eight experimental anchors within pre-declared tolerances, and shows that an aligned WSe₂/WS₂ moiré, whose period is set by lattice mismatch rather than twist, suppresses twist-disorder scatter 42-fold at σθ = 0.1° (47 µeV against 1.9 meV). The budget also explains the one published moiré-exciton cavity experiment as collective coupling of 70–235 emitters.</p>
+          <p>Two related studies are in revision and report only audited results: an erasure-biased architecture that uses the position of a dark interlayer exciton in a double trap as a qubit, and a DFT study of twisted Janus WSSe and MoSSe, where the valence maximum and conduction minimum sit on the same site (K–K phase separation 174° and 178°).</p>
+        </div>
+        <div class="links"><a href="https://github.com/FarukSamiBilgin/heterotmd-purcell-emitters">heterotmd-purcell-emitters</a><a href="https://github.com/FarukSamiBilgin/ix-erasure-architecture">ix-erasure-architecture (in revision)</a><a href="https://github.com/FarukSamiBilgin/janus-wsse-mosse-colocalization">janus-wsse-mosse-colocalization (in revision)</a></div>
+      </div>
+    </details>
+  </div>
+</section>
+
+<!-- ======================= 05 MATBG junction ======================= -->
+<section class="chapter light" id="d5">
+  <div class="wrap">
+    <div class="chead"><div class="n">05</div><div><div class="label">Magic-angle graphene</div><h2>A twisted-graphene junction in a sub-terahertz cavity</h2><span class="badge">Proposed device · computed</span></div></div>
+    <div class="cbody">
+      <div class="prose">
+        <p>Twisted bilayer graphene at its magic angle, 1.025° in my model, where the flat bands are 2.9 meV wide, superconducts. Gate a strip of it between two superconducting leads and you have a Josephson junction whose current–phase relation is skewed by its high transparency, and a skewed relation shows half-integer Shapiro steps under microwaves (<a href="../#ch3">chapter 3 of my notes</a>; the junction itself is explained in <a href="../josephson/">the long read</a>).</p>
+        <p>The design puts the junction in the defect of a silicon photonic-crystal slab: three missing holes, an L3 cavity, in a lattice of 587 µm, which traps a mode at 145 GHz with an in-situ \(Q_i = 1.46\times10^4\). The cavity is millimetres across, the junction micrometres; the slider zooms from one to the other. A bare van der Waals stack would barely feel the cavity, about 1 µV of drive instead of 600 µV, so an engineered collection structure 20–25 µm long is part of the design.</p>
+        <p>At \(I_c = 300\) nA and \(R_n = 200\) Ω, the half step is \(0.200\,I_c\), 60 nA, wide: four times the floor set by a sinusoidal junction. It survives heating only while \(E_J/k_BT > 55.5\), so the electrons must be colder than 129 mK; a parametric estimate puts them near 0.6 K at the reference drive.</p>
+        <p>A companion study draws the limits. The step measures transparency, not mechanism: trapped vortices and multiple Andreev reflection mimic its dependence on filling and twist. A quantum-geometric readout is ruled out, the Higgs mode is overdamped (\(Q_H \approx 1.5\)), and 145 GHz sits at or above the pair-breaking edge, \(\hbar\omega/2\Delta = 0.99\)–1.9. A safe, adiabatic drive is 15–29 GHz.</p>
+      </div>
+      <aside class="side">
+        <span class="label">Computed</span>
+        <dl>
+          <dt>Cavity mode, in-situ Q<sub>i</sub></dt><dd>145 GHz<small>Q<sub>i</sub> = 1.46 × 10⁴</small></dd>
+          <dt>I<sub>c</sub>, R<sub>n</sub></dt><dd>300 nA, 200 Ω</dd>
+          <dt>Half-step width, τ = 0.8</dt><dd>0.200 I<sub>c</sub> = 60 nA</dd>
+          <dt>Needed for 50 % survival</dt><dd class="acc">T<sub>e</sub> &lt; 129 mK</dd>
+        </dl>
+        <p class="verdict"><span class="label">Verdict</span>A fingerprint of transparency, not of mechanism; the 145 GHz drive sits at the pair-breaking edge, and the safe window is 15–29 GHz.</p>
+      </aside>
+    </div>
+    <figure class="dfig">
+      <div class="dstage"><canvas id="d5cv" role="img" aria-label="A silicon photonic-crystal slab with a triangular lattice of holes and an L3 defect, glowing with the cavity mode; at its centre a micrometre-scale junction."></canvas><svg class="dov" id="d5cv-ov" aria-hidden="true"></svg><span class="tag">Proposed device · computed</span></div>
+      <div class="controls">
+        <div class="ctl"><label for="d5z">Zoom: cavity → junction</label><output id="d5zo" for="d5z">view —</output><input id="d5z" type="range" min="0" max="1000" step="1" value="0"></div>
+      </div>
+      <div class="readouts" aria-live="polite">
+        <span>Lattice constant<output>586.74 µm</output></span>
+        <span>Drive ħω / 2Δ<output>0.99–1.9</output></span>
+        <span>Half-step survival at 100 mK<output class="acc">0.585</output></span>
+      </div>
+      <figcaption><b>Figure 5.</b> High-resistivity silicon slab with a triangular lattice of holes (a = 586.74 µm, radius 0.3a, thickness 0.5a; 9 rows drawn) and an L3 defect: three missing holes, the end holes shifted outward by 0.20a, the surrounding ring of holes enlarged 1.15 times. The red glow marks the 145 GHz mode, schematically, slowed down enormously. At the centre: an hBN-encapsulated twisted-graphene channel between two superconducting leads, fed by a collection structure about 22 µm long. Its bow-tie shape, the channel size and the lead material are illustrative.</figcaption>
+    </figure>
+    <details class="more">
+      <summary><span class="pm">+</span>More — in my work<span class="sub">Three repositories on one platform</span></summary>
+      <div class="mbody">
+        <div>
+          <p>The fractional-Shapiro study chains four modules (material, cavity, junction, integration), each re-derived independently, and turns the floor-corrected half step into an electron thermometer for 36–715 mK. The limits study records two errors its validation protocol caught and withdrew.</p>
+          <p>Shunted into the transmon regime, the same junction would be a gatemon at f₀₁ = 40.6 GHz; the drive cavity cannot read it out, and the Shapiro experiment and the qubit cannot run on the same chip at once.</p>
+        </div>
+        <div class="links"><a href="https://github.com/FarukSamiBilgin/tbg-fractional-shapiro">tbg-fractional-shapiro</a><a href="https://github.com/FarukSamiBilgin/matbg-subthz-limits">matbg-subthz-limits</a><a href="https://github.com/FarukSamiBilgin/tbg-gatemon">tbg-gatemon</a><a href="../josephson/">Long read: the Josephson junction</a><a href="../#ch3">Notes, chapter 3</a></div>
+      </div>
+    </details>
+  </div>
+</section>
+
+<!-- ======================= 06 BLG dot ======================= -->
+<section class="chapter light" id="d6">
+  <div class="wrap">
+    <div class="chead"><div class="n">06</div><div><div class="label">Bilayer graphene</div><h2>Shaking a quantum dot does not quiet it</h2><span class="badge">Proposed device · computed · refuted</span></div></div>
+    <div class="cbody">
+      <div class="prose">
+        <p>In bilayer graphene a perpendicular electric field opens a band gap, and gates can carve a quantum dot out of the gapped sheet. Its weakness is charge noise: any fluctuating charge nearby shifts the dot's levels. I asked whether shaking the confinement, modulating the dot potential at a frequency well above the qubit's, could average that noise away and make a dynamical sweet spot.</p>
+        <p>The model is a four-band continuum with a Gaussian dot 15 nm wide and 20 meV deep at a displacement gap of 0.167 eV, where the two lowest levels are 0.989 meV apart; an independent atomistic solver reproduces that to three digits. Averaged over one period of the drive, the modulation seemed to help: T₂* rose by 9 % at an amplitude of 50 meV.</p>
+        <p>It does not survive. The averaging argument needs the level splitting to bend down as a function of the field; it bends up (curvature +0.48). And when the drive is followed in time, in the full space of states, it throws the electron out of the two qubit levels: 38–95 % of the population leaves every period at the amplitudes where the protection appeared. Where the qubit survives, the effect is negligible. The slider steps through the computed amplitudes.</p>
+        <p>What did survive is symmetry: a mirror-symmetric double dot, and a spin qubit inside one valley, are protected; the tunable sweet spots were not.</p>
+      </div>
+      <aside class="side">
+        <span class="label">Computed</span>
+        <dl>
+          <dt>Δ₀₁ at Δ<sub>ext</sub> = 0.167 eV</dt><dd>0.989 meV</dd>
+          <dt>Period-averaged claim, A = 50 meV</dt><dd>T₂* × 1.09<small>superseded</small></dd>
+          <dt>Floquet leakage per period, A = 20–50 meV</dt><dd class="acc">38–95 %</dd>
+          <dt>Curvature ∂²Δ₀₁/∂Δ<sub>ext</sub>²</dt><dd>+0.48 (convex)</dd>
+        </dl>
+        <p class="verdict"><span class="label">Verdict</span>Negative. The protection was an artifact of averaging over the drive period; full Floquet evolution destroys it.</p>
+      </aside>
+    </div>
+    <figure class="dfig">
+      <div class="dstage"><canvas id="d6cv" role="img" aria-label="A gate-defined quantum dot in bilayer graphene: split gates, lifted finger gates, and a red electron cloud in the dot, breathing with the drive."></canvas><svg class="dov" id="d6cv-ov" aria-hidden="true"></svg><span class="tag">Proposed device · computed</span></div>
+      <div class="controls">
+        <div class="ctl"><label for="d6a">AC amplitude A of the confinement</label><output id="d6ao" for="d6a">0 meV</output><input id="d6a" type="range" min="0" max="6" step="1" value="0"></div>
+      </div>
+      <div class="readouts" aria-live="polite">
+        <span>Leakage out of the qubit per period<output id="d6-l" class="acc">0 %</output></span>
+        <span>Drive<output>ħω = 6.6 Δ₀₁</output></span>
+      </div>
+      <figcaption><b>Figure 6.</b> A gate-defined dot in hBN-encapsulated bilayer graphene: split gates leave a channel, finger gates across it (lifted 50 nm here so that the dot can be seen) define the dot; graphite back gate below. Gate shapes and spacings are illustrative. The dot is the model's Gaussian, U₀ = 20 meV, L<sub>dot</sub> = 15 nm; the cloud is drawn with a schematic threefold warping (the computed states show C₃ trefoils). The drive is slowed down enormously; the share of the cloud that escapes each period is the computed Floquet leakage.</figcaption>
+    </figure>
+    <details class="more">
+      <summary><span class="pm">+</span>More — in my work<span class="sub">A refuted hypothesis, documented</span></summary>
+      <div class="mbody">
+        <div>
+          <p>The repository keeps both the original claim and its refutation: the period-averaged scans, the convexity check, the full-Hilbert Floquet calculation with its time-step convergence, and six candidate sweet spots that dissolved under convergence tests.</p>
+        </div>
+        <div class="links"><a href="https://github.com/FarukSamiBilgin/bilayer-graphene-qd-qubit">bilayer-graphene-qd-qubit</a><a href="../#ch7">Notes, chapter 7: when the answer is no</a></div>
+      </div>
+    </details>
+  </div>
+</section>
+
+<!-- ======================= Why not yet ======================= -->
+<section class="chapter light" id="why">
+  <div class="wrap">
+    <div class="chead"><div class="n">07</div><div><div class="label">Scale</div><h2>Why none of these is a logical qubit yet</h2></div></div>
+    <div class="cbody">
+      <div class="prose">
+        <p>A logical qubit is not a better physical qubit. It is hundreds of physical qubits, each controlled individually, running error correction together. I asked whether a moiré platform could reach 300 logical qubits, starting from its best material, isotopically purified twisted MoS₂ (device 2), and attacking every design with an independent reviewer who wrote separate code. The material and the qubit type survived. The control layer did not.</p>
+        <p>The reason is a mismatch of scales. To address one bond of the array, a control line must set an energy to within 5 µeV to 0.23 meV, depending on the scheme; the moiré sites themselves scatter by about 15 meV. A metal line 3–20 nm above the plane spreads its potential over 16–44 nm, wider than the 8 nm bond it is meant to address. The least-bad scheme needs 607–809 thousand analog lines for 300 logical qubits; an active matrix would cut the wiring, but it needs a memory node at a 12.5–14 nm pitch that no technology offers. Until site disorder falls to 3–5 meV and such a node exists, moiré qubits remain a research platform, and the main line for a large processor is a conventional gate-defined one.</p>
+      </div>
+      <aside class="side">
+        <span class="label">The mismatch</span>
+        <dl>
+          <dt>Per-bond precision required</dt><dd>5 µeV – 0.23 meV</dd>
+          <dt>Site disorder today</dt><dd class="acc">≈ 15 meV</dd>
+          <dt>Analog lines, 300 logical qubits</dt><dd>607–809 k</dd>
+          <dt>Qubit pitch vs DRAM cell</dt><dd>12.5–14 vs 35–36.5 nm</dd>
+        </dl>
+        <div class="links" style="margin-top:18px"><a href="https://github.com/FarukSamiBilgin/moire-300-logical-qubit-feasibility">moire-300-logical-qubit-feasibility</a></div>
+      </aside>
+    </div>
+    <section class="further" aria-labelledby="further-h">
+      <h3 id="further-h">Further in my notes</h3>
+      <ul>
+        <li><a href="../teardown/">Taking a quantum computer apart</a> — the same kind of teardown for a superconducting processor, from the closed cryostat to the atoms of a junction.</li>
+        <li><a href="../cryostat/">The machine around a qubit</a> — the dilution refrigerator, its wiring and the sample box, with the numbers worked out.</li>
+        <li><a href="../josephson/">The Josephson junction</a> — from phase and the Josephson relations to the transmon and Rabi oscillations.</li>
+        <li><a href="../">Notes on quantum devices</a> — the contents page, and every repository.</li>
+      </ul>
+    </section>
+  </div>
+</section>
+</main>
+
+<footer>
+  <div class="in">
+    <div>
+      <p>Faruk Sami Bilgin — independent researcher in quantum devices.</p>
+      <p>Every device on this page is a model drawn in your browser from the geometries and numbers in my manuscripts and repositories; none is a photograph or a record of fabricated hardware, and none has been made. Dimensions that are not in those sources are drawn at generic values and marked illustrative. In Part I each step is drawn at its own scale, shown by the scale bar.</p>
+    </div>
+    <div class="r">
+      <p><a href="../">Notes on quantum devices</a></p>
+      <p><a href="../teardown/">Teardown</a></p>
+      <p><a href="../cryostat/">The machine around a qubit</a></p>
+      <p><a href="../josephson/">The Josephson junction</a></p>
+    </div>
+  </div>
+</footer>
+<noscript><p style="text-align:center;font:400 15px sans-serif">The figures need JavaScript and WebGL.</p></noscript>
+
+<script>
+addEventListener('load', () => {
+  if (window.renderMathInElement) renderMathInElement(document.body, { delimiters: [{ left: '$$', right: '$$', display: true }, { left: '\\(', right: '\\)', display: false }], throwOnError: false });
+});
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+
+/* ====================================================================================
+   Common helpers
+   ==================================================================================== */
+const $ = id => document.getElementById(id);
+const RM = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+const TAU = Math.PI * 2, D2R = Math.PI / 180, S3 = Math.sqrt(3);
+const sstep = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
+const ease = t => t * t * t * (t * (t * 6 - 15) + 10);
+const lerp = (a, b, t) => a + (b - a) * t;
+const clamp = (x, a, b) => Math.min(b, Math.max(a, x));
+const V3 = (x, y, z) => new THREE.Vector3(x, y, z);
+const UP = V3(0, 1, 0);
+function mulberry32(a) { return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+const SUPD = '⁰¹²³⁴⁵⁶⁷⁸⁹';
+const sup = n => String(n).replace('-', '⁻').replace(/\d/g, d => SUPD[d]);
+function sci(x, d = 1) {
+  if (!isFinite(x) || x === 0) return String(x);
+  let e = Math.floor(Math.log10(Math.abs(x))), m = x / Math.pow(10, e);
+  if (+m.toFixed(d) >= 10) { m /= 10; e += 1; }
+  if (e >= -1 && e <= 2) return String(+x.toPrecision(d + 1));
+  return `${m.toFixed(d)} × 10${sup(e)}`;
+}
+function fmtT(ns) {           // a time given in nanoseconds
+  if (ns < 1) return `${+(ns * 1000).toPrecision(2)} ps`;
+  if (ns < 1000) return `${+ns.toPrecision(2)} ns`;
+  return `${+(ns / 1000).toPrecision(2)} µs`;
+}
+function lenText(um) {        // a length given in micrometres
+  const f = v => String(+v.toPrecision(2));
+  if (um >= 1000) return f(um / 1000) + ' mm';
+  if (um >= 1) return f(um) + ' µm';
+  if (um >= 1e-3) return f(um * 1000) + ' nm';
+  return f(um * 1e4) + ' Å';
+}
+
+function prep(g) {
+  if (g.index) { const n = g.toNonIndexed(); g.dispose(); g = n; }
+  for (const k of Object.keys(g.attributes)) if (k !== 'position' && k !== 'normal') g.deleteAttribute(k);
+  if (!g.attributes.normal) g.computeVertexNormals();
+  g.morphAttributes = {}; return g;
+}
+class Bucket {           // collects geometry per material and merges it into one mesh per material
+  constructor() { this.m = new Map(); }
+  add(mat, g) { g = prep(g); if (!this.m.has(mat)) this.m.set(mat, []); this.m.get(mat).push(g); return this; }
+  build(parent, { cast = true, recv = true } = {}) {
+    const out = [];
+    for (const [mat, list] of this.m) {
+      const g = mergeGeometries(list); g.computeBoundingSphere();
+      const mesh = new THREE.Mesh(g, mat); mesh.castShadow = cast; mesh.receiveShadow = recv; parent.add(mesh); out.push(mesh);
+      for (const x of list) x.dispose();
+    }
+    this.m.clear(); return out;
+  }
+}
+const boxG = (w, h, d, x = 0, y = 0, z = 0) => new THREE.BoxGeometry(w, h, d).translate(x, y, z);
+const boxY = (w, y0, y1, d, x = 0, z = 0) => boxG(w, y1 - y0, d, x, (y0 + y1) / 2, z);
+const cylY = (r, y0, y1, x = 0, z = 0, seg = 16) => new THREE.CylinderGeometry(r, r, Math.abs(y1 - y0), seg).translate(x, (y0 + y1) / 2, z);
+const tube = (curve, r, n = 24, rs = 8) => new THREE.TubeGeometry(curve, n, r, rs, false);
+function rrShape(w, d, r) {
+  const s = new THREE.Shape(), x = w / 2, z = d / 2;
+  s.moveTo(-x + r, -z); s.lineTo(x - r, -z); s.absarc(x - r, -z + r, r, -Math.PI / 2, 0, false);
+  s.lineTo(x, z - r); s.absarc(x - r, z - r, r, 0, Math.PI / 2, false);
+  s.lineTo(-x + r, z); s.absarc(-x + r, z - r, r, Math.PI / 2, Math.PI, false);
+  s.lineTo(-x, -z + r); s.absarc(-x + r, -z + r, r, Math.PI, 1.5 * Math.PI, false); return s;
+}
+function rrPath(w, d, r) { const s = rrShape(w, d, r), p = new THREE.Path(); p.curves = s.curves; p.currentPoint = s.currentPoint; return p; }
+function extrudeY(shape, h, cs = 8) {       // a shape in (x, -z) extruded upwards from y = 0 to y = h
+  const g = new THREE.ExtrudeGeometry(shape, { depth: h, bevelEnabled: false, curveSegments: cs });
+  g.rotateX(-Math.PI / 2); return g;
+}
+function prismXZ(outer, holes, y0, h, cs = 4) {   // a polygon [[x, z], ...] with holes, from y0 to y0 + h
+  const sh = new THREE.Shape(outer.map(([x, z]) => new THREE.Vector2(x, -z)));
+  for (const hp of holes) sh.holes.push(new THREE.Path(hp.map(([x, z]) => new THREE.Vector2(x, -z))));
+  const g = new THREE.ExtrudeGeometry(sh, { depth: h, bevelEnabled: false, curveSegments: cs }); g.rotateX(-Math.PI / 2); g.translate(0, y0, 0); return g;
+}
+function taper(x0, z0, x1, z1, w0, w1) {    // a trapezoid from (x0, z0), width w0, to (x1, z1), width w1
+  const dx = x1 - x0, dz = z1 - z0, L = Math.hypot(dx, dz), nx = -dz / L, nz = dx / L;
+  return [[x0 + nx * w0 / 2, z0 + nz * w0 / 2], [x1 + nx * w1 / 2, z1 + nz * w1 / 2], [x1 - nx * w1 / 2, z1 - nz * w1 / 2], [x0 - nx * w0 / 2, z0 - nz * w0 / 2]];
+}
+/* a layer that climbs over two parallel steps at |z| = zw: polygon in (z, y), extruded along x */
+function conformal(lo, hi, zw, t, W) {
+  return [[-W, hi], [-zw, hi], [-zw, lo], [zw, lo], [zw, hi], [W, hi], [W, hi + t], [zw - t, hi + t], [zw - t, lo + t], [-zw + t, lo + t], [-zw + t, hi + t], [-W, hi + t]];
+}
+function alongX(poly, x0, x1) {
+  const sh = new THREE.Shape(poly.map(([z, y]) => new THREE.Vector2(z, y)));
+  const g = new THREE.ExtrudeGeometry(sh, { depth: x1 - x0, bevelEnabled: false });
+  g.rotateY(Math.PI / 2).translate(x0, 0, 0); return g;
+}
+function hexSites(a, half, fn) {           // triangular lattice points inside |x|, |z| <= half
+  const nz = Math.ceil(half / (a * S3 / 2)) + 1, nx = Math.ceil(half / a) + 2;
+  for (let j = -nz; j <= nz; j++) for (let i = -nx; i <= nx; i++) {
+    const x = (i + 0.5 * (j & 1)) * a, z = j * a * S3 / 2;
+    if (Math.abs(x) <= half && Math.abs(z) <= half) fn(x, z);
+  }
+}
+const _d = new THREE.Object3D();
+function instanced(geo, mat, pts, s = 1, parent = null) {   // pts: [[x, y, z], ...]
+  const m = new THREE.InstancedMesh(geo, mat, Math.max(1, pts.length));
+  pts.forEach(([x, y, z], i) => { _d.position.set(x, y, z); _d.rotation.set(0, 0, 0); _d.scale.setScalar(s); _d.updateMatrix(); m.setMatrixAt(i, _d.matrix); });
+  m.count = pts.length; m.instanceMatrix.needsUpdate = true; m.computeBoundingSphere(); m.frustumCulled = false;
+  if (parent) parent.add(m); return m;
+}
+let glowTex = null;
+function glowTexture() {
+  if (glowTex) return glowTex;
+  const c = document.createElement('canvas'); c.width = c.height = 64; const x = c.getContext('2d');
+  const g = x.createRadialGradient(32, 32, 0, 32, 32, 32);
+  g.addColorStop(0, 'rgba(255,255,255,1)'); g.addColorStop(0.22, 'rgba(255,255,255,0.7)'); g.addColorStop(0.6, 'rgba(255,255,255,0.14)'); g.addColorStop(1, 'rgba(255,255,255,0)');
+  x.fillStyle = g; x.fillRect(0, 0, 64, 64);
+  glowTex = new THREE.CanvasTexture(c); glowTex.colorSpace = THREE.SRGBColorSpace; return glowTex;
+}
+function radialTexture(fn, n = 256) {      // fn(r in units of the half-size, phi) -> alpha in [0, 1]
+  const c = document.createElement('canvas'); c.width = c.height = n; const x = c.getContext('2d'), im = x.createImageData(n, n);
+  for (let j = 0; j < n; j++) for (let i = 0; i < n; i++) {
+    const u = (i + 0.5) / n * 2 - 1, v = (j + 0.5) / n * 2 - 1, a = clamp(fn(Math.hypot(u, v), Math.atan2(v, u)), 0, 1), k = 4 * (j * n + i);
+    im.data[k] = im.data[k + 1] = im.data[k + 2] = 255; im.data[k + 3] = Math.round(255 * a);
+  }
+  x.putImageData(im, 0, 0);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
+}
+const glowSprite = (color, size, op = 1) => { const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTexture(), color, transparent: true, opacity: op, depthWrite: false, toneMapped: false })); s.scale.setScalar(size); return s; };
+function fade(mat, o) {       // fade a material, remembering its own opacity and transparency
+  const u = mat.userData;
+  if (u.b === undefined) { u.b = mat.opacity; u.t = mat.transparent; u.dw = mat.depthWrite; }
+  const tr = u.t || o < 0.999;
+  if (mat.transparent !== tr) { mat.transparent = tr; mat.depthWrite = tr ? (u.t ? u.dw : false) : u.dw; mat.needsUpdate = true; }
+  mat.opacity = u.b * o;
+}
+/* a dark studio for reflections (from the teardown): a warm dome with soft boxes */
+function studioEnv() {
+  const s = new THREE.Scene(), geo = new THREE.SphereGeometry(50, 48, 24), pos = geo.attributes.position, col = [];
+  for (let i = 0; i < pos.count; i++) {
+    const y = pos.getY(i) / 50;
+    if (y > 0) col.push(lerp(0.2, 0.62, y), lerp(0.16, 0.55, y), lerp(0.11, 0.45, y));
+    else col.push(lerp(0.2, 0.1, -y), lerp(0.16, 0.07, -y), lerp(0.11, 0.045, -y));
+  }
+  geo.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
+  s.add(new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ vertexColors: true, side: THREE.BackSide })));
+  const panel = (w, h, x, y, z, c, k) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ color: new THREE.Color(c).multiplyScalar(k), side: THREE.DoubleSide })); m.position.set(x, y, z); m.lookAt(0, 0, 0); s.add(m); };
+  panel(44, 16, 0, 40, 16, 0xfff0d8, 3.0); panel(9, 46, -42, 4, 12, 0xffe0b0, 2.6); panel(9, 46, 40, 2, -18, 0xffd49a, 2.2);
+  panel(9, 46, 30, 0, 34, 0xfff4e6, 1.6); panel(36, 9, 0, -32, 28, 0xffb45e, 1.5); panel(22, 22, 8, 12, -45, 0xc9dcff, 1.1);
+  return s;
+}
+/* labels: leader lines with collision avoidance (from the teardown) */
+const DARKT = { line: '#8a8982', dotF: '#f2f1ec', dotS: '#0a0a0a', halo: '#0a0a0a' };
+const LIGHTT = { line: '#9b9b94', dotF: '#121212', dotS: '#e9e9e4', halo: '#e9e9e4' };
+function Placer(W, H, T) {
+  const rects = []; let out = '';
+  const hit = r => rects.some(q => r[0] < q[2] && r[2] > q[0] && r[1] < q[3] && r[3] > q[1]);
+  return {
+    block(r) { rects.push(r); },
+    add(x, y, dx, dy, html, op, cls) {
+      const tw = (W < 721 ? 6.2 : 7.0) * html.replace(/<[^>]+>/g, '').length + 6;
+      const cands = [[dx, dy], [dx, dy - 18], [dx, dy + 18], [dx, dy - 36], [dx, dy + 36], [-dx, dy], [-dx, -dy], [dx * 1.6, dy - 26], [dx * 1.6, dy + 26], [-dx, dy + 30], [-dx, dy - 30]];
+      for (const [cx, cy] of cands) {
+        let ddx = cx, ddy = cy;
+        if (ddx > 0 && x + ddx + tw > W - 8) ddx = -ddx; else if (ddx < 0 && x + ddx - tw < 8) ddx = -ddx;
+        if (y + ddy < 16) ddy = Math.abs(ddy) + 4; else if (y + ddy > H - 10) ddy = -Math.abs(ddy) - 4;
+        const tx = x + ddx + (ddx < 0 ? -5 : 5), r = ddx < 0 ? [tx - tw, y + ddy - 10, tx, y + ddy + 6] : [tx, y + ddy - 10, tx + tw, y + ddy + 6];
+        if (r[0] < 4 || r[2] > W - 4) continue;
+        if (!hit(r)) {
+          rects.push(r);
+          const x2 = x + ddx, y2 = y + ddy, anchor = ddx < 0 ? 'end' : 'start';
+          out += `<g opacity="${op.toFixed(3)}"><line x1="${x.toFixed(1)}" y1="${y.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="${T.line}" stroke-width="1"/>` +
+            `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="2.6" fill="${T.dotF}" stroke="${T.dotS}" stroke-width="1"/>` +
+            `<text class="${cls}" x="${tx.toFixed(1)}" y="${(y2 + 4).toFixed(1)}" text-anchor="${anchor}" stroke="${T.halo}" stroke-width="4" paint-order="stroke" stroke-linejoin="round">${html}</text></g>`;
+          return true;
+        }
+      }
+      return false;
+    },
+    get svg() { return out; }
+  };
+}
+/* moiré of two identical triangular lattices (a in nm), the top one turned by thDeg about the origin
+   with three.js's rotation.y; first three shells of moiré vectors; U(x, z) = sum_s V_s sum_G cos(G.r),
+   which is the hole potential -Delta(r) of the Gamma-valley model with psi = pi */
+function moire(a, thDeg, V = [39.45, 6.5, 10.0]) {
+  const th = thDeg * D2R, c = Math.cos(th), s = Math.sin(th);
+  const ry = ([x, z]) => [x * c + z * s, -x * s + z * c];
+  const k = TAU / a, b1 = [k, -k / S3], b2 = [0, 2 * k / S3];
+  const g = b => { const r = ry(b); return [r[0] - b[0], r[1] - b[1]]; };
+  const G1 = g(b1), G2 = g(b2), gm = Math.hypot(G1[0], G1[1]);
+  const shells = [[], [], []];
+  for (let m = -3; m <= 3; m++) for (let n = -3; n <= 3; n++) {
+    if (!m && !n) continue;
+    const v = [m * G1[0] + n * G2[0], m * G1[1] + n * G2[1]], q = Math.hypot(v[0], v[1]) / gm;
+    if (Math.abs(q - 1) < 1e-6) shells[0].push(v); else if (Math.abs(q - S3) < 1e-6) shells[1].push(v); else if (Math.abs(q - 2) < 1e-6) shells[2].push(v);
+  }
+  const U = (x, z) => { let u = 0; for (let i = 0; i < 3; i++) for (const v of shells[i]) u += V[i] * Math.cos(v[0] * x + v[1] * z); return u; };
+  const det = G1[0] * G2[1] - G1[1] * G2[0];
+  const A1 = [TAU * G2[1] / det, -TAU * G2[0] / det], A2 = [-TAU * G1[1] / det, TAU * G1[0] / det];
+  const cand = [];
+  for (let p = -3; p <= 3; p++) for (let q = -3; q <= 3; q++) { const x = (p * A1[0] + q * A2[0]) / 3, z = (p * A1[1] + q * A2[1]) / 3; cand.push([x, z, U(x, z)]); }
+  const umin = Math.min(...cand.map(q => q[2]));
+  const bern = cand.filter(q => q[2] < umin + 1e-6 && Math.hypot(q[0], q[1]) > 1e-6).sort((p, q) => Math.hypot(p[0], p[1]) - Math.hypot(q[0], q[1]));
+  return { L: a / (2 * Math.sin(th / 2)), U, A1, A2, bern, umin };
+}
+/* a colour map from [[value, [r, g, b] in sRGB]], returning linear RGB for vertex colours */
+function cmapOf(STOPS) {
+  const _c = new THREE.Color();
+  return u => {
+    for (let i = 1; i < STOPS.length; i++) if (u <= STOPS[i][0] || i === STOPS.length - 1) {
+      const [u0, c0] = STOPS[i - 1], [u1, c1] = STOPS[i], t = clamp((u - u0) / (u1 - u0), 0, 1);
+      _c.setRGB(lerp(c0[0], c1[0], t), lerp(c0[1], c1[1], t), lerp(c0[2], c1[2], t), THREE.SRGBColorSpace);
+      return [_c.r, _c.g, _c.b];
+    }
+  };
+}
+function makeTouchRule(cv, controls, minP, maxP) {   // one finger turns the model horizontally only
+  cv.addEventListener('pointerdown', e => {
+    if (e.pointerType === 'touch') { const p = controls.getPolarAngle(); controls.minPolarAngle = controls.maxPolarAngle = p; }
+    else { controls.minPolarAngle = minP; controls.maxPolarAngle = maxP; }
+  }, { capture: true });
+  const relax = () => { controls.minPolarAngle = minP; controls.maxPolarAngle = maxP; };
+  cv.addEventListener('pointerup', relax); cv.addEventListener('pointercancel', relax);
+}
+/* ====================================================================================
+   Part I: the common device, taken apart with one master value m in [0, 1].
+   World units: micrometres. The bilayer midplane sits at y = YM, the chip surface at y = 0.
+   ==================================================================================== */
+const STEPS = [
+  { title: 'The chip on its carrier', meta: 'Model device · chip 5 × 5 mm (illustrative)',
+    text: 'This is the part that goes into the refrigerator: a silicon chip in a ceramic carrier, wired to it by gold bonds about 25 µm thick. Everything that matters happens in a patch at the centre a few micrometres across; the rest of the chip exists to bring wires to it.' },
+  { title: 'Pads and leads', meta: 'Ti/Au leads · lifted away',
+    text: 'Each bond lands on a pad at the edge of the chip, and from each pad a gold lead narrows towards the centre. With the bonds cut and the leads lifted off, what is left in the middle is a stack of flakes, each peeled from a crystal and laid on the one below: graphite, boron nitride, the twisted bilayer, boron nitride again.' },
+  { title: 'The gates', meta: 'Ti/Au · finger gates at 40 nm pitch',
+    text: 'At the centre, gates lie on the stack. Two wide split gates leave a channel between them; above a thin oxide, a row of finger gates crosses it at a 40 nm pitch, the spacing used in my exchange calculations for twisted WSe₂. A voltage on a finger raises or lowers the energy of carriers beneath it: plunger gates fill dots, barrier gates couple them.' },
+  { title: 'Top hBN', meta: '≈ 10 nm (illustrative) · gates 3–20 nm above the plane',
+    text: 'Under the gates is hexagonal boron nitride, an insulator flat to the atom and nearly free of charged defects. It holds the gates a few nanometres above the qubit layer. Even that is coarse: a metal line 3–20 nm above the plane spreads its potential over 16–44 nm, wider than one moiré site.' },
+  { title: 'The twisted bilayer', meta: 'two MoS₂ monolayers · 1.3 nm in all',
+    text: 'The active layer is molybdenum disulfide, two sheets each three atoms thick. From here it looks like any other flake. What makes it a moiré material is invisible at this scale: one sheet is turned by 2° relative to the other.' },
+  { title: 'One twist', meta: 'θ = 2° between the layers',
+    text: 'Pulled apart, the two monolayers are the same crystal turned by a small angle; the lines mark one crystal axis in each. The angle is set by hand when the stack is assembled, and it is the most important number in the device: it fixes the size of the superlattice and the shape of every well in it.' },
+  { title: 'Bottom hBN', meta: '≈ 20 nm (illustrative)',
+    text: 'A second boron nitride flake completes the encapsulation, so that the bilayer touches nothing but an inert crystal on both sides. Its nuclei are not inert: boron and nitrogen have no spin-free isotope, and in device 2 below they set the coherence floor.' },
+  { title: 'Graphite back gate', meta: 'a few nm (illustrative)',
+    text: 'Under the boron nitride lies a thin graphite flake. One voltage on it sets how many carriers the whole bilayer holds, and it screens the charges trapped in the oxide below.' },
+  { title: 'Oxidised silicon', meta: 'SiO₂ 285 nm on Si (illustrative)',
+    text: 'The stack rests on silicon covered by its own oxide, whose thickness is usually chosen so that thin flakes show up by interference in an optical microscope; it is why such chips look violet. Taken apart, the device is a stack a few hundred nanometres tall, and the qubit lives in its thinnest layer.' },
+  { title: 'Atoms', meta: 'MoS₂ · a = 3.18 Å',
+    text: 'Each monolayer is a plane of molybdenum atoms (teal) between two planes of sulfur (yellow), on a hexagonal lattice with a lattice constant of 3.18 Å. In the bilayer the two molybdenum planes are 6.1 Å apart. Here the top layer is lifted off and turned by 2°.' },
+  { title: 'The moiré', meta: 'L = a / 2 sin(θ/2) · 9.1 nm at 2°',
+    text: 'Brought back together and seen from above, the two lattices beat against each other. Where their atoms coincide the stacking is AA; between the AA spots it is Bernal. The pattern repeats every L = a / 2 sin(θ/2): turning the layer to 5° shrinks it to 3.6 nm, and back at 2° it is 9.1 nm, about 29 lattice constants.' },
+  { title: 'The moiré potential', meta: 'V₁, V₂, V₃ = 39.45, 6.5, 10.0 meV · ψ = π',
+    text: 'Each local stacking has a slightly different band edge, so a hole moving through the bilayer feels a landscape that repeats with the moiré, Δ(r) = 2 Σ V cos(G·r + ψ) over three shells of moiré vectors. For holes at Γ, AA is a hill and the Bernal sites are wells, 445 meV below the hilltops and 77 meV below the saddle between neighbours. Each well is a natural quantum dot; the hole in it is spread over about 1.2 nm.' }
+];
+const N = STEPS.length;
+const REST = i => i === N - 1 ? 1 : (i + 0.965) / N;
+
+function partOne() {
+  const cv = $('cv'), ov = $('ov'), stageEl = $('stage'), tear = $('tear');
+  let renderer;
+  try { renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true, alpha: true, powerPreference: 'high-performance', logarithmicDepthBuffer: true }); }
+  catch (e) { const d = document.createElement('div'); d.className = 'nogl'; d.textContent = 'This teardown needs WebGL, which is not available in this browser.'; cv.replaceWith(d); return; }
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.setClearColor(0x000000, 0);
+  renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.15;
+  renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  const scene = new THREE.Scene();
+  const pmrem = new THREE.PMREMGenerator(renderer);
+  scene.environment = pmrem.fromScene(studioEnv(), 0.03).texture; pmrem.dispose();
+  scene.add(new THREE.HemisphereLight(0xfff3e2, 0x1a1a1c, 0.34));
+  const key = new THREE.DirectionalLight(0xfff0dc, 2.2); key.castShadow = true;
+  key.shadow.mapSize.set(2048, 2048); key.shadow.bias = -0.0004;
+  const rimA = new THREE.DirectionalLight(0xa9c4ff, 1.4), rimB = new THREE.DirectionalLight(0xffcf8f, 1.6);
+  scene.add(key, key.target, rimA, rimA.target, rimB, rimB.target);
+  const FOV = 32, tanV = Math.tan(FOV * D2R / 2);
+  const camera = new THREE.PerspectiveCamera(FOV, 2, 0.1, 1e5);
+  const controls = new OrbitControls(camera, cv);
+  controls.enableZoom = false; controls.enablePan = false; controls.enableDamping = false; controls.rotateSpeed = 0.6;
+  controls.minPolarAngle = 0.04; controls.maxPolarAngle = Math.PI - 0.04;
+  cv.style.touchAction = 'pan-y';
+  makeTouchRule(cv, controls, 0.04, Math.PI - 0.04);
+  const root = new THREE.Group(); scene.add(root);
+
+  const S = (color, metalness, roughness, extra = {}) => new THREE.MeshStandardMaterial({ color, metalness, roughness, ...extra });
+  const PH = o => new THREE.MeshPhysicalMaterial(o);
+  const MAT = {
+    gold: () => S(0xe0b257, 1, 0.24, { envMapIntensity: 2.0 }),
+    goldP: () => S(0xd6a957, 1, 0.34, { envMapIntensity: 1.6 }),
+    ti: () => S(0x8f9298, 0.9, 0.42, { envMapIntensity: 1.0 }),
+    ceramic: () => S(0xe6e1d5, 0, 0.55, { envMapIntensity: 0.7 }),
+    si: () => S(0x2f333b, 0.35, 0.38, { envMapIntensity: 0.9 }),
+    sio2: () => PH({ color: 0x4b408d, metalness: 0.15, roughness: 0.22, clearcoat: 1, clearcoatRoughness: 0.12, iridescence: 0.7, iridescenceIOR: 1.46, iridescenceThicknessRange: [240, 330], envMapIntensity: 1.2 }),
+    graphite: () => S(0x202227, 0.55, 0.3, { envMapIntensity: 1.2 }),
+    hbn: () => PH({ color: 0xa8d2ff, metalness: 0, roughness: 0.1, transparent: true, opacity: 0.48, depthWrite: false, clearcoat: 1, clearcoatRoughness: 0.05, envMapIntensity: 1.5 }),
+    ml: () => PH({ color: 0x2a7a74, metalness: 0.15, roughness: 0.45, iridescence: 0.35, iridescenceIOR: 1.8, iridescenceThicknessRange: [180, 520], sheen: 0.4, sheenColor: new THREE.Color(0xc9ae22), sheenRoughness: 0.5, envMapIntensity: 0.75 }),
+    ox: () => PH({ color: 0xe8eef5, metalness: 0, roughness: 0.2, transparent: true, opacity: 0.24, depthWrite: false, clearcoat: 1 })
+  };
+  const MW = { pkg: [], lead: [], wire: [], flake: [], tile: [] };
+  const mk = (list, kind) => { const m = MAT[kind](); MW[list].push(m); return m; };
+
+  /* ---------------- the package: carrier, chip, pads, leads, bonds ---------------- */
+  const SIDES = [[1, 0], [0, 1], [-1, 0], [0, -1]];
+  const PK = new THREE.Group(), LD = new THREE.Group(), WR = new THREE.Group(), FL = new THREE.Group();
+  root.add(PK, LD, WR, FL);
+  {
+    const B = new Bucket(), CAR = 15000, R = 600, cer = mk('pkg', 'ceramic'), gp = mk('pkg', 'goldP');
+    B.add(cer, extrudeY(rrShape(CAR, CAR, R), 1000, 12).translate(0, -1520, 0));
+    const sh = rrShape(CAR, CAR, R); sh.holes.push(rrPath(5900, 5900, 150)); B.add(cer, extrudeY(sh, 370, 12).translate(0, -520, 0));
+    const up = rrShape(CAR, CAR, R); up.holes.push(rrPath(9800, 9800, 300)); B.add(cer, extrudeY(up, 420, 12).translate(0, -150, 0));
+    const sr = rrShape(CAR - 500, CAR - 500, R - 250); sr.holes.push(rrPath(10400, 10400, 400)); B.add(gp, extrudeY(sr, 12, 12).translate(0, 270, 0));
+    B.add(gp, boxY(5800, -520, -512, 5800));
+    for (const [nx, nz] of SIDES) for (let k = -4; k <= 4; k++) {
+      const o = 700 * k, tx = -nz, tz = nx;
+      B.add(gp, boxY(nx ? 900 : 300, -150, -144, nx ? 300 : 900, nx * 3650 + tx * o, nz * 3650 + tz * o));
+      if (Math.abs(k) <= 3) B.add(gp, cylY(230, -1520, 270, nx * 7500 + tx * o * 2, nz * 7500 + tz * o * 2, 18));
+    }
+    B.add(mk('pkg', 'si'), boxY(5000, -512, -0.3, 5000));
+    B.add(mk('pkg', 'sio2'), boxY(5000, -0.3, -0.0004, 5000));
+    B.build(PK);
+  }
+  /* pads around the chip, and the twelve lines they serve */
+  const PADS = [];
+  for (const [nx, nz] of SIDES) for (const o of [-700, 0, 700]) { const tx = -nz, tz = nx; PADS.push({ x: nx * 2300 + tx * o, z: nz * 2300 + tz * o, nx, nz, o }); }
+  const ang = (x, z) => (Math.atan2(z, x) + TAU) % TAU;
+  PADS.forEach(p => (p.a = ang(p.x, p.z))); PADS.sort((p, q) => p.a - q.a);
+  const FX0 = i => (i - 3) * 0.04;              // finger gate positions along x, 40 nm pitch
+  const ENDS = [];                               // where each coarse lead ends (radius about 6 um)
+  for (let i = 0; i < 7; i++) {
+    const s = i % 2 ? 1 : -1, phi = (s > 0 ? 90 - FX0(i) / 0.04 * 10 : 270 + FX0(i) / 0.04 * 10) * D2R;
+    ENDS.push({ x: 6 * Math.cos(phi), z: 6 * Math.sin(phi), sx: FX0(i), sz: s * 0.3, kind: 'gate' });
+  }
+  ENDS.push({ x: 6 * Math.cos(35 * D2R), z: 6 * Math.sin(35 * D2R), sx: 0.3, sz: 0.17, kind: 'gate' });
+  ENDS.push({ x: 6 * Math.cos(215 * D2R), z: 6 * Math.sin(215 * D2R), sx: -0.3, sz: -0.17, kind: 'gate' });
+  ENDS.push({ x: 12.5, z: 0, kind: 'ohmic' }, { x: -11.0, z: 0.4, kind: 'ohmic' }, { x: -21, z: -2.5, kind: 'back' });
+  ENDS.forEach(e => (e.a = ang(e.x, e.z))); ENDS.sort((p, q) => p.a - q.a);
+  const bondCurves = [];
+  {
+    const mL = mk('lead', 'gold'), B = new Bucket();
+    PADS.forEach((p, i) => {
+      const e = ENDS[i];
+      B.add(mL, boxY(120, 0, 0.15, 120, p.x, p.z));
+      B.add(mL, prismXZ(taper(p.x - p.nx * 30, p.z - p.nz * 30, e.x, e.z, 70, 0.9), [], 0, 0.12));
+    });
+    B.build(LD);
+    const mW = mk('wire', 'gold'), BW = new Bucket();
+    for (const p of PADS) {
+      const A = V3(p.x + p.nx * 20, 0.15, p.z + p.nz * 20), tx = -p.nz, tz = p.nx, Bp = V3(p.nx * 3300 + tx * p.o, -144, p.nz * 3300 + tz * p.o);
+      const c = new THREE.CubicBezierCurve3(A, V3(A.x + (Bp.x - A.x) * 0.1, A.y + 420, A.z + (Bp.z - A.z) * 0.1), V3(A.x + (Bp.x - A.x) * 0.55, A.y + 400, A.z + (Bp.z - A.z) * 0.55), Bp);
+      bondCurves.push(c); BW.add(mW, tube(c, 12.5, 28, 8));
+    }
+    BW.build(WR);
+  }
+  /* the flakes around the device, each with a square hole where the cut-out block sits */
+  const HOLE = [[-0.3, -0.3], [0.3, -0.3], [0.3, 0.3], [-0.3, 0.3]];
+  const TH = 2 * D2R;
+  const PG = [[-24, -3], [-10, -8], [6, -9], [12, -3], [10, 6], [-3, 9], [-12, 5], [-24, 2]];
+  const PBH = [[-16, -12], [4, -15], [18, -8], [20, 6], [8, 16], [-10, 14], [-19, 2]];
+  const PML = [[-12, -4], [-3, -7], [9, -6], [13, 0], [8, 5], [-4, 6], [-11, 2]];
+  const PTH = [[-8, -10], [6, -12], [11, -4], [9, 9], [-2, 12], [-9, 6]];
+  const G1 = 0.0363, YM = 0.02566;
+  {
+    const B = new Bucket();
+    B.add(mk('flake', 'graphite'), prismXZ(PG, [HOLE], 0, 0.005));
+    B.add(mk('flake', 'hbn'), prismXZ(PBH, [HOLE], 0.005, 0.02));
+    B.add(mk('flake', 'ml'), prismXZ(PML, [HOLE], 0.025193, 0.00032));
+    B.add(mk('flake', 'ml'), prismXZ(PML, [HOLE], 0.025807, 0.00032).rotateY(TH));
+    B.add(mk('flake', 'hbn'), prismXZ(PTH, [HOLE], 0.0263, 0.01));
+    const fg = mk('flake', 'gold');
+    for (const e of ENDS) if (e.kind === 'gate') B.add(fg, prismXZ(taper(e.sx, e.sz, e.x, e.z, 0.02, 0.9), [], G1, 0.015));
+    B.build(FL);
+    for (const m of FL.children) m.castShadow = !m.material.transparent;
+  }
+
+  /* ---------------- the cut-out block: a 0.6 um square of the stack ---------------- */
+  const TW = 0.6;
+  const T = { g: new THREE.Group() };
+  for (const k of ['sub', 'graph', 'botH', 'botML', 'topML', 'topH', 'split', 'fing']) { T[k] = new THREE.Group(); T.g.add(T[k]); }
+  root.add(T.g);
+  const tm = kind => mk('tile', kind);
+  const addM = (grp, geo, mat) => { const m = new THREE.Mesh(geo, mat); m.castShadow = !mat.transparent; m.receiveShadow = true; grp.add(m); return m; };
+  addM(T.sub, boxY(TW, -0.6, -0.285, TW), tm('si'));
+  addM(T.sub, boxY(TW, -0.285, 0, TW), tm('sio2'));
+  addM(T.graph, boxY(TW, 0, 0.005, TW), tm('graphite'));
+  addM(T.botH, boxY(TW, 0.005, 0.025, TW), tm('hbn'));
+  addM(T.botML, boxY(TW, 0.025193, 0.025513, TW), tm('ml'));
+  addM(T.topML, boxY(TW, 0.025807, 0.026127, TW).rotateY(TH), tm('ml'));
+  addM(T.topH, boxY(TW, 0.0263, G1, TW), tm('hbn'));
+  { const ti = tm('ti'), au = tm('gold');
+    for (const s of [-1, 1]) { addM(T.split, boxY(TW, G1, G1 + 0.003, 0.26, 0, s * 0.17), ti); addM(T.split, boxY(TW, G1 + 0.003, G1 + 0.015, 0.26, 0, s * 0.17), au); }
+    addM(T.fing, alongX(conformal(G1, G1 + 0.015, 0.04, 0.008, 0.3), -0.3, 0.3), tm('ox'));
+    const fa = tm('gold'), B = new Bucket();
+    for (let i = 0; i < 7; i++) B.add(fa, alongX(conformal(G1 + 0.008, G1 + 0.023, 0.032, 0.015, 0.3), FX0(i) - 0.01, FX0(i) + 0.01));
+    B.build(T.fing);
+  }
+  const FTOP = G1 + 0.023 + 0.015;               // top of the fingers over the split gates
+  /* crystal-axis lines for the twist step */
+  const axA = new THREE.MeshBasicMaterial({ color: 0xdcdad3, toneMapped: false }), axB = new THREE.MeshBasicMaterial({ color: 0xff4a3a, toneMapped: false });
+  T.botML.add(new THREE.Mesh(boxY(1.3, 0.025513, 0.0262, 0.005), axA));
+  T.topML.add(new THREE.Mesh(boxY(1.3, 0.026127, 0.0268, 0.005).rotateY(TH), axB));
+  T.axisMeshes = [T.botML.children[1], T.topML.children[1]];
+
+  /* ---------------- atoms (local nanometres) ---------------- */
+  const A0 = 0.3182, HW = 11;
+  const AT = new THREE.Group(); AT.position.set(0, YM, 0); AT.scale.setScalar(1e-3); root.add(AT);
+  const botL = new THREE.Group(), topL = new THREE.Group(); AT.add(botL, topL);
+  const matMo = S(0x37a7a3, 0.25, 0.35, { envMapIntensity: 1.1 }), matS = S(0xe6cb34, 0.05, 0.4, { envMapIntensity: 1.0 });
+  {
+    const ico = new THREE.IcosahedronGeometry(1, 1), mo = [], sl = [], ox = 0.5 * A0, oz = A0 / (2 * S3);
+    hexSites(A0, HW, (x, z) => { mo.push([x, z]); if (Math.abs(x + ox) <= HW && Math.abs(z + oz) <= HW) sl.push([x + ox, z + oz]); });
+    for (const [grp, sg] of [[botL, -1], [topL, 1]]) {
+      instanced(ico, matMo, mo.map(([x, z]) => [x, sg * 0.307, z]), 0.1, grp);
+      instanced(ico, matS, sl.map(([x, z]) => [x, sg * 0.149, z]).concat(sl.map(([x, z]) => [x, sg * 0.465, z])), 0.085, grp);
+    }
+  }
+  /* the hole potential of the twisted bilayer at 2 degrees, as a height field */
+  const MO = moire(A0, 2), KH = 0.0058, YS = 1.75;
+  const surfG = new THREE.PlaneGeometry(2 * HW, 2 * HW, 200, 200); surfG.rotateX(-Math.PI / 2);
+  const sP = surfG.attributes.position, UU = new Float32Array(sP.count), col = new Float32Array(sP.count * 3);
+  const STOPS = [[-110, [0.11, 0.17, 0.30]], [0, [0.30, 0.38, 0.52]], [150, [0.66, 0.60, 0.45]], [336, [0.95, 0.86, 0.62]]];
+  const cmap = cmapOf(STOPS);
+  for (let i = 0; i < sP.count; i++) { UU[i] = MO.U(sP.getX(i), sP.getZ(i)); const c = cmap(UU[i]); col[3 * i] = c[0]; col[3 * i + 1] = c[1]; col[3 * i + 2] = c[2]; }
+  surfG.setAttribute('color', new THREE.BufferAttribute(col, 3));
+  const surfM = S(0xffffff, 0.1, 0.42, { vertexColors: true, side: THREE.DoubleSide, envMapIntensity: 0.9 });
+  const surf = new THREE.Mesh(surfG, surfM); AT.add(surf);
+  const surfY = (u, p) => lerp(0.62, YS, p) + KH * u * p;
+  let surfP = -1;
+  const setSurf = p => { if (p === surfP) return; surfP = p; for (let i = 0; i < sP.count; i++) sP.setY(i, surfY(UU[i], p)); sP.needsUpdate = true; surfG.computeVertexNormals(); };
+  const RB = MO.bern[0], ELL = 1.22;
+  const holeG = new THREE.PlaneGeometry(6 * ELL, 6 * ELL, 48, 48); holeG.rotateX(-Math.PI / 2);
+  const holeM = new THREE.MeshStandardMaterial({ color: 0xff3b2a, emissive: 0xda291c, emissiveIntensity: 0.9, roughness: 0.4, map: radialTexture(r => Math.exp(-9 * r * r)), transparent: true, depthWrite: false, side: THREE.DoubleSide });
+  const hole = new THREE.Mesh(holeG, holeM); AT.add(hole);
+  const hP = holeG.attributes.position, hX = [], hZ = [];
+  for (let i = 0; i < hP.count; i++) { hX.push(hP.getX(i) + RB[0]); hZ.push(hP.getZ(i) + RB[1]); }
+  const setHole = p => { for (let i = 0; i < hP.count; i++) { const x = hX[i], z = hZ[i], r2 = ((x - RB[0]) ** 2 + (z - RB[1]) ** 2) / (ELL * ELL); hP.setXYZ(i, x, surfY(MO.U(x, z), p) + 0.05 + 0.5 * Math.exp(-r2), z); } hP.needsUpdate = true; holeG.computeVertexNormals(); };
+  const holeGlow = glowSprite(0xff5a40, 3.2, 0.7); AT.add(holeGlow);
+  const nb = MO.bern.slice(1).sort((p, q) => Math.hypot(p[0] - RB[0], p[1] - RB[1]) - Math.hypot(q[0] - RB[0], q[1] - RB[1]))[0];
+  const SADDLE = [(RB[0] + nb[0]) / 2, (RB[1] + nb[1]) / 2];
+  const OTHER = MO.bern.find(q => Math.hypot(q[0] - RB[0], q[1] - RB[1]) > MO.L * 0.9) || nb;
+
+  /* ====================================================================================
+     State: a pure function of the master value m
+     ==================================================================================== */
+  const st = { m: 0, s: 0 };
+  let contF = 1, atomP = 0, thNow = 2, holeO = 0;
+  function apply(m) {
+    const s = m * N, P = k => clamp(s - k, 0, 1);
+    st.m = m; st.s = s;
+    // 2: bonds go; pads and leads lift and fade
+    const p1 = P(1), bo = 1 - sstep(0.06, 0.3, p1);
+    for (const mt of MW.wire) fade(mt, bo); WR.visible = bo > 0.003;
+    const ly = sstep(0.16, 0.62, p1); LD.position.y = 900 * ly * ly;
+    const lo = 1 - sstep(0.4, 0.72, p1); for (const mt of MW.lead) fade(mt, lo); LD.visible = lo > 0.003;
+    // 3: the camera dives; the package and the flakes fade, leaving the cut-out block
+    const pko = 1 - sstep(0.08, 0.3, P(2));
+    for (const mt of MW.pkg) fade(mt, pko); PK.visible = pko > 0.003;
+    for (const mt of MW.flake) fade(mt, pko); FL.visible = pko > 0.003;
+    // 3–9: the block explodes; 10: it closes again
+    const back = 1 - sstep(0, 0.22, P(9));
+    const g3 = sstep(0.42, 0.9, P(2)) * back, s4 = sstep(0.12, 0.85, P(3)) * back, s6 = sstep(0.1, 0.6, P(5)) * back;
+    const s7 = sstep(0.12, 0.85, P(6)) * back, s8 = sstep(0.12, 0.85, P(7)) * back, s9 = sstep(0.12, 0.85, P(8)) * back;
+    const upML = 0.05 * s6, upH = upML + 0.1 * s4, upS = upH + 0.2 * g3, upF = upS + 0.05 * g3;
+    T.topML.position.y = upML; T.topH.position.y = upH; T.split.position.y = upS; T.fing.position.y = upF;
+    const dnB = -0.07 * s7, dnG = dnB - 0.08 * s8, dnS = dnG - 0.1 * s9;
+    T.botH.position.y = dnB; T.graph.position.y = dnG; T.sub.position.y = dnS;
+    const ax = sstep(0.35, 0.7, P(5)) * (1 - sstep(0.05, 0.35, P(6)));
+    fade(axA, ax); fade(axB, ax); for (const a of T.axisMeshes) a.visible = ax > 0.003;
+    // 10: the continuum fades, atoms appear
+    const p9 = P(9); contF = 1 - sstep(0.18, 0.36, p9); atomP = sstep(0.3, 0.6, p9);
+    for (const mt of MW.tile) fade(mt, contF); T.g.visible = contF > 0.003;
+    const atomO = atomP * (1 - 0.82 * sstep(0.05, 0.45, P(11)));
+    fade(matMo, atomO); fade(matS, atomO); AT.visible = atomP > 0.001;
+    // 11: the layers close and the twist sweeps 2 -> 5 -> 2 degrees
+    const p10 = P(10);
+    topL.position.y = 1.6 * (1 - sstep(0.02, 0.32, p10));
+    thNow = p10 < 0.35 ? 2 : p10 < 0.65 ? lerp(2, 5, sstep(0.35, 0.65, p10)) : lerp(5, 2, sstep(0.65, 0.95, p10));
+    topL.rotation.y = thNow * D2R;
+    // 12: the potential rises out of the bilayer; the hole settles into a well
+    const sp = sstep(0.1, 0.6, P(11)); setSurf(sp); surf.visible = sp > 0.001;
+    holeO = sstep(0.5, 0.82, P(11));
+    if (holeO > 0) setHole(sp);
+    fade(holeM, holeO); hole.visible = holeO > 0.003;
+    holeGlow.visible = holeO > 0.003; holeGlow.material.opacity = 0.65 * holeO;
+    holeGlow.position.set(RB[0], surfY(MO.umin, sp) + 0.45, RB[1]);
+    root.updateMatrixWorld(true);
+  }
+
+  /* ====================================================================================
+     Camera path: per-step poses, distance interpolated in log space
+     ==================================================================================== */
+  const FXp = (x, y, z) => () => V3(x, y, z);
+  const atC = () => AT.localToWorld(V3(0, 0, 0));
+  const atW = () => AT.localToWorld(V3(RB[0] * 0.35, 0.8, RB[1] * 0.35));
+  const KEYS = [];
+  const ck = (k, u, t, h, az, pol, w) => KEYS.push({ M: (k + u) / N, t, h, w, az, pol });
+  ck(0, 0, FXp(0, -500, 0), 8600, 0.78, 0.96, 9600); ck(0, 0.9, FXp(0, -500, 0), 8200, 0.62, 0.9, 9400);
+  ck(1, 0.4, FXp(0, 0, 0), 3300, 0.5, 0.84); ck(1, 0.96, FXp(0, 0.02, 0), 26, 0.42, 0.9);
+  ck(2, 0.3, FXp(0, 0.04, 0), 0.62, 0.55, 1.0); ck(2, 0.96, FXp(0, 0.2, 0), 0.62, 0.62, 1.07);
+  ck(3, 0.96, FXp(0, 0.2, 0), 0.64, 0.7, 1.1);
+  ck(4, 0.55, FXp(0.2, 0.024, 0.2), 0.15, 0.82, 1.3); ck(4, 0.96, FXp(0.2, 0.024, 0.2), 0.14, 0.9, 1.32);
+  ck(5, 0.96, FXp(0, 0.05, 0), 0.5, 0.96, 1.12);
+  ck(6, 0.96, FXp(0, -0.02, 0), 0.55, 1.05, 1.12);
+  ck(7, 0.96, FXp(0, -0.1, 0), 0.66, 1.15, 1.13);
+  ck(8, 0.96, FXp(0, -0.18, 0), 0.84, 1.25, 1.14);
+  const atF = () => AT.localToWorld(V3(0, 0.75, 9.2));
+  ck(9, 0.2, FXp(0, 0.02, 0), 0.62, 1.1, 1.12); ck(9, 0.62, atC, 0.012, 0.6, 1.25); ck(9, 0.96, atF, 0.003, 0.15, 1.5);
+  ck(10, 0.3, atF, 0.003, 0.15, 1.45); ck(10, 0.96, atC, 0.0125, 0.6, 0.06);
+  ck(11, 0.45, atC, 0.0125, 0.55, 0.62); ck(11, 0.96, atW, 0.0102, 0.5, 0.98);
+  KEYS.sort((a, b) => a.M - b.M);
+  const hv = h => typeof h === 'function' ? h() : h;
+  let W = 1, H = 1, view = { cx: 0.5, cy: 0.5, fw: 1, fh: 1 };
+  function poseDist(K) { const h = hv(K.h), w = K.w !== undefined ? K.w : h; return Math.max(h * H / view.fh, w * H / view.fw) / tanV; }
+  function camAt(m) {
+    let i = 0; while (i < KEYS.length - 1 && KEYS[i + 1].M <= m) i++;
+    const A = KEYS[i], B = KEYS[Math.min(i + 1, KEYS.length - 1)];
+    const t = B.M > A.M ? ease(clamp((m - A.M) / (B.M - A.M), 0, 1)) : 0;
+    const tA = A.t(), tB = B.t(), dA = poseDist(A), dB = poseDist(B);
+    const d = Math.exp(lerp(Math.log(dA), Math.log(dB), t));
+    const tgt = Math.abs(Math.log(dB / dA)) > 0.6 ? tB.clone().lerp(tA, (d - dB) / (dA - dB)) : tA.clone().lerp(tB, t);
+    return { tgt, d, az: lerp(A.az, B.az, t), pol: lerp(A.pol, B.pol, t) };
+  }
+  let azOff = 0, polOff = 0, placing = false, cam = null;
+  const sph = new THREE.Spherical();
+  function place() {
+    cam = camAt(st.m);
+    sph.set(cam.d, clamp(cam.pol + polOff, 0.04, Math.PI - 0.04), cam.az + azOff);
+    camera.position.setFromSpherical(sph).add(cam.tgt); controls.target.copy(cam.tgt);
+    camera.near = cam.d * 0.004; camera.far = cam.d * 800; camera.updateProjectionMatrix();
+    placing = true; controls.update(); placing = false;
+  }
+  controls.addEventListener('change', () => {
+    if (placing || !cam) return;
+    const a = controls.getAzimuthalAngle() - cam.az; azOff = Math.atan2(Math.sin(a), Math.cos(a)); polOff = controls.getPolarAngle() - cam.pol;
+    request();
+  });
+
+  /* ====================================================================================
+     Labels
+     ==================================================================================== */
+  const LB = [];
+  const lab = (t, at, d, k0, k1, cls = '') => LB.push({ t, at, d, k0, k1, cls });
+  const tW = (grp, x, y, z) => () => grp.localToWorld(V3(x, y, z));
+  const atL = (grp, x, y, z) => () => grp.localToWorld(V3(x, y, z));
+  const rgt = V3(1, 0, 0);
+  const cE = (grp, y, side = 1) => () => grp.localToWorld(V3(side * Math.sign(rgt.x || 1) * 0.3, y, side * Math.sign(rgt.z || 1) * 0.3));   // the tile corner on the camera's right (or left)
+  lab('Ceramic chip carrier', FXp(-5400, 282, 6900), [-40, 22], -1, 1.15, 'b');
+  lab('Silicon chip · 5 × 5 mm', FXp(2500, 0, -1500), [44, -24], -1, 1.15, 'b');
+  lab('Gold wire bonds · ≈ 25 µm', () => bondCurves[1].getPoint(0.4), [44, -30], -1, 1.15);
+  lab('Bond pads', () => V3(PADS[7].x, 0.15, PADS[7].z), [-40, 26], -1, 1.15);
+  lab('Gold-plated bond fingers', FXp(-3650, -144, -2100), [-40, -26], -1, 1.15);
+  lab('Leads converge on the device', () => V3(PADS[3].x * 0.3, 0.12, PADS[3].z * 0.3), [44, 28], -1, 1.15);
+  lab('Ti/Au leads, lifted away', () => LD.localToWorld(V3(PADS[0].x * 0.08, 0.12, PADS[0].z * 0.08)), [40, -26], 1.12, 1.62, 'b');
+  lab('Top hBN', FXp(8.4, G1, 7.6), [44, -24], 1.72, 2.12, 'b');
+  lab('Bottom hBN', FXp(17, 0.025, -7), [44, 22], 1.72, 2.12, 'b');
+  lab('Twisted MoS₂ bilayer', FXp(12.2, 0.0262, 0.4), [44, 4], 1.72, 2.12, 'b');
+  lab('Graphite back gate', FXp(-21, 0.005, -1), [-40, 22], 1.72, 2.12, 'b');
+  lab('Gate leads', () => V3(ENDS[3].x * 0.5, G1 + 0.015, ENDS[3].z * 0.5), [-40, -26], 1.72, 2.12);
+  lab('Cut-out: 0.6 µm of the stack', tW(T.topH, 0.3, G1, 0.3), [46, 30], 2.22, 2.55);
+  lab('Split gate · Ti/Au', tW(T.split, 0.22, G1 + 0.015, 0.22), [46, 24], 2.3, 3.12, 'b');
+  lab('Plunger gate', tW(T.fing, FX0(3), FTOP, -0.24), [-44, -22], 2.3, 3.12, 'b');
+  lab('Barrier gate', tW(T.fing, FX0(4), FTOP, -0.27), [40, -30], 2.3, 3.12, 'b');
+  lab('Al₂O₃ between gate layers (illustrative)', tW(T.fing, -0.29, G1 + 0.023, 0.12), [-46, 24], 2.3, 3.12);
+  lab('<tspan class="t">40 nm</tspan> pitch', tW(T.fing, (FX0(1) + FX0(2)) / 2, FTOP, 0.28), [-40, -34], 2.3, 3.12);
+  lab('Top hBN · ≈ 10 nm', cE(T.topH, 0.031), [46, 10], 3.22, 4.15, 'b');
+  lab('Gates, lifted', cE(T.split, G1 + 0.015, -1), [-44, -14], 3.3, 4.15);
+  lab('MoS₂ bilayer · 1.3 nm', tW(T.botML, 0.3, 0.0258, 0.2), [46, 26], 4.3, 5.15, 'b');
+  lab('Top hBN, lifted', tW(T.topH, 0.3, 0.0263, 0.05), [46, -30], 4.3, 5.15);
+  lab('Bottom hBN', tW(T.botH, 0.3, 0.012, 0.08), [46, 30], 4.3, 5.15);
+  lab('Top monolayer · turned by <tspan class="t">θ = 2°</tspan>', cE(T.topML, 0.026), [46, -22], 5.42, 6.12, 'b');
+  lab('Bottom monolayer', cE(T.botML, 0.0254), [46, 24], 5.42, 6.12, 'b');
+  lab('Crystal axes', tW(T.topML, -0.5, 0.0268, -0.0175), [-44, -26], 5.42, 6.12);
+  lab('Bottom hBN · ≈ 20 nm', cE(T.botH, 0.015), [46, 8], 6.3, 9.2, 'b');
+  lab('Graphite · a few nm', cE(T.graph, 0.0025), [46, 10], 7.3, 9.2, 'b');
+  lab('SiO₂ · 285 nm', cE(T.sub, -0.14), [46, 0], 8.3, 9.2, 'b');
+  lab('Si', cE(T.sub, -0.45), [46, 0], 8.4, 9.2);
+  lab('Gates', cE(T.split, G1 + 0.012), [46, -6], 8.45, 9.2);
+  lab('Top hBN', cE(T.topH, 0.031), [46, -4], 8.45, 9.2);
+  lab('Twisted bilayer', cE(T.topML, 0.026), [46, 2], 8.45, 9.2);
+  lab('S', atL(topL, 0.75, 0.465, 10.75), [46, -30], 9.62, 10.25);
+  lab('Mo', atL(topL, 0.6, 0.307, 10.75), [52, -8], 9.62, 10.25);
+  lab('S', atL(topL, 0.75, 0.149, 10.75), [50, 14], 9.62, 10.25);
+  lab('Top layer, lifted and turned 2°', atL(topL, -1.6, 0.465, 10.75), [-50, -30], 9.62, 10.25, 'b');
+  lab('Bottom layer', atL(botL, -1.6, -0.307, 10.75), [-50, 30], 9.62, 10.25, 'b');
+  lab('AA', () => AT.localToWorld(V3(0, 0.6, 0)), [-36, -30], 10.88, 11.12, 'b');
+  lab('Bernal', () => AT.localToWorld(V3(RB[0], 0.6, RB[1])), [40, -30], 10.88, 11.12, 'b');
+  lab('AA · a hill for holes, +336 meV', () => AT.localToWorld(V3(0, surfY(MO.U(0, 0), surfP), 0)), [-46, -30], 11.5, 12.2, 'b');
+  lab('Bernal well · −109 meV', () => AT.localToWorld(V3(OTHER[0], surfY(MO.umin, surfP), OTHER[1])), [-44, 30], 11.5, 12.2, 'b');
+  lab('Saddle · 77 meV above the wells', () => AT.localToWorld(V3(SADDLE[0], surfY(MO.U(SADDLE[0], SADDLE[1]), surfP), SADDLE[1])), [50, -44], 11.5, 12.2);
+  lab('<tspan class="r">Hole · spread over ℓ = 1.22 nm</tspan>', () => AT.localToWorld(V3(RB[0], surfY(MO.umin, surfP) + 0.55, RB[1])), [-50, 44], 11.62, 12.2);
+
+  let blocks = [];
+  function measureBlocks() {
+    const sr = stageEl.getBoundingClientRect();
+    blocks = ['steps', 'cap', 'scale', 'hud'].map(id => $(id)).concat([stageEl.querySelector('.tbar')]).map(el => {
+      const r = el.getBoundingClientRect(); if (!r.width || !r.height) return null;
+      return [r.left - sr.left - 4, r.top - sr.top - 4, r.right - sr.left + 4, r.bottom - sr.top + 4];
+    }).filter(Boolean);
+    const lst = $('slist'); if (getComputedStyle(lst).display === 'none') blocks = blocks.filter(b => b[3] - b[1] < 80 || b[1] > 100);
+  }
+  function overlay() {
+    rgt.set(1, 0, 0).applyQuaternion(camera.quaternion); rgt.y = 0; rgt.normalize();
+    const pl = Placer(W, H, DARKT); blocks.forEach(b => pl.block(b));
+    for (const L of LB) {
+      const op = (L.k0 < 0 ? 1 : sstep(L.k0, L.k0 + 0.12, st.s)) * (1 - sstep(L.k1 - 0.12, L.k1, st.s)); if (op < 0.02) continue;
+      const p = L.at(); p.project(camera);
+      if (p.z > 1 || p.z < -1 || Math.abs(p.x) > 1.05 || Math.abs(p.y) > 1.05) continue;
+      const x = (p.x + 1) / 2 * W, y = (1 - p.y) / 2 * H;
+      if (blocks.some(b => x > b[0] && x < b[2] && y > b[1] && y < b[3])) continue;
+      pl.add(x, y, L.d[0], L.d[1], typeof L.t === 'function' ? L.t() : L.t, op, L.cls);
+    }
+    ov.innerHTML = pl.svg;
+  }
+
+  /* ====================================================================================
+     Render on demand
+     ==================================================================================== */
+  const scaleT = $('scaleT'), scaleB = $('scaleB'), hud = $('hud');
+  function updateScale() {
+    const wpp = 2 * cam.d * tanV / H, want = 96 * wpp, p = Math.pow(10, Math.floor(Math.log10(want)));
+    let len = p; for (const k of [1, 2, 5, 10]) if (k * p <= want) len = k * p;
+    scaleB.style.width = (len / wpp).toFixed(1) + 'px'; scaleT.textContent = lenText(len);
+  }
+  const LDIR = V3(-0.5, 0.72, 0.62).normalize(), RA = V3(-0.85, 0.3, -0.75).normalize(), RBd = V3(0.9, 0.22, -0.6).normalize();
+  function lights() {
+    const q = camera.quaternion, half = Math.max(cam.d * tanV * Math.max(1, W / H) * 1.2, 1e-9);
+    const kd = LDIR.clone().applyQuaternion(q);
+    key.target.position.copy(cam.tgt); key.position.copy(cam.tgt).addScaledVector(kd, half * 4);
+    const c = key.shadow.camera; c.left = -half; c.right = half; c.top = half; c.bottom = -half; c.near = half * 0.5; c.far = half * 9; c.updateProjectionMatrix();
+    key.shadow.normalBias = half * 0.0012; key.target.updateMatrixWorld();
+    for (const [L, d] of [[rimA, RA], [rimB, RBd]]) { L.target.position.copy(cam.tgt); L.position.copy(cam.tgt).addScaledVector(d.clone().applyQuaternion(q), half * 4); L.target.updateMatrixWorld(); }
+  }
+  function gates() {
+    const d = cam.d;
+    PK.visible = PK.visible && d > 6; LD.visible = LD.visible && d > 6; WR.visible = WR.visible && d > 6;
+    FL.visible = FL.visible && d > 0.05; AT.visible = AT.visible && d < 0.6;
+    T.g.visible = T.g.visible && d < 2000;
+  }
+  let raf = 0, visible = true, tween = null, lastStep = -1;
+  function request() { if (!raf) raf = requestAnimationFrame(frame); }
+  function frame(now) {
+    raf = 0;
+    if (tween) {
+      const u = clamp((now - tween.t0) / tween.dur, 0, 1), v = lerp(tween.a, tween.b, ease(u));
+      setMaster(v, 'tween'); if (u >= 1) tween = null;
+    }
+    if (!visible && !tween) return;
+    apply(st.m); place(); gates(); lights();
+    renderer.render(scene, camera);
+    overlay(); updateScale(); updateUI();
+    const showHud = st.s > 10.02;
+    hud.style.opacity = showHud ? 1 : 0;
+    if (showHud) hud.innerHTML = `θ = ${thNow.toFixed(2)}° <span>·</span> L = ${(A0 / (2 * Math.sin(thNow * D2R / 2))).toFixed(2)} nm`;
+    if (tween) request();
+  }
+
+  /* ====================================================================================
+     UI: slider, scroll, buttons, keys, step list (as in the teardown)
+     ==================================================================================== */
+  const slider = $('master'), posEl = $('pos'), list = $('slist');
+  STEPS.forEach((S_, i) => {
+    const li = document.createElement('li'), b = document.createElement('button');
+    b.type = 'button'; b.className = 'sbtn'; b.dataset.i = i;
+    b.innerHTML = `<span class="n">${String(i + 1).padStart(2, '0')}</span><span class="t">${S_.title}</span>`;
+    b.addEventListener('click', () => { goTo(REST(i)); if (matchMedia('(max-width:720px)').matches) toggleList(false); });
+    li.appendChild(b); list.appendChild(li);
+  });
+  const btns = [...list.querySelectorAll('.sbtn')];
+  const stepOf = m => Math.min(N - 1, Math.floor(m * N + 1e-9));
+  function updateUI() {
+    const i = stepOf(st.m);
+    posEl.textContent = `${i + 1} / ${N}`;
+    if (i === lastStep) return; lastStep = i;
+    const St = STEPS[i];
+    btns.forEach((b, j) => { if (j === i) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current'); b.classList.toggle('done', j < i); });
+    const cb = btns[i]; if (cb && list.scrollHeight > list.clientHeight) list.scrollTop = cb.offsetTop - list.clientHeight / 2 + cb.offsetHeight / 2;
+    $('capK').innerHTML = `Step ${i + 1} of ${N} <span>·</span> ${St.meta}`;
+    $('capT').textContent = St.title; $('capP').textContent = St.text;
+    $('stogN').textContent = String(i + 1).padStart(2, '0'); $('stogT').textContent = St.title;
+    slider.setAttribute('aria-valuetext', `Step ${i + 1} of ${N}: ${St.title}`);
+    cv.setAttribute('aria-label', `Moiré device teardown, step ${i + 1} of ${N}: ${St.title}. ${St.text}`);
+    $('prev').disabled = st.m <= 0.0005; $('next').disabled = st.m >= 0.9995;
+    measureBlocks();
+  }
+  let secTop = 0, secRange = 1, expectY = null;
+  const BAR = () => parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--bar')) || 52;
+  function measure() { const r = tear.getBoundingClientRect(); secTop = r.top + window.scrollY; secRange = Math.max(1, tear.offsetHeight - stageEl.offsetHeight); }
+  function syncScroll() { const y = Math.round(secTop - BAR() + st.m * secRange); expectY = y; window.scrollTo(0, y); }
+  function setMaster(v, from) {
+    st.m = clamp(v, 0, 1);
+    if (from !== 'slider') slider.value = st.m;
+    if (from !== 'scroll') syncScroll();
+    $('prev').disabled = st.m <= 0.0005; $('next').disabled = st.m >= 0.9995;
+    request();
+  }
+  slider.addEventListener('input', () => { tween = null; setMaster(+slider.value, 'slider'); });
+  slider.addEventListener('keydown', e => {
+    const k = e.key;
+    if (k === 'ArrowRight' || k === 'ArrowUp' || k === 'PageDown') { e.preventDefault(); stepNext(1); }
+    else if (k === 'ArrowLeft' || k === 'ArrowDown' || k === 'PageUp') { e.preventDefault(); stepNext(-1); }
+    else if (k === 'Home') { e.preventDefault(); goTo(0); } else if (k === 'End') { e.preventDefault(); goTo(1); }
+  });
+  window.addEventListener('scroll', () => {
+    const y = window.scrollY;
+    if (expectY !== null && Math.abs(y - expectY) < 2) { expectY = null; return; }
+    expectY = null;
+    const r = tear.getBoundingClientRect();
+    if (r.bottom < -200 || r.top > innerHeight + 200) { if (!tween) return; }
+    tween = null;
+    setMaster((y + BAR() - secTop) / secRange, 'scroll');
+  }, { passive: true });
+  function goTo(v) {
+    if (RM) { tween = null; setMaster(v, 'tween'); return; }
+    const a = st.m, dur = clamp(Math.abs(v - a) * N * 1500, 450, 2600);
+    tween = { a, b: v, t0: performance.now(), dur }; request();
+  }
+  function stepNext(dir) {
+    const m = tween ? tween.b : st.m;
+    if (dir > 0) { for (let i = 0; i < N; i++) if (REST(i) > m + 0.002) return goTo(REST(i)); }
+    else { for (let i = N - 1; i >= 0; i--) if (REST(i) < m - 0.002) return goTo(REST(i)); goTo(0); }
+  }
+  $('next').addEventListener('click', () => stepNext(1));
+  $('prev').addEventListener('click', () => stepNext(-1));
+  $('reset').addEventListener('click', () => {
+    if (RM) { azOff = polOff = 0; request(); return; }
+    const a0 = azOff, p0 = polOff, t0 = performance.now();
+    const run = now => { const u = clamp((now - t0) / 450, 0, 1), e = ease(u); azOff = a0 * (1 - e); polOff = p0 * (1 - e); request(); if (u < 1) requestAnimationFrame(run); };
+    requestAnimationFrame(run);
+  });
+  document.addEventListener('keydown', e => {
+    if (e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey) return;
+    const tg = e.target; if (tg && (tg.tagName === 'INPUT' || tg.tagName === 'TEXTAREA' || tg.tagName === 'SELECT' || tg.isContentEditable)) return;
+    if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+    const r = stageEl.getBoundingClientRect(); if (r.bottom < innerHeight * 0.4 || r.top > innerHeight * 0.6) return;
+    e.preventDefault(); stepNext(e.key === 'ArrowRight' ? 1 : -1);
+  });
+  const stEl = $('steps'), stog = $('stoggle');
+  function toggleList(open) { stEl.classList.toggle('open', open); stog.setAttribute('aria-expanded', open ? 'true' : 'false'); measureBlocks(); request(); }
+  stog.addEventListener('click', () => toggleList(!stEl.classList.contains('open')));
+  function capMax() {
+    const k = $('capK'), t = $('capT'), p = $('capP'), cap = $('cap'), save = [k.innerHTML, t.textContent, p.textContent];
+    let hmax = 0;
+    for (const St of STEPS) { k.innerHTML = `Step 12 of ${N} <span>·</span> ${St.meta}`; t.textContent = St.title; p.textContent = St.text; hmax = Math.max(hmax, cap.offsetHeight); }
+    [k.innerHTML, t.textContent, p.textContent] = save; return hmax;
+  }
+  function layout() {
+    W = stageEl.clientWidth; H = stageEl.clientHeight; if (!W || !H) return;
+    renderer.setSize(W, H, false); camera.aspect = W / H;
+    const mobile = W < 721;
+    let x0 = 0, x1 = W, y0 = 0, y1 = H - 62;
+    if (mobile) { y0 = 52; y1 = H - 60 - capMax() - 8; } else { x1 = W - (W < 981 ? 238 : 276); y1 = H - 62 - capMax() * (W < 1200 ? 0.45 : 0.22); }
+    view = { fw: x1 - x0, fh: y1 - y0, cx: (x0 + x1) / 2, cy: (y0 + y1) / 2 };
+    camera.setViewOffset(W, H, Math.round(W / 2 - view.cx), Math.round(H / 2 - view.cy), W, H);
+    camera.updateProjectionMatrix();
+    const pinned = window.scrollY + BAR() >= secTop - 1 && window.scrollY + BAR() <= secTop + secRange + 1;
+    measure(); measureBlocks(); if (pinned) syncScroll(); request();
+  }
+  new ResizeObserver(layout).observe(stageEl);
+  new IntersectionObserver(es => { visible = es[es.length - 1].isIntersecting; if (visible) request(); }, { rootMargin: '120px' }).observe(stageEl);
+  addEventListener('load', () => { measure(); setMaster((window.scrollY + BAR() - secTop) / secRange, 'scroll'); });
+  tear.style.height = `calc(${N} * 80vh + 100vh)`;
+  layout(); measure();
+  st.m = clamp((window.scrollY + BAR() - secTop) / secRange, 0, 1); slider.value = st.m;
+  request();
+}
+partOne();
+/* ====================================================================================
+   Part II: one light stage per device. Each starts when it first comes near the
+   viewport, renders on demand, and animates only while visible.
+   ==================================================================================== */
+const SM = (color, metalness, roughness, extra = {}) => new THREE.MeshStandardMaterial({ color, metalness, roughness, ...extra });
+const PM = o => new THREE.MeshPhysicalMaterial(o);
+const ROSSO = 0xda291c;
+const LMAT = {
+  gold: () => SM(0xd7a84c, 1, 0.27, { envMapIntensity: 1.5 }),
+  hbn: () => PM({ color: 0x9cc8f2, metalness: 0, roughness: 0.12, transparent: true, opacity: 0.32, depthWrite: false, clearcoat: 1, envMapIntensity: 1.2 }),
+  ink: () => SM(0x1f1f1d, 0.2, 0.5),
+  red: () => SM(0xe0301f, 0.1, 0.38, { emissive: 0xb01a0e, emissiveIntensity: 0.55 })
+};
+function makeFig(id, opt, build) {
+  const cv = $(id); if (!cv) return null;
+  const ov = $(id + '-ov'), box = cv.parentElement;
+  const F = { cv, ov, labels: [], W: 1, H: 1, visible: false, unit: opt.unit ?? 1e-3, fov: opt.fov || 30, tgt: V3(0, 0, 0), h: opt.h || 10, w: opt.w, tick: null, anim: null, placed: false, dist: 1 };
+  F.dir = new THREE.Vector3().setFromSphericalCoords(1, opt.pol ?? 1.0, opt.az ?? 0.6);
+  let raf = 0, last = 0;
+  F.request = () => { if (!raf && F.renderer) raf = requestAnimationFrame(frame); };
+  function start() {
+    let r;
+    try { r = new THREE.WebGLRenderer({ canvas: cv, antialias: true, logarithmicDepthBuffer: !!opt.logDepth }); }
+    catch (e) { const d = document.createElement('div'); d.className = 'nogl'; d.textContent = 'This figure needs WebGL, which is not available in this browser.'; cv.replaceWith(d); F.dead = true; return; }
+    r.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+    r.toneMapping = THREE.ACESFilmicToneMapping; r.toneMappingExposure = opt.exposure || 1.0;
+    const scene = new THREE.Scene(); scene.background = new THREE.Color(0xe9e9e4);
+    const pm = new THREE.PMREMGenerator(r); scene.environment = pm.fromScene(new RoomEnvironment(), 0.04).texture; pm.dispose();
+    scene.add(new THREE.HemisphereLight(0xffffff, 0x9f9f98, 0.8));
+    const sun = new THREE.DirectionalLight(0xffffff, 1.5); sun.position.set(-0.8, 2.0, 1.2); scene.add(sun);
+    const camera = new THREE.PerspectiveCamera(F.fov, 2, 0.01, 1e7);
+    const controls = new OrbitControls(camera, cv);
+    const minP = opt.minPol ?? 0.06, maxP = opt.maxPol ?? 1.5;
+    controls.enableZoom = false; controls.enablePan = false; controls.enableDamping = false; controls.rotateSpeed = 0.7;
+    controls.minPolarAngle = minP; controls.maxPolarAngle = maxP;
+    cv.style.touchAction = 'pan-y'; makeTouchRule(cv, controls, minP, maxP);
+    Object.assign(F, { renderer: r, scene, camera, controls });
+    build(F);
+    controls.addEventListener('change', () => { if (!F.placing) F.request(); });
+    new ResizeObserver(resize).observe(cv); resize();
+  }
+  function resize() {
+    const w = cv.clientWidth, h = cv.clientHeight; if (!w || !h || !F.renderer) return;
+    F.W = w; F.H = h; F.renderer.setSize(w, h, false); F.camera.aspect = w / h; F.camera.updateProjectionMatrix(); F.request();
+  }
+  F.place = () => {
+    const { camera, controls } = F;
+    if (F.placed) { const c = camera.position.clone().sub(controls.target); if (c.lengthSq() > 0) F.dir.copy(c.normalize()); }
+    const tanV = Math.tan(F.fov * D2R / 2), asp = F.W / F.H, hv = F.h, wv = F.w || hv * 1.3;
+    F.dist = Math.max(hv, wv / asp) / tanV;
+    controls.target.copy(F.tgt); camera.position.copy(F.tgt).addScaledVector(F.dir, F.dist);
+    camera.near = F.dist * (opt.logDepth ? 0.001 : 0.02); camera.far = F.dist * 100; camera.updateProjectionMatrix();
+    F.placing = true; controls.update(); F.placing = false; F.placed = true;
+  };
+  function overlay() {
+    const W = F.W, H = F.H, pl = Placer(W, H, LIGHTT);
+    pl.block([0, 0, 250, 40]); pl.block([0, H - 46, 170, H]);
+    for (const L of F.labels) {
+      const op = L.op ? L.op() : 1; if (op < 0.02) continue;
+      const p = L.at().project(F.camera);
+      if (p.z > 1 || p.z < -1 || Math.abs(p.x) > 1.02 || Math.abs(p.y) > 1.02) continue;
+      pl.add((p.x + 1) / 2 * W, (1 - p.y) / 2 * H, L.d[0], L.d[1], typeof L.t === 'function' ? L.t() : L.t, op, L.cls || '');
+    }
+    const wpp = 2 * F.dist * Math.tan(F.fov * D2R / 2) / H, want = 110 * wpp, p = Math.pow(10, Math.floor(Math.log10(want)));
+    let len = p; for (const k of [1, 2, 5, 10]) if (k * p <= want) len = k * p;
+    const bl = len / wpp, x0 = 18, y0 = H - 18;
+    ov.innerHTML = pl.svg + `<g><line x1="${x0}" y1="${y0}" x2="${(x0 + bl).toFixed(1)}" y2="${y0}" stroke="#121212" stroke-width="1.5"/><line x1="${x0}" y1="${y0 - 5}" x2="${x0}" y2="${y0 + 3}" stroke="#121212"/><line x1="${(x0 + bl).toFixed(1)}" y1="${y0 - 5}" x2="${(x0 + bl).toFixed(1)}" y2="${y0 + 3}" stroke="#121212"/><text class="b" x="${x0}" y="${y0 - 9}">${lenText(len * F.unit)}</text></g>`;
+  }
+  function frame(now) {
+    raf = 0; if (!F.renderer) return;
+    const dt = last ? Math.min(0.05, (now - last) / 1000) : 0; last = now;
+    if (F.tick) F.tick(dt, now / 1000);
+    F.place();
+    if (F.after) F.after();
+    F.renderer.render(F.scene, F.camera);
+    overlay();
+    if (F.visible && F.anim && F.anim()) raf = requestAnimationFrame(frame); else last = 0;
+  }
+  new IntersectionObserver(es => {
+    const v = es[es.length - 1].isIntersecting; F.visible = v;
+    if (v && !F.renderer && !F.dead) start();
+    if (v) F.request();
+  }, { rootMargin: '300px' }).observe(box);
+  return F;
+}
+const press = (on, off) => { on.setAttribute('aria-pressed', 'true'); for (const b of off) b.setAttribute('aria-pressed', 'false'); };
+
+/* ---------------- 01 twisted hBN: proposed vs computed potential (units: nm) ---------------- */
+function buildD1(F) {
+  const { scene } = F;
+  const L = 13.162, K = 0.012, HWp = 21;
+  const STAR = [[[1, 0], [-1, 1], [0, -1]], [[1, 1], [-2, 1], [1, -2]], [[2, 0], [-2, 2], [0, -2]]];
+  const PF = [-56.62525583686586, 17.573633051746167, 3.6483664455215035];          // v0_fit_2d_K.json, cbK_abs
+  const reg = (x, z) => { const d2 = z / (L * S3 / 2); return [x / L + d2 / 2, d2]; };
+  const Vc = (x, z) => { const [d1, d2] = reg(x, z); let v = 0; for (let s = 0; s < 3; s++) for (const [m, n] of STAR[s]) v += PF[s] * Math.cos(TAU * (m * d1 + n * d2)); return v; };
+  const Vp = (x, z) => { const [d1, d2] = reg(x, z); let v = 0; for (const [m, n] of STAR[0]) { const ph = TAU * (m * d1 + n * d2); v -= 160 * (Math.cos(ph) - Math.sin(ph)); } return v; };
+  const LEV = { p: [-397.1994245367313, -317.6690767276649], c: [-88.92363970835898, -63.172989786736885] };   // levels_109.json (V0_minus160), levels_measured.json
+  const g = new THREE.PlaneGeometry(2 * HWp, 2 * HWp, 190, 190); g.rotateX(-Math.PI / 2);
+  const P = g.attributes.position, n = P.count, vp = new Float32Array(n), vc = new Float32Array(n), col = new Float32Array(3 * n);
+  for (let i = 0; i < n; i++) { vp[i] = Vp(P.getX(i), P.getZ(i)); vc[i] = Vc(P.getX(i), P.getZ(i)); }
+  g.setAttribute('color', new THREE.BufferAttribute(col, 3));
+  const STOPS = [[-480, [0.09, 0.14, 0.26]], [-120, [0.26, 0.34, 0.47]], [100, [0.58, 0.6, 0.62]], [656, [0.93, 0.9, 0.83]]];
+  const cmap = cmapOf(STOPS);
+  scene.add(new THREE.Mesh(g, SM(0xffffff, 0.05, 0.5, { vertexColors: true, side: THREE.DoubleSide, envMapIntensity: 0.8 })));
+  const ringMat = SM(0x1d1d1b, 0.2, 0.45);
+  const rings = [0, 1].map(() => { const m = new THREE.Mesh(new THREE.BufferGeometry(), ringMat); scene.add(m); return m; });
+  const ringR = [1, 1];
+  const elec = new THREE.Mesh(new THREE.SphereGeometry(0.62, 32, 16), LMAT.red()); scene.add(elec);
+  const eg = glowSprite(0xff5040, 2.6, 0.3); scene.add(eg);
+  const pts = []; for (let i = 0; i <= 90; i++) { const x = -2.6 + 5.2 * i / 90; pts.push(V3(x, 0.42 * Math.sin(TAU * x / 1.05) * Math.exp(-x * x / 1.6), 0)); }
+  const pgeo = new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts), 140, 0.075, 6, false);
+  const pmat = SM(0x2a2a27, 0.1, 0.5, { transparent: true });
+  const packets = [0, 1].map(() => { const m = new THREE.Mesh(pgeo, pmat); scene.add(m); return m; });
+  const rAt = (E, f) => { let a = 0.02, b = L / 2; if (f(b, 0) < E) return b; for (let i = 0; i < 40; i++) { const c = (a + b) / 2; if (f(c, 0) < E) a = c; else b = c; } return (a + b) / 2; };
+  let lev = [0, 0], mix = 0, mixT = 0, shown = -1, dirA = 0.7, cyc = -1, packVis = 0, ph = 0;
+  const fmix = (x, z) => lerp(Vp(x, z), Vc(x, z), shown);
+  function setT(t) {
+    if (t === shown) return; shown = t;
+    for (let i = 0; i < n; i++) { const v = lerp(vp[i], vc[i], t); P.setY(i, K * v); const c = cmap(v); col[3 * i] = c[0]; col[3 * i + 1] = c[1]; col[3 * i + 2] = c[2]; }
+    P.needsUpdate = true; g.attributes.color.needsUpdate = true; g.computeVertexNormals();
+    lev = [lerp(LEV.p[0], LEV.c[0], t), lerp(LEV.p[1], LEV.c[1], t)];
+    for (let k = 0; k < 2; k++) { ringR[k] = rAt(lev[k], fmix); rings[k].geometry.dispose(); rings[k].geometry = new THREE.TorusGeometry(ringR[k], 0.09, 8, 140).rotateX(Math.PI / 2).translate(0, K * lev[k], 0); }
+  }
+  setT(0);
+  const bP = $('d1p'), bC = $('d1c');
+  function setMode(c) {
+    mixT = c ? 1 : 0; press(c ? bC : bP, [c ? bP : bC]);
+    $('d1-pp').textContent = c ? '241 meV' : '1136 meV';
+    $('d1-e').textContent = c ? '25.8 meV' : '79.5 meV';
+    $('d1-t').textContent = c ? '≈ 6–11 ps' : 'not computed for this well';
+    F.cv.setAttribute('aria-label', c ? 'Height map of the computed (DFT) moiré potential of twisted hBN: a well at AA about a quarter as deep as the proposed one, with an electron in the ground level and two wave packets leaving it, a cartoon of two-phonon relaxation.' : 'Height map of the proposed moiré potential of twisted hBN, a deep well at AA, with an electron in the ground level and rings marking its two lowest levels.');
+    F.request();
+  }
+  bP.addEventListener('click', () => setMode(false)); bC.addEventListener('click', () => setMode(true));
+  F.tgt.set(1.2, -2.2, 1.0); F.h = 14.5;
+  F.tick = (dt, t) => {
+    if (mix !== mixT) { mix = RM ? mixT : clamp(mix + Math.sign(mixT - mix) * dt / 0.9, 0, 1); setT(ease(mix)); }
+    const cartoon = shown === 1;
+    let yE = K * lev[0];
+    packVis = 0;
+    if (cartoon) {
+      const T = 3.4, k = Math.floor(t / T); ph = RM ? 0.62 : (t / T) - k;
+      if (k !== cyc) { cyc = k; dirA = (k * 2.399) % TAU; }
+      if (!RM) yE = ph < 0.36 ? K * lev[1] : ph < 0.46 ? lerp(K * lev[1], K * lev[0], ease((ph - 0.36) / 0.1)) : K * lev[0];
+      const u = clamp((ph - 0.4) / 0.6, 0, 1); packVis = ph > 0.4 ? sstep(0, 0.08, u) * (1 - sstep(0.75, 1, u)) : 0;
+      packets.forEach((m, j) => { const a = dirA + j * (Math.PI + 0.5), r = 1.8 + 13 * u, x = r * Math.cos(a), z = r * Math.sin(a); m.position.set(x, K * Vc(x, z) + 0.55, z); m.rotation.set(0, -a, 0); });
+    }
+    fade(pmat, packVis); for (const m of packets) m.visible = packVis > 0.01;
+    elec.position.set(0, yE + 0.25, 0); eg.position.copy(elec.position);
+  };
+  F.anim = () => mix !== mixT || (!RM && shown === 1);
+  F.labels.push(
+    { t: '<tspan class="a">Electron</tspan>', at: () => elec.position.clone(), d: [-46, -40] },
+    { t: 'Ground level A₁', at: () => V3(ringR[0] * Math.cos(2.4), K * lev[0], ringR[0] * Math.sin(2.4)), d: [-50, 26], cls: 'b' },
+    { t: () => `E doublet · ${(lev[1] - lev[0]).toFixed(1)} meV higher`, at: () => V3(ringR[1] * Math.cos(-0.5), K * lev[1], ringR[1] * Math.sin(-0.5)), d: [52, -26], cls: 'b' },
+    { t: 'Next well · 13.2 nm away', at: () => V3(L, K * fmix(L, 0) + 0.2, 0), d: [44, -28] },
+    { t: () => shown === 1 ? 'Computed well at AA · V₀ = 40 meV' : 'Proposed well at AA · V₀ = 160 meV', at: () => V3(-L / 2 * 0.3, K * fmix(-L * 0.35, 0), L * 0.2), d: [-48, 36] },
+    { t: 'Two phonons (cartoon)', at: () => packets[0].position.clone(), d: [40, -30], op: () => packVis }
+  );
+}
+
+/* ---------------- 02 twisted MoS2 hole spin and the nuclear bath (units: nm) ---------------- */
+function buildD2(F) {
+  const { scene } = F;
+  const A0 = 0.3182, AH = 0.2504, EX = 2.5, RAD = 4.5, RADH = 3.6, ELL = 1.22;
+  const MOi = moire(A0, 2), rb = MOi.bern[0];
+  const th = 2 * D2R, cth = Math.cos(th), sth = Math.sin(th);
+  const rot = (x, z) => [x * cth + z * sth, -x * sth + z * cth];
+  const rnd = mulberry32(20261115);
+  const host = [], hbn = [];
+  const ox = 0.5 * A0, oz = A0 / (2 * S3);
+  hexSites(A0, 17, (x, z) => {
+    for (const [top, sg] of [[0, -1], [1, 1]]) {
+      let p = [x, z], q = [x + ox, z + oz];
+      if (top) { p = rot(p[0], p[1]); q = rot(q[0], q[1]); }
+      if (Math.hypot(p[0] - rb[0], p[1] - rb[1]) < RAD) host.push({ x: p[0] - rb[0], y: sg * 0.307 * EX, z: p[1] - rb[1], k: 'Mo' });
+      if (Math.hypot(q[0] - rb[0], q[1] - rb[1]) < RAD) for (const yy of [0.149, 0.465]) host.push({ x: q[0] - rb[0], y: sg * yy * EX, z: q[1] - rb[1], k: 'S' });
+    }
+  });
+  const keepH = (x, z, sg) => Math.hypot(x, z) < RAD && (sg < 0 || z < -0.25);    // the top hBN is cut away over the front half
+  hexSites(AH, RAD + 0.4, (x, z) => {
+    for (const sg of [-1, 1]) {
+      if (keepH(x, z, sg)) hbn.push({ x, y: sg * 0.795 * EX, z, k: 'B' });
+      const xn = x + 0.5 * AH, zn = z + AH / (2 * S3);
+      if (keepH(xn, zn, sg)) hbn.push({ x: xn, y: sg * 0.795 * EX, z: zn, k: 'N' });
+    }
+  });
+  const ico = new THREE.IcosahedronGeometry(1, 1);
+  const put = (list, k, mat, s) => instanced(ico, mat, list.filter(a => a.k === k).map(a => [a.x, a.y, a.z]), s, scene);
+  put(host, 'Mo', SM(0x37a7a3, 0.25, 0.35), 0.1); put(host, 'S', SM(0xe6cb34, 0.05, 0.4), 0.085);
+  put(hbn, 'B', SM(0xf0a4a2, 0.05, 0.45), 0.075); put(hbn, 'N', SM(0x4a66d6, 0.1, 0.4), 0.075);
+  const arrowG = mergeGeometries([prep(new THREE.CylinderGeometry(0.018, 0.018, 0.21, 6).translate(0, -0.025, 0)), prep(new THREE.ConeGeometry(0.05, 0.09, 8).translate(0, 0.125, 0))]);
+  const randQ = () => { const u = rnd() * 2 - 1, p = rnd() * TAU, s = Math.sqrt(1 - u * u); return new THREE.Quaternion().setFromUnitVectors(UP, V3(s * Math.cos(p), u, s * Math.sin(p))); };
+  host.forEach(a => { a.q = randQ(); a.u = rnd(); });
+  const hArr = new THREE.InstancedMesh(arrowG, SM(0x1d1d1b, 0.2, 0.5), host.length); hArr.frustumCulled = false; scene.add(hArr);
+  const bArr = hbn.filter(a => Math.hypot(a.x, a.z) < RADH);
+  const bMesh = new THREE.InstancedMesh(arrowG, SM(0x7d8089, 0.2, 0.5), bArr.length); bMesh.frustumCulled = false; scene.add(bMesh);
+  bArr.forEach((a, i) => { _d.position.set(a.x, a.y, a.z); _d.quaternion.copy(randQ()); _d.scale.setScalar(1.15); _d.updateMatrix(); bMesh.setMatrixAt(i, _d.matrix); });
+  bMesh.instanceMatrix.needsUpdate = true;
+  const env = new THREE.Mesh(new THREE.PlaneGeometry(6 * ELL, 6 * ELL).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ color: 0xe0301f, map: radialTexture(r => Math.exp(-9 * r * r)), transparent: true, opacity: 0.62, depthWrite: false, depthTest: false, side: THREE.DoubleSide, toneMapped: false }));
+  env.renderOrder = 5; scene.add(env);
+  const spin = new THREE.Group(); scene.add(spin);
+  const red = LMAT.red();
+  spin.add(new THREE.Mesh(new THREE.CylinderGeometry(0.07, 0.07, 2.3, 16).translate(0, 1.15, 0), red), new THREE.Mesh(new THREE.ConeGeometry(0.2, 0.55, 24).translate(0, 2.55, 0), red));
+  let f = 0.2547, perp = true, ang = 0, angT = 0, nShown = 0, firstMo = null;
+  const sl = $('d2f'), lf0 = Math.log10(0.2547), lf1 = -6;
+  const fromSlider = v => Math.pow(10, lerp(lf0, lf1, v / 1000));
+  const toSlider = ff => Math.round(1000 * (Math.log10(ff) - lf0) / (lf1 - lf0));
+  function update() {
+    nShown = 0; firstMo = null;
+    host.forEach((a, i) => {
+      const on = a.k === 'Mo' ? a.u < f : a.u < f * 0.0076 / 0.2547;
+      _d.position.set(a.x, a.y, a.z); _d.quaternion.copy(a.q); _d.scale.setScalar(on ? 1.6 : 1e-4); _d.updateMatrix(); hArr.setMatrixAt(i, _d.matrix);
+      if (on) { nShown++; if (!firstMo && a.k === 'Mo' && a.y > 0 && a.x > 0.8 && a.z > 0.3) firstMo = a; }
+    });
+    hArr.instanceMatrix.needsUpdate = true;
+    const t1 = 42.4296 * Math.sqrt(0.2547 / f), hb = perp ? 793.93 : 1296.48, t2 = 1 / Math.sqrt(1 / (t1 * t1) + 1 / (hb * hb));
+    $('d2fo').textContent = f > 0.2 ? '0.25 (natural)' : sci(f, 1);
+    $('d2-n').textContent = String(nShown);
+    $('d2-t1').textContent = fmtT(t1); $('d2-t2').textContent = fmtT(t2);
+    sl.setAttribute('aria-valuetext', `residual spinful fraction ${f > 0.2 ? '0.25, natural' : sci(f, 1)}; T2 star with hBN ${fmtT(t2)}`);
+    F.cv.setAttribute('aria-label', `One moiré well of twisted MoS2 with a red hole spin; ${nShown} host nuclei carry spin at residual fraction ${f > 0.2 ? '0.25' : sci(f, 1)}; every hBN nucleus carries spin. T2 star ${fmtT(t2)} with hBN.`);
+    F.request();
+  }
+  sl.addEventListener('input', () => { f = fromSlider(+sl.value); update(); });
+  $('d2pur').addEventListener('click', () => { f = 2e-4; sl.value = toSlider(f); update(); });
+  const bz = $('d2bz'), bx = $('d2bx');
+  bz.addEventListener('click', () => { perp = true; angT = 0; press(bz, [bx]); update(); });
+  bx.addEventListener('click', () => { perp = false; angT = -Math.PI / 2; press(bx, [bz]); update(); });
+  F.tick = dt => { if (ang !== angT) { ang = RM ? angT : (Math.abs(angT - ang) < 0.01 ? angT : lerp(ang, angT, 1 - Math.exp(-dt * 8))); spin.rotation.z = ang; } };
+  F.anim = () => ang !== angT;
+  F.h = 3.3; F.tgt.set(0, 0.5, 0.2);
+  update();
+  const tip = () => spin.localToWorld(V3(0, 2.75, 0));
+  F.labels.push(
+    { t: 'Hole spin · Γ valley', at: tip, d: [40, -24], cls: 'a' },
+    { t: 'Envelope · ℓ = 1.22 nm', at: () => V3(ELL * 1.1, 0, -ELL * 1.1), d: [52, 30], cls: 'a' },
+    { t: 'Mo nucleus with spin (⁹⁵Mo, ⁹⁷Mo)', at: () => firstMo ? V3(firstMo.x, firstMo.y, firstMo.z) : V3(), d: [46, -30], op: () => firstMo ? 1 : 0 },
+    { t: 'Top hBN, cut away in front: every B and N nucleus has spin', at: () => V3(-2.4, 0.795 * EX, -2.0), d: [-40, -30], cls: 'b' },
+    { t: 'MoS₂ bilayer (heights × 2.5)', at: () => V3(3.6, 0.465 * EX, 2.2), d: [46, 18], cls: 'b' },
+    { t: 'Bottom hBN', at: () => V3(-3.0, -0.795 * EX, 2.2), d: [-44, 26] }
+  );
+}
+
+/* ---------------- 03 twisted WSe2: electrical or optical (units: nm) ---------------- */
+function buildD3(F) {
+  const { scene } = F;
+  const HALF = 210, AE = 3.7424, AO = 13.2906, ZG = 10;
+  const WS = [5, 7, 10], DS = [382.23, 55.28, 3.414];                       // dot_ladder.json
+  const BS = [1, 0.3, 0.1], TG = [223.3, 239.3, 713.8], ER = [4.05e-3, 6.61e-3, 1.74e-2];   // raman_budget.json, trion linewidth 50 ueV
+  scene.add(new THREE.Mesh(boxY(2 * HALF, -1.3, 0, 2 * HALF), PM({ color: 0x3d6a96, metalness: 0.25, roughness: 0.35, sheen: 1, sheenColor: new THREE.Color(0xffa100), sheenRoughness: 0.5, iridescence: 0.6, iridescenceIOR: 1.7, envMapIntensity: 1.1 })));
+  scene.add(new THREE.Mesh(boxY(2 * HALF, -16, -1.3, 2 * HALF), LMAT.hbn()));
+  const sE = [], sO = [];
+  hexSites(AE, HALF - 2, (x, z) => sE.push([x, 0.08, z]));
+  hexSites(AO, HALF - 5, (x, z) => sO.push([x, 0.08, z]));
+  const mE = SM(0x1c3352, 0.2, 0.5, { transparent: true }), mO = SM(0x1c3352, 0.2, 0.5, { transparent: true }), mH = SM(0x1f1f1d, 0.2, 0.45, { transparent: true });
+  instanced(new THREE.CylinderGeometry(0.9, 0.9, 0.16, 10), mE, sE, 1, scene);
+  instanced(new THREE.CylinderGeometry(2.6, 2.6, 0.16, 18), mO, sO, 1, scene);
+  instanced(new THREE.SphereGeometry(1.6, 16, 10), mH, sO.filter(([x, , z]) => Math.hypot(x, z) > 1).map(([x, , z]) => [x, 1.7, z]), 1, scene);
+  const gM = LMAT.gold(), ub = new THREE.BoxGeometry(1, 1, 1);
+  const gate = () => { const m = new THREE.Mesh(ub, gM); scene.add(m); return m; };
+  const sA = gate(), sB = gate(), bL = gate(), bR = gate(), pl = gate();
+  const setBox = (m, x0, x1, y0, y1, z0, z1) => { m.scale.set(x1 - x0, y1 - y0, z1 - z0); m.position.set((x0 + x1) / 2, (y0 + y1) / 2, (z0 + z1) / 2); };
+  const dotM = new THREE.MeshBasicMaterial({ color: 0xe0301f, map: radialTexture(r => Math.exp(-5 * r * r)), transparent: true, opacity: 0.85, depthWrite: false, toneMapped: false });
+  const dot = new THREE.Mesh(new THREE.PlaneGeometry(1, 1).rotateX(-Math.PI / 2).translate(0, 0.25, 0), dotM); scene.add(dot);
+  const beamM = new THREE.MeshBasicMaterial({ color: 0xe0301f, transparent: true, opacity: 0.1, depthWrite: false, side: THREE.DoubleSide, toneMapped: false });
+  const beams = [0.17, -0.17].map(a => { const m = new THREE.Mesh(new THREE.CylinderGeometry(150, 55, 460, 48, 1, true).translate(0, 230, 0), beamM); m.rotation.z = a; scene.add(m); return m; });
+  const spotM = new THREE.MeshBasicMaterial({ color: 0xe0301f, map: radialTexture(r => 0.75 * Math.exp(-4 * r * r)), transparent: true, opacity: 0.6, depthWrite: false, toneMapped: false });
+  const spot = new THREE.Mesh(new THREE.PlaneGeometry(300, 300).rotateX(-Math.PI / 2).translate(0, 0.2, 0), spotM); scene.add(spot);
+  const resM = LMAT.red(); resM.transparent = true;
+  const res = new THREE.Mesh(new THREE.SphereGeometry(2.1, 24, 12).translate(0, 1.9, 0), resM); scene.add(res);
+  const ring = new THREE.Mesh(new THREE.TorusGeometry(4.6, 0.55, 8, 48).rotateX(Math.PI / 2).translate(0, 0.4, 0), resM); scene.add(ring);
+  let q = 0, qT = 0, R = WS[0] * AE, RT = R, wi = 0, bi = 0;
+  const GX = 115, GZ = 125;                       // the gate pattern ends inside the drawn patch
+  function setR(r) {
+    setBox(sA, -GX, GX, ZG, ZG + 8, r * 1.05 + 4, GZ); setBox(sB, -GX, GX, ZG, ZG + 8, -GZ, -(r * 1.05 + 4));
+    setBox(bL, -(r + 22), -(r + 6), ZG + 14, ZG + 22, -GZ, GZ); setBox(bR, r + 6, r + 22, ZG + 14, ZG + 22, -GZ, GZ);
+    setBox(pl, -Math.max(6, r * 0.4), Math.max(6, r * 0.4), ZG + 14, ZG + 22, r * 0.6, GZ);
+    dot.scale.set(2.6 * r, 1, 2.6 * r);
+  }
+  setR(R);
+  const mats = { e: [gM, mE, dotM], o: [mO, mH, beamM, spotM, resM] };
+  function setQ(v) {
+    const e = 1 - v;
+    for (const m of mats.e) fade(m, e); for (const m of mats.o) fade(m, v);
+    for (const m of [sA, sB, bL, bR, pl, dot]) m.visible = e > 0.01;
+    for (const m of [...beams, spot, res, ring]) m.visible = v > 0.01;
+    F.scene.children.forEach(c => { if (c.isInstancedMesh) c.visible = (c.material === mE ? e : v) > 0.01; });
+  }
+  setQ(0);
+  const bE = $('d3e'), bO = $('d3o'), sw = $('d3w'), sb = $('d3b');
+  const r1l = $('d3-r1l').firstChild, r2l = $('d3-r2l').firstChild;
+  function readouts() {
+    const opt = qT === 1;
+    $('d3-th').textContent = opt ? '1.43°' : '5.08°';
+    $('d3-am').textContent = opt ? '13.3 nm' : '3.74 nm';
+    r1l.nodeValue = opt ? 'π gate, time · error' : 'Valley splitting Δ₁S';
+    $('d3-r1').textContent = opt ? `${(TG[bi] / 1000).toFixed(2)} ns · ${sci(ER[bi], 1)}` : `${DS[wi] < 10 ? DS[wi].toFixed(2) : DS[wi] < 100 ? DS[wi].toFixed(1) : DS[wi].toFixed(0)} µeV`;
+    r2l.nodeValue = opt ? 'At σθ = 0.036°' : 'At σθ = 0.036°';
+    $('d3-r2').textContent = opt ? '~17 frequency channels' : '4.5 % spread of Δ₁S';
+    $('d3wo').innerHTML = `${WS[wi]} a<sub>M</sub> = ${(WS[wi] * AE).toFixed(1)} nm`;
+    $('d3bo').textContent = String(BS[bi]);
+    $('d3w-c').classList.toggle('off', opt); $('d3b-c').classList.toggle('off', !opt); sw.disabled = opt; sb.disabled = !opt;
+    F.cv.setAttribute('aria-label', opt ? `Optical control of twisted WSe2 at 1.43 degrees: a Mott lattice with one hole per 13.3 nm cell under two focused Raman beams; branching ratio ${BS[bi]}, pi gate ${(TG[bi] / 1000).toFixed(2)} ns at error ${sci(ER[bi], 1)}.` : `Electrical control of twisted WSe2 at 5.08 degrees: a gate-defined dot of radius ${(WS[wi] * AE).toFixed(1)} nm with valley splitting ${DS[wi]} microelectronvolts.`);
+    F.request();
+  }
+  bE.addEventListener('click', () => { qT = 0; press(bE, [bO]); readouts(); });
+  bO.addEventListener('click', () => { qT = 1; press(bO, [bE]); readouts(); });
+  sw.addEventListener('input', () => { wi = +sw.value; RT = WS[wi] * AE; readouts(); });
+  sb.addEventListener('input', () => { bi = +sb.value; readouts(); });
+  const hOf = () => lerp(Math.max(78, 2.3 * R), 165, ease(q));
+  F.h = hOf();
+  F.tick = (dt, t) => {
+    if (q !== qT) { q = RM ? qT : clamp(q + Math.sign(qT - q) * dt / 0.8, 0, 1); setQ(ease(q)); }
+    if (R !== RT) { R = RM || Math.abs(RT - R) < 0.05 ? RT : lerp(R, RT, 1 - Math.exp(-dt * 7)); setR(R); }
+    F.h = hOf();
+    if (!RM) { dotM.opacity = (0.72 + 0.16 * Math.sin(TAU * 0.7 * t)) * (1 - ease(q)); beamM.opacity = (0.09 + 0.03 * Math.sin(TAU * 0.5 * t)) * ease(q); }
+  };
+  F.anim = () => q !== qT || R !== RT || !RM;
+  readouts();
+  const e = () => 1 - ease(q), o = () => ease(q);
+  F.labels.push(
+    { t: 'Split gate', at: () => V3(GX * 0.7, ZG + 8, R + 50), d: [44, -24], op: e, cls: 'b' },
+    { t: 'Barrier gate', at: () => V3(-(R + 14), ZG + 22, -GZ * 0.7), d: [-44, -26], op: e, cls: 'b' },
+    { t: 'Plunger gate', at: () => V3(0, ZG + 22, R * 0.6 + 40), d: [-44, -30], op: e, cls: 'b' },
+    { t: () => `Dot · radius ${(WS[wi] * AE).toFixed(1)} nm`, at: () => V3(R * 0.5, 0.3, -R * 0.35), d: [46, 30], op: e, cls: 'a' },
+    { t: 'Moiré sites · 3.74 nm apart', at: () => V3(-135, 0.2, 150), d: [-44, 30], op: e },
+    { t: 'Raman beams (two colours)', at: () => V3(-62, 190, 0), d: [-48, -20], op: o, cls: 'b' },
+    { t: 'The spot covers many sites', at: () => V3(95, 0.3, -70), d: [46, 28], op: o },
+    { t: 'Resonant site', at: () => V3(0, 3.8, 0), d: [44, -36], op: o, cls: 'a' },
+    { t: 'Mott lattice · one hole per 13.3 nm cell', at: () => V3(-150, 1.7, 130), d: [-40, 28], op: o }
+  );
+}
+
+/* ---------------- 04 interlayer-exciton emitter in a SiN nanobeam (units: nm) ---------------- */
+function buildD4(F) {
+  const { scene } = F;
+  const A = 290, W2 = 250, TB = 200, E = 1370, C = 3 / (4 * Math.PI * Math.PI) * 0.032 / 0.19, TAU0 = 138.9;
+  const holes = []; let x = 0;
+  for (let i = 0; i < 6; i++) { const t = i / 5, per = 0.86 + 0.14 * t, rr = 0.19 + 0.09 * t; x += i === 0 ? per / 2 : per; holes.push([x, rr]); }
+  for (let i = 0; i < 10; i++) { x += 1; holes.push([x, 0.28]); }
+  const Lh = (x + 0.28 + 1.0) * A;
+  const sh = new THREE.Shape([[-Lh, -W2], [Lh, -W2], [Lh, W2], [-Lh, W2]].map(([a, b]) => new THREE.Vector2(a, b)));
+  for (const [hx, r] of holes) for (const sg of [-1, 1]) { const p = new THREE.Path(); p.absarc(sg * hx * A, 0, r * A, 0, TAU, true); sh.holes.push(p); }
+  const bg = new THREE.ExtrudeGeometry(sh, { depth: TB, bevelEnabled: false, curveSegments: 28 }); bg.rotateX(-Math.PI / 2);
+  const sin = PM({ color: 0xc9d3d6, metalness: 0, roughness: 0.32, clearcoat: 0.6, clearcoatRoughness: 0.2, envMapIntensity: 1.0 });
+  scene.add(new THREE.Mesh(bg, sin));
+  const siM = SM(0x5a5f68, 0.3, 0.45), sinS = SM(0xc9d0d4, 0, 0.3);
+  for (const sg of [-1, 1]) {
+    scene.add(new THREE.Mesh(boxG(1500, TB, 2400, sg * (Lh + 750), TB / 2, 0), sinS));
+    scene.add(new THREE.Mesh(boxY(1500, -1800, 0, 2400, sg * (Lh + 750), 0), siM));
+  }
+  scene.add(new THREE.Mesh(boxY(2 * Lh + 6000, -2200, -1800, 9000), siM));
+  const FLK = [[-720, -262], [660, -268], [780, 0], [700, 264], [-660, 270], [-780, 0]];
+  const B = new Bucket();
+  B.add(LMAT.hbn(), prismXZ(FLK, [], TB, 10));
+  B.add(PM({ color: 0x3e9d98, metalness: 0.3, roughness: 0.3, sheen: 1, sheenColor: new THREE.Color(0xffa100), transparent: true, opacity: 0.55, depthWrite: false }), prismXZ(FLK, [], TB + 10, 0.65));
+  B.add(PM({ color: 0x3a78bd, metalness: 0.3, roughness: 0.3, sheen: 1, sheenColor: new THREE.Color(0xffa100), transparent: true, opacity: 0.55, depthWrite: false }), prismXZ(FLK, [], TB + 10.65, 0.65));
+  B.add(LMAT.hbn(), prismXZ(FLK, [], TB + 11.3, 15));
+  B.build(scene, { cast: false });
+  const em = new THREE.Mesh(new THREE.SphereGeometry(22, 24, 12), LMAT.red()); em.position.set(0, TB + 11, 0); scene.add(em);
+  const emG = glowSprite(0xff4a34, 300, 0.7); emG.position.copy(em.position); scene.add(emG);
+  const coneM = new THREE.MeshBasicMaterial({ color: 0xe0301f, transparent: true, opacity: 0.2, depthWrite: false, side: THREE.DoubleSide, toneMapped: false });
+  const cone = new THREE.Mesh(new THREE.CylinderGeometry(420, 24, 900, 48, 1, true).translate(0, 450 + TB + 26, 0), coneM); scene.add(cone);
+  const anti = [0]; for (let k = 0; k < holes.length - 1; k++) { const m = (holes[k][0] + holes[k + 1][0]) / 2; anti.push(m, -m); }
+  const lobes = anti.map(ax => { const s = glowSprite(0xff3b28, 0.7 * A, 0.5); s.position.set(ax * A, TB + 4, 0); s.userData.e = Math.exp(-ax * ax / (2 * 2.4 * 2.4)); scene.add(s); return s; });
+  let lq = Math.log10(7890), gam = 0.1;
+  const sl = $('d4q'), Feff = (Q, g) => C * E / (E / Q + g);
+  function update() {
+    const Q = Math.pow(10, lq), Fe = Feff(Q, gam), Qh = E / gam;
+    $('d4qo').textContent = sci(Q, 1);
+    $('d4-f').textContent = Fe >= 10 ? Fe.toFixed(0) : Fe.toFixed(1);
+    $('d4-t').textContent = fmtT(TAU0 / Fe);
+    const rq = Q / Qh; $('d4-r').textContent = rq >= 100 ? String(Math.round(rq)) : String(+rq.toPrecision(2));
+    sl.setAttribute('aria-valuetext', `Q ${sci(Q, 1)}, effective Purcell factor ${Fe.toFixed(1)}`);
+    coneM.opacity = 0.04 + 0.32 * Fe / 175;
+    emG.material.opacity = 0.35 + 0.5 * Fe / 175;
+    const b = clamp((lq - 2) / 4, 0.15, 1);
+    for (const s of lobes) s.material.opacity = Math.min(1, 1.25 * s.userData.e * b);
+    F.cv.setAttribute('aria-label', `Silicon-nitride nanobeam cavity with a heterobilayer emitter on top. Q ${sci(Q, 1)}, linewidth ${gam * 1000} microelectronvolts, effective Purcell factor ${Fe.toFixed(1)}, lifetime ${fmtT(TAU0 / Fe)}.`);
+    plot(); F.request();
+  }
+  const svg = $('d4plot');
+  function plot() {
+    const W = svg.clientWidth || 600, H = 150, m = { l: 54, r: 16, t: 12, b: 30 }, bw = W - m.l - m.r, bh = H - m.t - m.b;
+    svg.setAttribute('viewBox', `0 0 ${W} ${H}`);
+    const X = l => m.l + (l - 2) / 4 * bw, Y = v => m.t + bh - v / 180 * bh;
+    let s = '';
+    for (const v of [0, 50, 100, 150]) s += `<line x1="${m.l}" x2="${m.l + bw}" y1="${Y(v)}" y2="${Y(v)}" stroke="#dbdbd5"/><text x="${m.l - 8}" y="${Y(v) + 4}" text-anchor="end">${v}</text>`;
+    for (let e = 2; e <= 6; e++) s += `<text x="${X(e)}" y="${H - 10}" text-anchor="middle">10${sup(e)}</text>`;
+    s += `<text x="${m.l - 8}" y="${m.t + 2}" text-anchor="end" dominant-baseline="hanging" style="fill:#121212">F</text><text x="${m.l + bw}" y="${m.t + bh - 6}" text-anchor="end" style="fill:#121212">Q</text>`;
+    s += `<line x1="${X(Math.log10(7890))}" x2="${X(Math.log10(7890))}" y1="${m.t}" y2="${m.t + bh}" stroke="#93938d" stroke-dasharray="2 3"/><text x="${X(Math.log10(7890)) + 4}" y="${m.t + 10}">FDTD</text>`;
+    for (const g of [0.1, 0.64]) {
+      let d = ''; for (let i = 0; i <= 120; i++) { const l = 2 + 4 * i / 120; d += (i ? 'L' : 'M') + X(l).toFixed(1) + ' ' + Y(Feff(Math.pow(10, l), g)).toFixed(1); }
+      const on = g === gam;
+      s += `<path d="${d}" fill="none" stroke="${on ? '#121212' : '#b9b9b2'}" stroke-width="${on ? 1.8 : 1.2}"/>`;
+      s += `<text x="${m.l + bw - 2}" y="${Y(Feff(1e6, g)) - 6}" text-anchor="end">γ = ${g * 1000} µeV</text>`;
+    }
+    const qh = Math.log10(E / gam); if (qh <= 6) s += `<line x1="${X(qh)}" x2="${X(qh)}" y1="${m.t}" y2="${m.t + bh}" stroke="#da291c" stroke-dasharray="3 3"/><text x="${X(qh) + 4}" y="${m.t + 24}" style="fill:#da291c">Q½ = E/γ</text>`;
+    s += `<circle cx="${X(lq)}" cy="${Y(Feff(Math.pow(10, lq), gam))}" r="4.5" fill="#da291c" stroke="#f4f4f1" stroke-width="1.5"/>`;
+    svg.innerHTML = s;
+  }
+  new ResizeObserver(plot).observe(svg);
+  sl.addEventListener('input', () => { lq = +sl.value; update(); });
+  const g1 = $('d4g1'), g2 = $('d4g2');
+  g1.addEventListener('click', () => { gam = 0.1; press(g1, [g2]); update(); });
+  g2.addEventListener('click', () => { gam = 0.64; press(g2, [g1]); update(); });
+  $('d4fd').addEventListener('click', () => { lq = Math.log10(7890); sl.value = lq; update(); });
+  F.tgt.set(0, 160, 0); F.h = 700; F.w = 1750;
+  update();
+  F.labels.push(
+    { t: 'SiN nanobeam · 500 × 200 nm', at: () => V3(-1500, TB, W2), d: [-40, 34], cls: 'b' },
+    { t: 'Mirror holes · period 290 nm', at: () => V3(-holes[6][0] * A, TB, -holes[6][1] * A), d: [-40, -34] },
+    { t: 'Taper towards the centre', at: () => V3(holes[4][0] * A, TB, holes[4][1] * A), d: [44, 34] },
+    { t: 'hBN / MoSe₂–WSe₂ / hBN (illustrative)', at: () => V3(560, TB + 26, -200), d: [46, -34], cls: 'b' },
+    { t: 'Cavity mode (schematic)', at: () => V3(-(holes[2][0] + holes[3][0]) / 2 * A, TB + 4, 0), d: [-46, 40], cls: 'a' },
+    { t: 'Emitter at the cavity centre', at: () => em.position.clone(), d: [-50, -44], cls: 'a' },
+    { t: 'Emission', at: () => V3(200, TB + 560, 0), d: [46, -10] },
+    { t: 'Suspended over a trench (illustrative)', at: () => V3(1300, -700, 0), d: [44, 26] }
+  );
+}
+
+/* ---------------- 05 MATBG junction in an L3 photonic-crystal cavity (units: um) ---------------- */
+function buildD5(F) {
+  const { scene } = F;
+  const a = 586.74, r0 = 0.3 * a, t = 0.5 * a, HX = 7.0 * a, HZ = 4.0 * a;
+  const sh = new THREE.Shape([[-HX, -HZ], [HX, -HZ], [HX, HZ], [-HX, HZ]].map(([x, z]) => new THREE.Vector2(x, z)));
+  for (let j = -4; j <= 4; j++) for (let i = -8; i <= 8; i++) {
+    let x = (i + ((j & 1) ? 0.5 : 0)) * a, r = r0;
+    const z = j * a * S3 / 2;
+    if (j === 0 && Math.abs(i) <= 1) continue;
+    if (j === 0 && Math.abs(i) === 2) { x = Math.sign(i) * 2.2 * a; r = 1.15 * r0; }
+    if (Math.abs(j) === 1 && i >= -2 && i <= 1) r = 1.15 * r0;
+    if (Math.abs(x) + r > HX - 0.15 * a || Math.abs(z) + r > HZ - 0.08 * a) continue;
+    const p = new THREE.Path(); p.absarc(x, z, r, 0, TAU, true); sh.holes.push(p);
+  }
+  const sg = new THREE.ExtrudeGeometry(sh, { depth: t, bevelEnabled: false, curveSegments: 22 }); sg.rotateX(-Math.PI / 2); sg.translate(0, -t, 0);
+  scene.add(new THREE.Mesh(sg, SM(0x4b5059, 0.3, 0.33, { envMapIntensity: 1.1 })));
+  const gold = LMAT.gold(), B = new Bucket();
+  for (const s of [-1, 1]) B.add(gold, prismXZ([[s * 1.0, -0.25], [s * 11, -4], [s * 11, 4], [s * 1.0, 0.25]], [], 0, 0.1));
+  B.build(scene);
+  scene.add(new THREE.Mesh(prismXZ([[-0.9, -0.6], [0.9, -0.6], [0.9, 0.6], [-0.9, 0.6]], [], 0, 0.03), LMAT.hbn()));
+  scene.add(new THREE.Mesh(prismXZ([[-0.8, -0.45], [0.8, -0.45], [0.8, 0.45], [-0.8, 0.45]], [], 0.03, 0.002), SM(0x26282c, 0.5, 0.3)));
+  scene.add(new THREE.Mesh(prismXZ([[-0.85, -0.55], [0.85, -0.55], [0.85, 0.55], [-0.85, 0.55]], [], 0.032, 0.02), LMAT.hbn()));
+  const sc = SM(0xc6ccd4, 0.9, 0.3, { envMapIntensity: 1.3 });
+  for (const s of [-1, 1]) scene.add(new THREE.Mesh(prismXZ(taper(s * 1.05, 0, s * 0.15, 0, 0.42, 0.42), [], 0.052, 0.06), sc));
+  const lobes = [[-0.95 * a, 720], [0, 900], [0.95 * a, 720]].map(([x, s]) => { const g = glowSprite(0xff2a18, s, 0.5); g.position.set(x, 4, 0); scene.add(g); return g; });
+  const jg = glowSprite(0xff3b28, 0.9, 0.5); jg.position.set(0, 0.12, 0); scene.add(jg);
+  let z = 0;
+  const sl = $('d5z');
+  function setZ() {
+    F.h = Math.exp(lerp(Math.log(3000), Math.log(1.3), z)); F.w = F.h * 1.55;
+    F.tgt.set(0, lerp(-t * 0.45, 0.04, sstep(0, 0.28, z)), 0);
+    F.request();
+  }
+  sl.addEventListener('input', () => { z = +sl.value / 1000; setZ(); });
+  setZ();
+  F.tick = (dt, time) => {
+    const pulse = RM ? 0.8 : 0.55 + 0.45 * Math.sin(TAU * 0.5 * time) ** 2;
+    const fo = 1 - sstep(0.3, 0.55, z), jo = sstep(0.55, 0.85, z);
+    for (const g of lobes) { g.material.opacity = 0.9 * fo * pulse; g.visible = fo > 0.01; }
+    jg.material.opacity = 0.55 * jo * pulse; jg.visible = jo > 0.01;
+  };
+  F.after = () => {
+    const vw = lenText(2 * F.dist * Math.tan(F.fov * D2R / 2) * (F.W / F.H));
+    $('d5zo').textContent = 'view ' + vw; sl.setAttribute('aria-valuetext', 'view width ' + vw);
+  };
+  F.anim = () => !RM;
+  const W_ = (k0, k1) => () => sstep(k0, k0 + 0.08, z) * (1 - sstep(k1 - 0.08, k1, z));
+  const head = () => 1 - sstep(0.22, 0.32, z);
+  F.labels.push(
+    { t: 'Silicon slab · a = 587 µm', at: () => V3(-5.0 * a, 0, 2.6 * a), d: [-40, 30], op: head, cls: 'b' },
+    { t: 'L3 defect: three missing holes', at: () => V3(0.5 * a, 0, 0), d: [46, -40], op: head, cls: 'b' },
+    { t: 'End hole shifted by 0.20a', at: () => V3(2.2 * a, 0, 0.345 * a), d: [44, 34], op: head },
+    { t: '145 GHz mode (schematic)', at: () => V3(-0.95 * a, 0, 0), d: [-44, -34], op: head, cls: 'a' },
+    { t: 'Collection structure · d<tspan baseline-shift="sub" font-size="9">eff</tspan> ≈ 20–25 µm', at: () => V3(-8, 0.1, 2.4), d: [-40, -30], op: W_(0.58, 1.1), cls: 'b' },
+    { t: 'Superconducting lead (illustrative)', at: () => V3(0.6, 0.112, 0.2), d: [46, -34], op: W_(0.82, 1.1) },
+    { t: 'Twisted graphene in hBN', at: () => V3(-0.5, 0.052, 0.5), d: [-44, 34], op: W_(0.82, 1.1), cls: 'b' },
+    { t: 'Junction', at: () => V3(0, 0.06, 0), d: [44, 40], op: W_(0.85, 1.1), cls: 'a' }
+  );
+}
+
+/* ---------------- 06 bilayer-graphene dot under AC confinement (units: nm) ---------------- */
+function buildD6(F) {
+  const { scene } = F;
+  const HALF = 140, LIFT = 50;
+  const AS = [0, 5, 10, 15, 20, 30, 50], LK = [0, 0.0286, 0.1098, 0.2310, 0.3755, 0.6633, 0.9522];   // README / birlesimblg.ipynb
+  scene.add(new THREE.Mesh(boxY(2 * HALF, -26, -22, 2 * HALF), SM(0x26282d, 0.55, 0.3)));
+  scene.add(new THREE.Mesh(boxY(2 * HALF, -22, -0.5, 2 * HALF), LMAT.hbn()));
+  const gr = SM(0x2b2d33, 0.6, 0.28, { envMapIntensity: 1.3 });
+  scene.add(new THREE.Mesh(boxY(2 * HALF, -0.22, -0.12, 2 * HALF), gr), new THREE.Mesh(boxY(2 * HALF, 0.12, 0.22, 2 * HALF), gr));
+  scene.add(new THREE.Mesh(boxY(2 * HALF, 0.5, 18, 2 * HALF), LMAT.hbn()));
+  const ti = SM(0x8f9298, 0.9, 0.42), au = LMAT.gold();
+  for (const s of [-1, 1]) { scene.add(new THREE.Mesh(boxY(2 * HALF, 18, 21, HALF - 45, 0, s * (45 + HALF) / 2), ti)); scene.add(new THREE.Mesh(boxY(2 * HALF, 21, 30, HALF - 45, 0, s * (45 + HALF) / 2), au)); }
+  const oxm = PM({ color: 0xe8eef5, metalness: 0, roughness: 0.2, transparent: true, opacity: 0.22, depthWrite: false });
+  scene.add(new THREE.Mesh(alongX(conformal(18, 30, 45, 8, HALF), -HALF, HALF).translate(0, LIFT, 0), oxm));
+  const plM = SM(0xd7a84c, 1, 0.27, { envMapIntensity: 1.5, emissive: ROSSO, emissiveIntensity: 0 });
+  for (const xc of [-45, 0, 45]) scene.add(new THREE.Mesh(alongX(conformal(26, 38, 37, 14, HALF), xc - 13, xc + 13).translate(0, LIFT, 0), xc === 0 ? plM : au));
+  const cloudM = new THREE.MeshBasicMaterial({ color: 0xe0301f, map: radialTexture((r, p) => Math.exp(-16 * r * r) * (1 + 0.3 * Math.cos(3 * p)) / 1.3), transparent: true, depthWrite: false, side: THREE.DoubleSide, toneMapped: false });
+  const cloud = new THREE.Mesh(new THREE.PlaneGeometry(72, 72).rotateX(-Math.PI / 2), cloudM); scene.add(cloud);
+  const cg = glowSprite(0xff3b28, 26, 0.45); cg.position.set(0, 2, 0); scene.add(cg);
+  const blob = new THREE.Mesh(new THREE.SphereGeometry(1, 40, 20), SM(0xe0301f, 0.1, 0.35, { emissive: 0xb01a0e, emissiveIntensity: 0.5, transparent: true, opacity: 0.55, depthWrite: false }));
+  blob.scale.set(9, 2.6, 9); cloud.add(blob);
+  const NP = 60, parts = new THREE.InstancedMesh(new THREE.SphereGeometry(1.5, 12, 8), new THREE.MeshBasicMaterial({ color: 0xe0301f, toneMapped: false }), NP);
+  parts.frustumCulled = false; scene.add(parts);
+  const P = Array.from({ length: NP }, () => ({ live: false, a: 0, r0: 0, v: 0, age: 0, life: 1.6 }));
+  const rnd = mulberry32(7);
+  let ai = 0, cyc = -1, firstLive = null;
+  const TP = 1.8;
+  function drawParts() {
+    firstLive = null;
+    P.forEach((p, i) => {
+      const s = p.live ? Math.max(1e-4, 1 - p.age / p.life) : 1e-4, r = p.r0 + p.v * p.age;
+      _d.position.set(r * Math.cos(p.a), 0.4, r * Math.sin(p.a)); _d.rotation.set(0, 0, 0); _d.scale.setScalar(s); _d.updateMatrix(); parts.setMatrixAt(i, _d.matrix);
+      if (p.live && s > 0.4 && !firstLive) firstLive = _d.position.clone();
+    });
+    parts.instanceMatrix.needsUpdate = true;
+  }
+  function staticParts() {
+    const n = Math.round(LK[ai] * 26);
+    P.forEach((p, i) => { p.live = i < n; p.a = i * 2.399; p.r0 = 18 + 34 * (i / Math.max(1, n)); p.v = 0; p.age = 0.25; p.life = 1.6; });
+    drawParts();
+  }
+  const sl = $('d6a');
+  function update() {
+    $('d6ao').textContent = `${AS[ai]} meV`;
+    const l = LK[ai];
+    $('d6-l').textContent = ai === 0 ? '≈ 0 (10⁻⁹)' : `${(100 * l).toFixed(1)} %`;
+    sl.setAttribute('aria-valuetext', `${AS[ai]} meV, leakage ${(100 * l).toFixed(1)} percent per period`);
+    F.cv.setAttribute('aria-label', `Bilayer-graphene quantum dot under AC confinement of amplitude ${AS[ai]} meV; ${(100 * l).toFixed(1)} percent of the electron leaves the qubit levels every drive period.`);
+    if (RM || ai === 0) staticParts();
+    F.request();
+  }
+  sl.addEventListener('input', () => { ai = +sl.value; update(); });
+  F.tick = (dt, t) => {
+    const A = AS[ai] / 50;
+    if (RM || ai === 0) { cloud.scale.set(1, 1, 1); plM.emissiveIntensity = 0; return; }
+    const w = Math.sin(TAU * t / TP);
+    cloud.scale.set(1 + 0.2 * A * w, 1, 1 + 0.2 * A * w);
+    plM.emissiveIntensity = 0.5 * A * (0.5 + 0.5 * w);
+    const k = Math.floor(t / TP);
+    if (k !== cyc) {
+      cyc = k; let n = Math.round(LK[ai] * 26);
+      for (const p of P) { if (n <= 0) break; if (!p.live) { p.live = true; p.a = rnd() * TAU; p.r0 = 5 + 6 * rnd(); p.v = 38 + 30 * rnd(); p.age = 0; p.life = 1.5 + 0.3 * rnd(); n--; } }
+    }
+    for (const p of P) if (p.live) { p.age += dt; if (p.age >= p.life) p.live = false; }
+    drawParts();
+  };
+  F.anim = () => !RM && ai > 0;
+  F.tgt.set(0, 26, 0); F.h = 100; F.w = 190;
+  update();
+  F.labels.push(
+    { t: 'Finger gates, lifted 50 nm for view', at: () => V3(45, 52 + LIFT, -HALF * 0.55), d: [44, -28], cls: 'b' },
+    { t: 'Plunger', at: () => V3(0, 52 + LIFT, HALF * 0.5), d: [-40, -30] },
+    { t: 'Split gate', at: () => V3(HALF * 0.6, 30, 95), d: [44, 24], cls: 'b' },
+    { t: 'Bilayer graphene', at: () => V3(HALF * 0.9, 0.22, 30), d: [44, 10], cls: 'b' },
+    { t: 'Graphite back gate', at: () => V3(HALF, -24, -40), d: [44, 22] },
+    { t: 'Dot · L<tspan baseline-shift="sub" font-size="9">dot</tspan> = 15 nm', at: () => V3(-6, 0.4, 8), d: [-46, 34], cls: 'a' },
+    { t: 'Population leaving the qubit', at: () => firstLive || V3(), d: [44, 30], op: () => firstLive ? 1 : 0 }
+  );
+}
+
+makeFig('d1cv', { az: 0.5, pol: 0.68, maxPol: 1.35 }, buildD1);
+makeFig('d2cv', { az: 0.45, pol: 0.95, maxPol: 1.55 }, buildD2);
+makeFig('d3cv', { az: 0.5, pol: 0.82, maxPol: 1.4 }, buildD3);
+makeFig('d4cv', { az: 0.14, pol: 0.92, maxPol: 1.5 }, buildD4);
+makeFig('d5cv', { az: 0.5, pol: 0.8, maxPol: 1.45, unit: 1, logDepth: true }, buildD5);
+makeFig('d6cv', { az: 1.15, pol: 0.9, maxPol: 1.45 }, buildD6);
+</script>
+</body>
+</html>

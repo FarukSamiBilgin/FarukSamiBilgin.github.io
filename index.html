@@ -186,7 +186,7 @@ figcaption,.links,.row p,.ctl label{font-stretch:100%}
 </head>
 <body>
 
-<div class="top"><a href="#top">Faruk Sami Bilgin</a><span><a href="josephson/" style="margin-right:22px">Junction</a><a href="cryostat/" style="margin-right:22px">Cryostat</a><a href="teardown/" style="margin-right:28px">Teardown</a><a href="#contents">Contents</a></span></div>
+<div class="top"><a href="#top">Faruk Sami Bilgin</a><span><a href="josephson/" style="margin-right:22px">Junction</a><a href="cryostat/" style="margin-right:22px">Cryostat</a><a href="teardown/" style="margin-right:22px">Teardown</a><a href="moire/" style="margin-right:28px">Moiré</a><a href="#contents">Contents</a></span></div>
 
 <header class="hero dark" id="top">
   <canvas id="moire" role="img" aria-label="Interactive moiré pattern of two triangular lattices; drag horizontally to change the twist angle."></canvas>
@@ -218,6 +218,7 @@ figcaption,.links,.row p,.ctl label{font-stretch:100%}
       <li><a href="josephson/"><span class="num">LR</span><span class="t">A long read: the Josephson junction</span><span class="d">From a chip you can rotate to a qubit you can drive — five figures you can move.</span></a></li>
       <li><a href="cryostat/"><span class="num">LR</span><span class="t">A long read: the machine around a qubit</span><span class="d">The dilution refrigerator, its wiring and the sample box, taken apart in 3D.</span></a></li>
       <li><a href="teardown/"><span class="num">3D</span><span class="t">Taking a quantum computer apart</span><span class="d">One slider, sixteen steps: from the closed cryostat, screw by screw, down to the atoms of the junction.</span></a></li>
+      <li><a href="moire/"><span class="num">3D</span><span class="t">Inside a moiré qubit</span><span class="d">A gated van der Waals device taken apart, then six device concepts from my work, each with its verdict.</span></a></li>
       <li><a href="#papers"><span class="num">—</span><span class="t">Papers, code and data</span><span class="d">Three preprints, one software release, and every repository.</span></a></li>
     </ol>
   </div>
@@ -258,7 +259,7 @@ figcaption,.links,.row p,.ctl label{font-stretch:100%}
         <div>
           <p>A recent proposal treats twisted hexagonal boron nitride as a lattice of identical "artificial atoms": each moiré cell would trap an electron in a deep, smooth well. The proposal rests on a fitted model of the moiré potential.</p>
           <p>I recomputed the potential directly with density-functional theory at twenty-one stacking registries. The well is three to four times shallower than assumed (\(V_0 = 40\) meV), and the functional form the proposal uses is forbidden by the symmetry of the stack. A follow-up calculation of how fast the trapped states relax shows they cannot serve as orbital qubits (Chapter&nbsp;5).</p>
-          <div class="links"><a href="https://doi.org/10.5281/zenodo.24201814">Preprint · Zenodo</a><a href="https://www.alphaxiv.org/abs/2611.twisted-hbn-artificial-atoms-registry-dft">alphaXiv</a><a href="https://github.com/FarukSamiBilgin/twisted-hbn-artificial-atoms">Code and data</a></div>
+          <div class="links"><a href="https://doi.org/10.5281/zenodo.24201814">Preprint · Zenodo</a><a href="https://www.alphaxiv.org/abs/2611.twisted-hbn-artificial-atoms-registry-dft">alphaXiv</a><a href="https://github.com/FarukSamiBilgin/twisted-hbn-artificial-atoms">Code and data</a><a href="moire/">Inside a moiré qubit (3D)</a></div>
         </div>
         <div class="plate"><img loading="lazy" src="https://raw.githubusercontent.com/FarukSamiBilgin/twisted-hbn-artificial-atoms/main/figures/fig2_levels.png" alt="Claimed moiré well versus the potential computed by registry-resolved DFT"></div>
       </div>
@@ -347,7 +348,7 @@ figcaption,.links,.row p,.ctl label{font-stretch:100%}
       <summary><span class="pm">+</span>More — in my work<span class="sub">Magic-angle graphene junctions in a sub-THz cavity</span></summary>
       <div class="mbody">
         <div>
-          <p>I built a modular simulation of a magic-angle graphene junction placed in a photonic-crystal cavity and driven at sub-terahertz frequency — material, cavity, junction and qubit as separate, cross-checked modules. The half step is a usable fingerprint: 0.200 I<sub>c</sub> wide at τ = 0.95, and its temperature dependence turns it into an electron thermometer.</p>
+          <p>I built a modular simulation of a magic-angle graphene junction placed in a photonic-crystal cavity and driven at sub-terahertz frequency — material, cavity, junction and qubit as separate, cross-checked modules. The half step is a usable fingerprint: in that study, with τ = 0.8 and drive amplitude i<sub>ac</sub> = 3.5, it is 0.200 I<sub>c</sub> wide (60 nA), and its temperature dependence turns it into an electron thermometer. (The figure above uses different drive settings.)</p>
           <p>A companion study draws the limits. The step measures transparency, not mechanism: trapped flux in an asymmetric loop also makes half steps, and which purely electrical measurements can tell the two apart is worked out separately.</p>
         </div>
         <div>
