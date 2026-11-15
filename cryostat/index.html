@@ -1,0 +1,1571 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The machine around a qubit — Faruk Sami Bilgin</title>
+<meta name="description" content="An interactive long read on the dilution refrigerator, its wiring and the sample package that hold a transmon qubit at ten millikelvin, with three-dimensional models and figures computed in the browser.">
+<meta property="og:title" content="The machine around a qubit">
+<meta property="og:description" content="A tour of a dilution refrigerator, from room temperature down to the chip and back, with models you can turn, peel apart and drive.">
+<meta name="color-scheme" content="light">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230a0a0a'/%3E%3Cg fill='%23f2f2f0'%3E%3Ccircle cx='9' cy='11' r='1.8'/%3E%3Ccircle cx='16' cy='11' r='1.8'/%3E%3Ccircle cx='23' cy='11' r='1.8'/%3E%3Ccircle cx='12.5' cy='17' r='1.8'/%3E%3Ccircle cx='19.5' cy='17' r='1.8'/%3E%3Ccircle cx='9' cy='23' r='1.8'/%3E%3Ccircle cx='16' cy='23' r='1.8'/%3E%3Ccircle cx='23' cy='23' r='1.8'/%3E%3C/g%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500;600&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css">
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"></script>
+<script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"></script>
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
+<style>
+:root{
+  --sans:"IBM Plex Sans",-apple-system,"Segoe UI",Helvetica,Arial,sans-serif;
+  --serif:"Source Serif 4",Georgia,"Times New Roman",serif;
+  --mono:"IBM Plex Mono",ui-monospace,Consolas,Menlo,monospace;
+  --bg:#f4f4f1;--fg:#121212;--muted:#5c5c57;--faint:#93938d;--line:#dbdbd5;--line2:#c4c4bd;--accent:#cf1f25;--stage:#e9e9e4;
+}
+*{box-sizing:border-box}
+html{background:var(--bg);scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--fg);font:400 19px/1.65 var(--serif);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+a{color:inherit;text-decoration-color:var(--line2);text-underline-offset:3px}
+a:hover{text-decoration-color:var(--accent)}
+
+.top{position:fixed;inset:0 0 auto 0;z-index:20;height:52px;display:flex;align-items:center;justify-content:space-between;padding:0 40px;font:500 12px var(--sans);letter-spacing:.16em;text-transform:uppercase;color:#f2f2f0;background:#0a0a0a;border-bottom:1px solid #262626}
+.top a{text-decoration:none}
+
+.col{max-width:728px;margin:0 auto;padding:0 24px}
+.head{padding-top:148px;padding-bottom:28px}
+.kicker{font:500 12px/1.4 var(--sans);letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+h1{font:600 clamp(42px,8.4vw,64px)/1.02 var(--sans);letter-spacing:-.035em;margin:22px 0 22px}
+.dek{font-size:21px;line-height:1.5;color:var(--muted);margin:0 0 26px}
+.by{font:400 15px var(--sans);color:var(--muted);padding-bottom:30px;border-bottom:1px solid var(--line)}
+.by b{font-weight:500;color:var(--fg)}
+
+article p{margin:0 0 1.05em}
+h2{font:600 30px/1.15 var(--sans);letter-spacing:-.02em;margin:76px 0 20px}
+.katex{font-size:1.04em}
+.katex-display{margin:1.15em 0 1.35em;overflow-x:auto;overflow-y:hidden;padding:2px 0}
+sub,sup{line-height:0}
+
+figure.fig{max-width:1028px;margin:44px auto 52px;padding:0 24px;scroll-margin-top:68px}
+h2{scroll-margin-top:68px}
+.stage{position:relative;background:var(--stage);border:1px solid var(--line)}
+.stage canvas{display:block;width:100%;touch-action:auto}
+.cell{position:relative;min-width:0}
+.ov{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+.ov text{font:400 13px var(--sans);fill:var(--muted)}
+.ov .m{font-family:var(--mono);font-size:12.5px}
+.ov .a{fill:var(--accent)}
+.ov .f{fill:var(--fg)}
+.ov .b{font-weight:500;fill:var(--fg)}
+#f1{height:720px;cursor:grab}
+#f2{height:580px;cursor:grab}
+#f3{height:600px;cursor:grab}
+#f3b{height:600px}
+#f4{height:300px}
+#f5{height:560px;cursor:grab}
+#f1:active,#f2:active,#f3:active,#f5:active{cursor:grabbing}
+.split{display:grid;grid-template-columns:minmax(0,1fr) 300px}
+.split > :last-child{border-left:1px solid var(--line)}
+.nogl{display:grid;place-items:center;min-height:200px;padding:24px;font:400 15px var(--sans);color:var(--muted);text-align:center}
+
+.controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px 36px;margin-top:16px}
+.ctl{display:grid;grid-template-columns:1fr auto;gap:2px 12px;align-items:center}
+.ctl label{font:400 14px var(--sans);color:var(--muted)}
+.ctl output{font:500 15px var(--mono);color:var(--accent)}
+.ctl input{grid-column:1/-1;width:100%;accent-color:var(--accent);margin:6px 0 2px}
+.row{display:flex;flex-wrap:wrap;align-items:center;gap:8px 10px;margin-top:14px}
+.btn{font:500 13px/1 var(--sans);letter-spacing:.02em;color:var(--fg);background:transparent;border:1px solid var(--line2);border-radius:999px;padding:8px 15px;cursor:pointer}
+.btn:hover{border-color:var(--fg)}
+.btn:focus-visible,.ctl input:focus-visible,.check input:focus-visible{outline:2px solid var(--fg);outline-offset:2px}
+.btn[aria-pressed=true]{background:var(--fg);color:var(--bg);border-color:var(--fg)}
+.btn:disabled{opacity:.4;cursor:default;border-color:var(--line2)}
+.check{display:inline-flex;align-items:center;gap:8px;font:400 14px var(--sans);color:var(--muted);margin-left:6px}
+.check input{accent-color:var(--accent);width:16px;height:16px;margin:0}
+.readouts{display:flex;flex-wrap:wrap;gap:6px 28px;margin-top:14px;font:400 14px var(--sans);color:var(--muted)}
+.readouts output{font:500 14.5px var(--mono);color:var(--fg);margin-left:6px}
+figcaption{font:400 14.5px/1.55 var(--sans);color:var(--muted);margin-top:16px;max-width:54em}
+figcaption b{color:var(--fg);font-weight:500}
+
+.further{margin-top:64px;border-top:1px solid var(--line2);padding-top:22px}
+.further h3{font:500 12px/1.4 var(--sans);letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+.further ul{list-style:none;margin:0;padding:0}
+.further li{padding:11px 0;border-bottom:1px solid var(--line);font:400 15.5px/1.5 var(--sans);color:var(--muted)}
+.further li a{color:var(--fg);font-weight:500;text-decoration:none;border-bottom:1px solid var(--line2)}
+.further li a:hover{border-color:var(--accent)}
+.further .m{font:400 14px var(--mono)}
+
+footer{margin-top:110px;background:#0a0a0a;color:#9b9b96;font:400 14.5px/1.6 var(--sans);padding:60px 0 90px;border-top:1px solid #262626}
+footer .in{max-width:1028px;margin:0 auto;padding:0 24px;display:grid;grid-template-columns:1fr auto;gap:24px 48px}
+footer p{margin:0 0 8px;max-width:40em}
+footer a{color:#f2f2f0;text-decoration-color:#3a3a38}
+footer .r{text-align:right}
+
+@media (max-width:820px){
+  .split{grid-template-columns:1fr}
+  .split > :last-child{border-left:0;border-top:1px solid var(--line)}
+  #f3b{height:230px}
+}
+@media (max-width:640px){
+  body{font-size:18px}
+  .top{padding:0 16px;letter-spacing:.1em}
+  .top .long{display:none}
+  .col,figure.fig{padding-left:16px;padding-right:16px}
+  .head{padding-top:110px}
+  .dek{font-size:19px}
+  h2{font-size:26px;margin-top:60px}
+  #f1{height:560px}
+  #f2{height:470px}
+  #f3{height:500px}
+  #f4{height:330px}
+  #f5{height:400px}
+  .ov text{font-size:12px}
+  .ov .m{font-size:11.5px}
+  .controls{gap:10px 24px}
+  footer .in{grid-template-columns:1fr}
+  footer .r{text-align:left}
+}
+@media (prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+
+<div class="top"><a href="../">Faruk Sami Bilgin</a><a href="../#contents">Notes<span class="long"> on quantum devices</span></a></div>
+
+<article>
+<header class="head col">
+  <div class="kicker">A long read · Notes on quantum devices</div>
+  <h1>The machine around a qubit</h1>
+  <p class="dek">A transmon is a few square millimetres of patterned metal. Keeping it quantum takes a refrigerator taller than a person, dozens of cables that must not let heat in, and a small copper box. This is a tour of that machine, from room temperature down to the chip and back.</p>
+  <div class="by"><b>Faruk Sami Bilgin</b> · November 2026</div>
+</header>
+
+<div class="col">
+<p>In <a href="../josephson/">the article on the Josephson junction</a> I described the transmon, a superconducting circuit whose two lowest energy levels make a qubit. Its transition frequency is a few gigahertz, and that one number decides almost everything about the machine it has to live in. A microwave photon at \(f = 5\) GHz carries an energy \(hf \approx 3.3\times10^{-24}\) J, about 21 µeV. Thermal energies come in units of \(k_BT\), and the two are equal at</p>
+$$T = \frac{hf}{k_B} \approx 0.24\ \text{K}.$$
+<p>Well below that temperature the qubit relaxes to its ground state and stays there. Well above it, its surroundings keep knocking it into the excited state. In thermal equilibrium the ratio of the populations of the excited and the ground state is the Boltzmann factor</p>
+$$\frac{P_1}{P_0} = e^{-hf/k_BT}.$$
+<p>At 10 mK the exponent is 24 and \(e^{-24} \approx 4\times10^{-11}\): for every practical purpose the qubit is in its ground state. At 100 mK the ratio is already 9 per cent, which would be an error waiting in almost every operation. At 4 K, the temperature of liquid helium, it is 0.94; the qubit is then close to an even, random mixture of its two states and holds no information at all.</p>
+<p>So a superconducting quantum processor is kept at about ten millikelvin, some 270 times colder than the microwave background that fills the universe. The machine that does this is a dilution refrigerator, and it is the object in nearly every photograph of a quantum computer: the gold chandelier. In this article I'll take it apart, from the plate at room temperature down to the copper box that holds the chip, and follow a microwave pulse all the way down and back up again.</p>
+<p>Here is the whole machine. It hangs from a stainless-steel plate at room temperature. Below it, held by thin rods, are five plates, each colder than the one above: about 50 kelvin, about 4 kelvin, the <em>still</em> at under a kelvin, the <em>cold plate</em> at about a tenth of a kelvin, and finally the <em>mixing-chamber</em> plate at about ten millikelvin, under which the sample hangs. The upper stages are each wrapped in a radiation shield, and the whole stack sits inside a vacuum can. Drag the figure to turn it. The first slider slides the shields away, the second pulls the stages apart, and the third takes you down to the sample. The button sends a microwave pulse to the qubit and brings its answer back.</p>
+</div>
+
+<figure class="fig" id="fig1">
+  <div class="stage">
+    <canvas id="f1" role="img" aria-label="Three-dimensional model of a dilution refrigerator: a stainless-steel top plate with the pulse-tube cold head, five gold-plated plates below it joined by thin rods, coaxial lines with attenuators running down one side and amplifiers on the other, the dilution unit in the middle, and a sample package on a cold finger at the bottom, inside nested radiation shields and a vacuum can that can be cut away or removed."></canvas>
+    <svg class="ov" id="f1-ov" aria-hidden="true"></svg>
+  </div>
+  <div class="controls">
+    <div class="ctl"><label for="s1r">Remove the shields</label><output id="o1r" for="s1r">—</output><input id="s1r" type="range" min="0" max="1" step="0.001" value="0"></div>
+    <div class="ctl"><label for="s1s">Separate the stages</label><output id="o1s" for="s1s">—</output><input id="s1s" type="range" min="0" max="1" step="0.001" value="0"></div>
+    <div class="ctl"><label for="s1d">Go down to the sample</label><output id="o1d" for="s1d">—</output><input id="s1d" type="range" min="0" max="1" step="0.001" value="0"></div>
+  </div>
+  <div class="row">
+    <button class="btn" id="b1p" type="button">Send a pulse</button>
+    <label class="check"><input type="checkbox" id="c1c" checked> Cut-away shields</label>
+    <div class="readouts" style="margin-top:0;margin-left:8px">
+      <span>Pulse power<output id="r1p">—</output></span>
+      <span>Where<output id="r1w" style="font-family:var(--sans);font-weight:400">—</output></span>
+    </div>
+  </div>
+  <figcaption><b>Figure 1.</b> A dilution refrigerator modelled on the proportions of commercial units: the real stack is about 1.1 m from the top plate to the mixing-chamber plate, with plates some 40–70 cm across, and the model is drawn to that scale. Wiring is simplified to a few dozen lines, where real systems carry tens to hundreds. Connectors, attenuators and amplifiers are drawn at about their real size; the chip inside the package is shown at its real size but its features are enlarged. Temperatures are typical values; each manufacturer and each system differs. The pulse budget uses typical attenuations and cable losses, listed in the text.</figcaption>
+</figure>
+
+<div class="col">
+<p>Start at the top. The cylinder standing on the top plate is the head of a pulse-tube cooler. A compressor in a neighbouring room pushes helium gas back and forth through it roughly once a second, and the expansion of the gas cools two stages: the first to roughly 40–60 K, the second to about 3–4 K. Nothing moves in the cold part of a pulse tube, which keeps vibrations low. Its two stages are bolted through copper flanges to the 50 K and 4 K plates. A typical cooler delivers some tens of watts at the first stage and a watt or two at the second.</p>
+<p>Everything colder than 4 K is the work of the dilution unit in the middle of the stack, which the next section takes apart: the still, the heat exchangers below it, and the mixing chamber on the bottom plate, the coldest place in the machine. Each plate has a cooling budget, and the budget shrinks at every step: about a watt at 4 K, milliwatts at the still, and only microwatts at the mixing chamber. Everything about the construction follows from that. The plates hang on thin-walled rods of stainless steel, a poor conductor of heat. The shields are there because a surface at 300 K radiates about 46 mW per square centimetre, while one at 50 K radiates about 0.035 mW: each shield catches the radiation from the one outside it and hands the heat to a stage that can afford it.</p>
+<p>The lines on the near left carry microwave pulses down to the chip. Each one passes through every plate and is clamped to it, and on three plates it runs through an attenuator, the small dark cylinders: 20 dB at 4 K, 10 dB on the cold plate and 20 dB at the mixing chamber, which are typical values. The lines on the near right bring the signal back up. At the mixing chamber they pass two isolators and a Josephson travelling-wave parametric amplifier, the TWPA; at 4 K, a transistor amplifier, the HEMT. Between the two the cable is made of niobium–titanium, a superconductor. The brown bundles at the back are twisted pairs for DC bias and thermometers.</p>
+<p>Press <em>Send a pulse</em>. A readout pulse leaves the room-temperature electronics at −70 dBm, 100 picowatts. On the way down it loses 50 dB in the attenuators and 6 dB more in the cables and in a filter just above the sample, and it reaches the chip at about −126 dBm, some \(2.5\times10^{-16}\) W. At a readout frequency of 7 GHz that is about fifty photons per microsecond. The answer coming back is just as weak. It gains 20 dB in the TWPA and 40 dB in the HEMT, loses a few dB along the way, and leaves the refrigerator at about −70 dBm again. Why the line is built this way, cold attenuators going in and cold amplifiers coming out, is the subject of the second half of this article.</p>
+
+<h2 id="dilution">How a dilution refrigerator gets cold</h2>
+<p>Pumping on a liquid cools it. The most energetic atoms leave as vapour and take heat with them; the rest are colder. Pumping on liquid <sup>4</sup>He reaches about 1 K, and on the rarer isotope <sup>3</sup>He about 0.3 K. Below that the vapour pressure falls exponentially with temperature, there is almost nothing left to pump, and the cooling stops. A dilution refrigerator gets around this with a mixture of the two isotopes.</p>
+<p>Cooled below about 0.87 K, a mixture with enough <sup>3</sup>He separates into two liquid phases, a little like oil and water. One, the concentrated phase, is almost pure <sup>3</sup>He; it is the lighter of the two and floats on top. The other, the dilute phase, is mostly <sup>4</sup>He, which at these temperatures is a superfluid with almost no thermal excitations, so that it is thermally almost inert. But even as the temperature approaches zero, the dilute phase keeps about 6.6 per cent of <sup>3</sup>He dissolved in it. A <sup>3</sup>He atom is bound slightly more strongly in the dense <sup>4</sup>He liquid than among other <sup>3</sup>He atoms, and that is what keeps its solubility finite.</p>
+<p>Those 6.6 per cent are the whole trick. The two phases meet in the mixing chamber. Its dilute phase is connected through a tube to the still, a pot higher up at about 0.7 K that is pumped by pumps at room temperature. At that temperature <sup>3</sup>He has a far higher vapour pressure than <sup>4</sup>He, so what leaves the still is almost pure <sup>3</sup>He. As <sup>3</sup>He is taken out of the dilute phase in the still, <sup>3</sup>He from the mixing chamber moves up to replace it, and in the mixing chamber <sup>3</sup>He atoms cross the phase boundary, from the concentrated phase into the dilute one, to keep its concentration at 6.6 per cent. Crossing costs energy, because <sup>3</sup>He has a higher enthalpy in the dilute phase, and each atom that crosses takes heat from its surroundings, the way a molecule does when it evaporates. The concentrated phase plays the liquid, the dilute phase the vapour, and the <sup>4</sup>He is simply the space in which that vapour lives.</p>
+<p>The <sup>3</sup>He pumped away is compressed at room temperature, cleaned and sent back down. It is precooled by the pulse tube, condensed, and cooled further in heat exchangers by the cold dilute stream on its way up to the still, before it re-enters the mixing chamber. It circulates. For ideal heat exchangers the cooling power is</p>
+$$\dot Q = 84\ \frac{\text{J}}{\text{mol K}^2}\;\dot n\,T^2,$$
+<p>where \(\dot n\) is the circulation rate of <sup>3</sup>He in moles per second and \(T\) is the temperature of the mixing chamber. Because the concentration of the "vapour" stays at 6.6 per cent instead of falling exponentially, the cooling power falls only as \(T^2\). For a typical \(\dot n = 500\) µmol/s it gives about 17 µW at 20 mK and 420 µW at 100 mK. The mixing chamber settles where cooling power and heat load are equal, \(T = \sqrt{\dot Q/(84\,\dot n)}\).</p>
+<p>The figure below shows the still, the heat exchanger and the mixing chamber, drawn larger than they are and with the liquids tinted so that you can see them. Cut the walls away with the last slider. The dark beads are <sup>3</sup>He atoms, the pale ones <sup>4</sup>He. Change the circulation rate and the heat load on the mixing-chamber plate, and the temperature on the thermometer follows the balance above.</p>
+</div>
+
+<figure class="fig" id="fig2">
+  <div class="stage">
+    <canvas id="f2" role="img" aria-label="Three-dimensional cut-away model of the coldest part of a dilution refrigerator: the still pot at the top with its pumping line, a double helix of heat-exchanger tubing, and the cylindrical mixing chamber on a gold plate. Inside the mixing chamber a pale concentrated phase floats on a darker dilute phase. Dark beads, helium-3 atoms, come down one helix, cross the phase boundary, flow up the other helix to the still and evaporate; pale beads, helium-4 atoms, stay in the dilute phase."></canvas>
+    <svg class="ov" id="f2-ov" aria-hidden="true"></svg>
+  </div>
+  <div class="controls">
+    <div class="ctl"><label for="s2n">Circulation rate ṅ</label><output id="o2n" for="s2n">—</output><input id="s2n" type="range" min="100" max="1000" step="10" value="500"></div>
+    <div class="ctl"><label for="s2q">Heat load on the mixing chamber</label><output id="o2q" for="s2q">—</output><input id="s2q" type="range" min="0" max="3" step="0.001" value="0.602"></div>
+    <div class="ctl"><label for="s2c">Cut away the walls</label><output id="o2c" for="s2c">—</output><input id="s2c" type="range" min="0" max="1" step="0.005" value="0.7"></div>
+  </div>
+  <div class="row">
+    <button class="btn" id="b2p" type="button" aria-pressed="true">Pause</button>
+    <div class="readouts" style="margin-top:0;margin-left:8px">
+      <span>T = √(Q̇ / 84ṅ)<output id="r2t">—</output></span>
+      <span>Cooling power at 20 mK<output id="r2a">—</output></span>
+      <span>at 100 mK<output id="r2b">—</output></span>
+    </div>
+  </div>
+  <figcaption><b>Figure 2.</b> A schematic of the dilution unit, not to scale. Real heat exchangers are a tube inside a tube followed by blocks of sintered silver; here they are drawn as two interleaved coils, one carrying returning <sup>3</sup>He down and the other the dilute stream up. The number of atoms drawn is arbitrary; only the flow pattern and the make-up of each phase mean anything, with roughly one <sup>3</sup>He for every fourteen <sup>4</sup>He in the dilute phase. The temperature is a toy model: the ideal-exchanger balance \(\dot Q = 84\,\dot n T^2\), with all heat leaks lumped into the heat load. A real refrigerator's base temperature, typically 7–15 mK with nothing attached, is also limited by its heat exchangers.</figcaption>
+</figure>
+
+<div class="col">
+<p>Follow one dark bead. It comes down the coil from the left, already liquid, and enters the top of the mixing chamber into the concentrated phase. It sinks to the boundary and crosses it, and the ring that flashes there is the moment it absorbs heat. In the dilute phase it is one <sup>3</sup>He among fourteen or so <sup>4</sup>He atoms. It drifts to the outlet near the bottom, climbs the other coil, passing the incoming stream and cooling it, reaches the still, and evaporates into the pumping line.</p>
+<p>Two things are worth trying. Double the circulation rate and the temperature falls only by a factor of \(\sqrt2\), because the cooling power is proportional to \(\dot n\) and to \(T^2\). Then raise the heat load: a few microwatts keep the mixing chamber near 10 mK, but a few hundred microwatts warm it towards 100 mK. Everything that touches the coldest plate, every cable, every support, every stray photon, is paid for out of this budget of microwatts.</p>
+
+<h2 id="attenuation">Why the input lines are attenuated</h2>
+<p>A coaxial cable is a pipe for microwaves, and at room temperature it is full of thermal photons. The mean number of photons in a mode of frequency \(f\) at temperature \(T\) is the Bose–Einstein occupation</p>
+$$n_{\rm th}(T) = \frac{1}{e^{hf/k_BT}-1},$$
+<p>which at 5 GHz and 300 K is about \(k_BT/hf \approx 1250\). If a cable ran straight from room temperature to the chip, the qubit's readout resonator would sit in a 300 K bath. As we will see, every stray photon in that resonator shifts the qubit frequency.</p>
+<p>An attenuator is a small resistive network that absorbs a fixed fraction of the power passing through it. At temperature \(T\) it does two things. It passes a fraction \(1/A\) of the photons arriving from above, where \(A\) is its attenuation as a power ratio, and, since anything that absorbs also emits, it adds thermal photons of its own:</p>
+$$n_{\rm out} = \frac{n_{\rm in}}{A} + \left(1-\frac{1}{A}\right) n_{\rm th}(T).$$
+<p>A 20 dB attenuator, \(A = 100\), at 4 K turns 1250 photons into \(12.5 + 0.99\times16.2 \approx 28.5\). However strong it is, it cannot go below its own \(n_{\rm th}\) of 16.2. The way down is to attenuate a little at each of several stages, so that every attenuator absorbs the noise of the warmer stages above it and replaces it with its own, colder noise.</p>
+<p>Why not put all the attenuation at the mixing chamber? Because an attenuator absorbs the signal as well, and absorbed power is heat. A drive line carrying −40 dBm, 100 nW, of pulses into a 20 dB attenuator at the mixing chamber dissipates 99 nW there, for every line, in a stage whose whole budget is some tens of microwatts. Dissipating at 4 K is far cheaper. The attenuators also have a second job: they connect the centre conductor of the coax, which its dielectric otherwise insulates, to the plate, so that the inner conductor is cooled stage by stage too.</p>
+<p>The figure shows one input line from the top plate to the sample, with an attenuator on each plate. The glowing cloud between two plates stands for the thermal photons in the line at that point: the number of dots grows with the logarithm of the occupation, so every dot that disappears is a factor of about 1.1 fewer photons. The numbers next to the line are exact, from the formula above. Change the attenuators and the frequency.</p>
+</div>
+
+<figure class="fig" id="fig3">
+  <div class="stage split">
+    <div class="cell">
+      <canvas id="f3" role="img" aria-label="Three-dimensional model of one input line passing down through six plates, from room temperature to the mixing chamber and the sample, with an attenuator on each plate whose length grows with its attenuation. Between the plates, a cloud of glowing red dots shows the thermal photon occupation of the line, shrinking stage by stage, with the computed occupation written beside each cloud."></canvas>
+      <svg class="ov" id="f3-ov" aria-hidden="true"></svg>
+    </div>
+    <canvas id="f3b" role="img" aria-label="Bar chart on a logarithmic scale of the thermal photon occupation after each stage, with the thermal floor of each stage marked."></canvas>
+  </div>
+  <div class="controls">
+    <div class="ctl"><label for="s3a">50 K attenuator</label><output id="o3a" for="s3a">—</output><input id="s3a" type="range" min="0" max="30" step="1" value="0"></div>
+    <div class="ctl"><label for="s3b">4 K attenuator</label><output id="o3b" for="s3b">—</output><input id="s3b" type="range" min="0" max="30" step="1" value="20"></div>
+    <div class="ctl"><label for="s3c">Still attenuator</label><output id="o3c" for="s3c">—</output><input id="s3c" type="range" min="0" max="30" step="1" value="0"></div>
+    <div class="ctl"><label for="s3d">Cold-plate attenuator</label><output id="o3d" for="s3d">—</output><input id="s3d" type="range" min="0" max="30" step="1" value="10"></div>
+    <div class="ctl"><label for="s3e">Mixing-chamber attenuator</label><output id="o3e" for="s3e">—</output><input id="s3e" type="range" min="0" max="30" step="1" value="20"></div>
+    <div class="ctl"><label for="s3f">Frequency f</label><output id="o3f" for="s3f">—</output><input id="s3f" type="range" min="4" max="8" step="0.05" value="5"></div>
+  </div>
+  <div class="row">
+    <button class="btn" id="b3p" type="button" aria-pressed="true">Pause</button>
+    <div class="readouts" style="margin-top:0;margin-left:8px">
+      <span>n at the chip<output id="r3n">—</output></span>
+      <span>T<sub>eff</sub> = hf / k<sub>B</sub> ln(1 + 1/n)<output id="r3t">—</output></span>
+      <span>Dephasing limit T<sub>φ</sub><output id="r3p">—</output></span>
+    </div>
+  </div>
+  <figcaption><b>Figure 3.</b> Thermal photons in one input line, from \(n_{\rm out} = n_{\rm in}/A + (1-1/A)\,n_{\rm th}(T)\) applied stage by stage, starting from \(n_{\rm th}(300\ \text{K})\). Stage temperatures are typical: 50 K, 4 K, 0.8 K, 0.1 K and 10 mK. Each attenuator is assumed to be at the temperature of its plate, and cable loss, which acts as a weak distributed attenuator, is left out. Right: the occupation after each stage on a logarithmic scale, with each stage's own \(n_{\rm th}(T)\), the floor its attenuator cannot go below, marked by a grey tick. The dephasing limit assumes the readout resonator is in equilibrium with this line alone, with a typical \(\kappa/2\pi = 1\) MHz and a dispersive shift \(2\chi = \kappa\).</figcaption>
+</figure>
+
+<div class="col">
+<p>With the typical values, 20 dB at 4 K, 10 dB on the cold plate and 20 dB at the mixing chamber, the line delivers about \(n = 0.029\) photons per mode at 5 GHz. That is equivalent to a bath at 68 mK, a thousand times better than room temperature but still much warmer than the mixing chamber. Notice how little the stages without attenuators do, and how each attenuator meets a floor: no attenuation at 4 K can push the occupation below 16. Add 10 dB at the still, or another 10 dB on the cold plate, and the occupation falls to \(6\times10^{-3}\) or \(4\times10^{-3}\).</p>
+<p>Does 0.03 of a photon matter? In the dispersive regime used for readout, each photon in the readout resonator shifts the qubit frequency by \(2\chi\). Thermal photons arrive and leave at random, so the shift jumps at random and the qubit's phase is scrambled at the rate</p>
+$$\Gamma_\varphi = \bar n\,\kappa\,\frac{4\chi^2}{\kappa^2+4\chi^2}\qquad(\bar n \ll 1),$$
+<p>where \(\kappa\) is the rate at which photons leave the resonator. For a typical \(\kappa/2\pi = 1\) MHz and \(2\chi = \kappa\), an occupation of 0.029 limits the dephasing time to about 11 µs, far below the hundreds of microseconds that good transmons reach. The rate is proportional to \(\bar n\), so every factor of ten in photons is a factor of ten in coherence. In a real setup the readout resonator is also connected to the output line, which is protected differently, and many groups use 60 dB or more on their input lines, together with infrared filters.</p>
+
+<h2 id="amplifiers">Why the output needs amplifiers</h2>
+<p>The answer from the chip is a microwave tone of about −126 dBm, a few tens of photons per microsecond, whose amplitude or phase differs slightly depending on whether the qubit is in \(|0\rangle\) or \(|1\rangle\). To tell the two apart within a microsecond, the noise added on the way out has to be comparable to that, a photon or two per unit of bandwidth and time. Every amplifier adds noise, characterised by a noise temperature \(T_i\), and a chain of amplifiers with power gains \(G_i\) adds noise according to the Friis formula:</p>
+$$T_{\rm sys} = T_1 + \frac{T_2}{G_1} + \frac{T_3}{G_1G_2} + \cdots$$
+<p>The first amplifier's noise counts in full; the second's is divided by the gain of the first. So the first amplifier must be as quiet as possible, and must have enough gain to make the rest of the chain irrelevant.</p>
+<p>A HEMT amplifier at 4 K has a noise temperature of a few kelvin, say 3 K, and about 40 dB of gain. Followed by a room-temperature amplifier with a noise temperature of about 100 K, the system noise temperature is \(T_{\rm sys} \approx 3 + 100/10^4 \approx 3.01\) K, about nine photons of noise at 7 GHz. A TWPA at the mixing chamber, with 20 dB of gain and an effective noise temperature of about 0.4 K, which includes the losses before it, changes this to \(T_{\rm sys} \approx 0.4 + 3/100 + 100/10^6 \approx 0.43\) K, close to one photon. Quantum mechanics sets a floor: an amplifier that preserves both quadratures of a signal must add at least half a photon of noise, \(hf/2k_B \approx 0.17\) K at 7 GHz. The time needed to reach a given signal-to-noise ratio is proportional to \(T_{\rm sys}\), so the TWPA makes readout about seven times faster at the same power, or allows a weaker readout tone.</p>
+</div>
+
+<figure class="fig" id="fig4">
+  <div class="stage">
+    <canvas id="f4" role="img" aria-label="Horizontal stacked bars comparing the system noise temperature of an output line with a TWPA as the first amplifier and with the HEMT as the first amplifier, each bar split into the contributions of the individual amplifiers, with the quantum limit marked by a dashed line."></canvas>
+  </div>
+  <div class="controls">
+    <div class="ctl"><label for="s4a">TWPA noise temperature</label><output id="o4a" for="s4a">—</output><input id="s4a" type="range" min="0.15" max="1.2" step="0.01" value="0.4"></div>
+    <div class="ctl"><label for="s4b">HEMT noise temperature</label><output id="o4b" for="s4b">—</output><input id="s4b" type="range" min="1" max="6" step="0.1" value="3"></div>
+  </div>
+  <div class="row">
+    <button class="btn" id="b4t" type="button" aria-pressed="true">TWPA in the line</button>
+    <div class="readouts" style="margin-top:0;margin-left:8px">
+      <span>T<sub>sys</sub><output id="r4s">—</output></span>
+      <span>k<sub>B</sub>T<sub>sys</sub> / hf<output id="r4p">—</output></span>
+      <span>Time for equal SNR<output id="r4i">—</output></span>
+    </div>
+  </div>
+  <figcaption><b>Figure 4.</b> System noise temperature from the Friis formula at a typical readout frequency of 7 GHz, with typical gains of 20 dB for the TWPA and 40 dB for the HEMT, and a room-temperature amplifier at 100 K. The button removes the TWPA from the chain; the faded bar shows the other configuration for comparison. The time needed for a given signal-to-noise ratio scales with \(T_{\rm sys}\) and is given relative to the chain with the TWPA. The dashed line is the quantum limit for a phase-preserving amplifier, \(hf/2k_B\).</figcaption>
+</figure>
+
+<div class="col">
+<p>Two details of the output line in Figure 1 follow from this. The isolators, circulators with one port terminated, let the signal pass upwards and absorb whatever travels down: the noise of the amplifiers, and the strong pump tone that the TWPA needs, which must not reach the qubit. And any loss before the first amplifier attenuates the signal but not the noise added after it, so it counts directly against \(T_{\rm sys}\). That is why the cable between the mixing chamber and the HEMT is superconducting niobium–titanium, which loses almost nothing and, like all superconductors, conducts little heat.</p>
+
+<h2 id="package">The sample package</h2>
+<p>At the bottom of Figure 1, below the mixing-chamber plate, a gold-plated copper cold finger holds the sample package, inside a magnetic shield. The package is a copper box, often gold-plated, sometimes made of aluminium, which becomes superconducting and screens magnetic fields. Inside it a printed circuit board carries coplanar-waveguide traces from coaxial connectors at its edge to the chip in its centre. The chip is glued or clamped into a pocket, and aluminium wire bonds, 25 µm thick, connect the traces on the board to pads on the chip. Many more bonds tie the ground plane of the chip to the ground of the board all around its edge; without them, parts of the chip's ground could ring on their own.</p>
+<p>The box itself is a microwave cavity. Its lowest mode, for a pocket of size \(a\times b\) that is not too tall, has the frequency</p>
+$$f = \frac{c}{2}\sqrt{\frac{1}{a^2}+\frac{1}{b^2}},$$
+<p>17.7 GHz for a 12 mm square pocket and 8.2 GHz for a 26 mm one. A box mode close to a qubit or a resonator couples to it and opens a new path for its energy to leak away, so pockets are kept small, or broken up with posts, to push their modes well above the band from roughly 4 to 8 GHz where qubits and readout resonators typically live. On large chips, where the pocket cannot be small, the same job is done by air bridges and by vias through the silicon.</p>
+<p>Two more shields complete the picture. A magnetic shield of high-permeability metal, sometimes with a superconducting one inside it, keeps the field at the chip small, because flux vortices trapped in the superconducting films as they cool through their transition cause loss. And the whole sample space is made light-tight against infrared radiation. A single photon above \(2\Delta/h\), about 90 GHz for aluminium, can break a Cooper pair, and the quasiparticles it creates make qubits relax; this is the reason for the closed shields, for blackened inner surfaces, and for the infrared-absorbing filter on the input line just above the sample. Lift the lid and go down to the chip:</p>
+</div>
+
+<figure class="fig" id="fig5">
+  <div class="stage">
+    <canvas id="f5" role="img" aria-label="Three-dimensional model of a sample package: a copper base and lid with SMA connectors and coaxial cables on four sides, a printed circuit board with gold coplanar-waveguide traces and via fences, and a six-millimetre chip wire-bonded in the centre. Zooming in shows the chip's aluminium ground plane, the feedline, two transmons with their capacitor pads and junctions, meandered readout resonators and drive lines."></canvas>
+    <svg class="ov" id="f5-ov" aria-hidden="true"></svg>
+  </div>
+  <div class="controls">
+    <div class="ctl"><label for="s5l">Lift the lid</label><output id="o5l" for="s5l">—</output><input id="s5l" type="range" min="0" max="1" step="0.001" value="0"></div>
+    <div class="ctl"><label for="s5z">From the box to the chip</label><output id="o5z" for="s5z">—</output><input id="s5z" type="range" min="0" max="1" step="0.001" value="0"></div>
+    <div class="ctl"><label for="s5a">Pocket in the lid, a × a</label><output id="o5a" for="s5a">—</output><input id="s5a" type="range" min="8" max="28" step="0.5" value="12"></div>
+  </div>
+  <div class="row">
+    <label class="check"><input type="checkbox" id="c5m"> Show the lowest box mode</label>
+    <div class="readouts" style="margin-top:0;margin-left:8px">
+      <span>Lowest mode of the empty pocket<output id="r5f">—</output></span>
+      <span><output id="r5v" style="font-family:var(--sans);font-weight:400;margin-left:0">—</output></span>
+    </div>
+  </div>
+  <figcaption><b>Figure 5.</b> A sample package of a common kind, drawn at its real size: a 32 mm copper box, a 0.5 mm circuit board and a 6 mm chip. On the chip, line widths, gaps and the metal thickness are enlarged several times so that they can be seen; a real feedline is about 10 µm wide and the metal is 100–200 nm thick. The chip has two transmons, each with a readout resonator coupled to a common feedline and its own drive line. The box-mode frequency is the estimate for an empty rectangular pocket; the silicon chip and the circuit board lower it somewhat. The red sheet shows where the electric field of that mode is strongest.</figcaption>
+</figure>
+
+<div class="col">
+<p>At the far end of the zoom are the two pads, the junction between them and the meandering resonator of <a href="../josephson/">the previous article</a>. Everything described there, the phase across a nanometre of oxide, the anharmonic ladder of levels, the Rabi oscillations, happens in a few square micrometres at the very bottom of this machine. The rest of it, the pulse tube and the helium mixture, the shields, the attenuators and the amplifiers, exists so that this small patch of aluminium sees almost nothing but the pulses we send it: not the heat of the room, not the noise of our electronics, not a stray infrared photon. A quantum computer is, to a large extent, this machine.</p>
+
+<section class="further" aria-labelledby="further-h">
+  <h3 id="further-h">Further in my notes</h3>
+  <ul>
+    <li><a href="../josephson/">The Josephson junction</a> — the companion long read: from phase and the Josephson relations to the transmon and Rabi oscillations.</li>
+    <li><a href="../#ch4">A qubit is the bottom of a ladder</a> — the levels against offset charge, from charge qubit to transmon.</li>
+    <li><a href="../#ch5">What a qubit forgets, and how fast</a> — relaxation, dephasing and coherence budgets, including thermal photons.</li>
+    <li><a href="https://github.com/FarukSamiBilgin/superconducting-qubit-chip-design" class="m">superconducting-qubit-chip-design</a> — a transmon design flow, from layout and readout to gates and a repetition code.</li>
+  </ul>
+</section>
+</div>
+</article>
+
+<footer>
+  <div class="in">
+    <div>
+      <p>Faruk Sami Bilgin — independent researcher in quantum devices.</p>
+      <p>Every figure on this page is modelled or computed in your browser from the equations shown next to it. Values marked typical vary between systems and manufacturers.</p>
+    </div>
+    <div class="r">
+      <p><a href="../">Notes on quantum devices</a></p>
+      <p><a href="https://orcid.org/0009-0001-9064-4410">ORCID 0009-0001-9064-4410</a></p>
+      <p><a href="https://github.com/FarukSamiBilgin">github.com/FarukSamiBilgin</a></p>
+    </div>
+  </div>
+</footer>
+<noscript><p style="text-align:center;font:400 15px sans-serif">The figures on this page need JavaScript.</p></noscript>
+
+<script>
+/* ---------- numerics (tested in node against hand calculations; see the notes in the source) ---------- */
+const CRYO = (() => {
+  const h = 6.62607015e-34, kB = 1.380649e-23, c0 = 299792458;
+  const hfk = f => h * f / kB;                                         // hf/kB in K, f in Hz
+  const nth = (f, T) => T <= 0 ? 0 : 1 / Math.expm1(h * f / (kB * T));  // Bose-Einstein occupation
+  const att = (n, dB, f, T) => { const A = Math.pow(10, dB / 10); return n / A + (1 - 1 / A) * nth(f, T); };
+  const chain = (f, st) => { let n = nth(f, 300); const out = [n]; for (const s of st) { n = att(n, s.dB, f, s.T); out.push(n); } return out; };
+  const Teff = (f, n) => hfk(f) / Math.log(1 + 1 / n);
+  const gphi = (n, kappa, chi2) => n * kappa * chi2 * chi2 / (kappa * kappa + chi2 * chi2);   // chi2 = 2 chi, n << 1
+  const Qmc = (nd, T) => 84 * nd * T * T;                               // W, nd in mol/s, ideal exchangers
+  const Tbase = (nd, Q) => Math.sqrt(Q / (84 * nd));
+  const friis = st => { let T = 0, G = 1; for (const s of st) { T += s.T / G; G *= Math.pow(10, s.GdB / 10); } return T; };
+  const fbox = (a, b) => c0 / 2 * Math.sqrt(1 / (a * a) + 1 / (b * b));
+  return { h, kB, c0, hfk, nth, att, chain, Teff, gphi, Qmc, Tbase, friis, fbox };
+})();
+window.CRYO = CRYO;
+/* check values (node): hf/kB(5 GHz) = 0.23996 K; nth(5 GHz, 300 K) = 1249.7; default chain 1249.7, 1249.7, 28.51, 28.51, 2.941, 0.02941;
+   Teff = 67.5 mK; T_phi = 10.8 us; Q(500 umol/s, 20 mK) = 16.8 uW; Tbase(500, 4 uW) = 9.76 mK; Tsys 0.430 / 3.010 K; fbox(12 mm) = 17.67 GHz */
+
+/* ---------- shared helpers ---------- */
+const $ = id => document.getElementById(id);
+const RM = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+const COL = { fg: '#121212', mu: '#5c5c57', fa: '#93938d', li: '#dbdbd5', l2: '#c4c4bd', ac: '#cf1f25', st: '#e9e9e4', bg: '#f4f4f1' };
+const MONO = '"IBM Plex Mono", ui-monospace, monospace', SANS = '"IBM Plex Sans", system-ui, sans-serif';
+function fit(cv) {
+  const dpr = Math.min(window.devicePixelRatio || 1, 2), r = cv.getBoundingClientRect();
+  const w = Math.max(1, Math.round(r.width * dpr)), h = Math.max(1, Math.round(r.height * dpr));
+  if (cv.width !== w || cv.height !== h) { cv.width = w; cv.height = h; }
+  const ctx = cv.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+  return { ctx, W: r.width, H: r.height };
+}
+function watchVisible(el, cb) { new IntersectionObserver(es => cb(es[es.length - 1].isIntersecting), { rootMargin: '80px' }).observe(el); }
+function watchSize(el, cb) { let w0 = -1, h0 = -1; new ResizeObserver(() => { const r = el.getBoundingClientRect(); if (r.width !== w0 || r.height !== h0) { w0 = r.width; h0 = r.height; cb(); } }).observe(el); }
+/* requestAnimationFrame loop that only runs while wanted() is true and the figure is on screen */
+function Loop(step, wanted) {
+  let vis = false, raf = 0, last = 0;
+  const tick = t => {
+    raf = 0; if (!(vis && wanted())) { last = 0; return; }
+    const dt = last ? Math.min(0.05, (t - last) / 1000) : 1 / 60; last = t;
+    step(dt); raf = requestAnimationFrame(tick);
+  };
+  const kick = () => { if (vis && wanted() && !raf) { last = 0; raf = requestAnimationFrame(tick); } };
+  return { kick, setVisible(v) { vis = v; kick(); }, get visible() { return vis; } };
+}
+const mn = s => String(s).replace(/-/g, '−');
+const SUPD = '⁰¹²³⁴⁵⁶⁷⁸⁹';
+const supN = e => String(e).replace('-', '⁻').replace(/\d/g, d => SUPD[d]);
+function fmtN(x) {
+  if (!(x > 0)) return '0';
+  if (x >= 0.1 && x < 1000) return x >= 100 ? x.toFixed(0) : x.toPrecision(3);
+  let e = Math.floor(Math.log10(x)), m = x / Math.pow(10, e);
+  if (+m.toFixed(2) >= 10) { m /= 10; e += 1; }
+  return `${m.toFixed(2)} × 10${supN(e)}`;
+}
+function fmtT(T) { return T >= 1 ? T.toFixed(2) + ' K' : (T * 1000).toPrecision(3) + ' mK'; }
+function fmtW(W) { return W >= 1e-3 ? (W * 1e3).toPrecision(3) + ' mW' : W >= 1e-6 ? (W * 1e6).toPrecision(3) + ' µW' : (W * 1e9).toPrecision(3) + ' nW'; }
+function setBtn(b, playing) { b.textContent = playing ? 'Pause' : 'Play'; b.setAttribute('aria-pressed', playing ? 'true' : 'false'); }
+
+/* ---------- Figure 4: Friis ---------- */
+(function friis() {
+  const cv = $('f4'), bT = $('b4t'), sA = $('s4a'), sB = $('s4b');
+  const f = 7e9, TQ = CRYO.hfk(f) / 2, TRT = 100;
+  let on = true;
+  function draw() {
+    const Ta = +sA.value, Th = +sB.value;
+    const rowT = [[Ta, 'TWPA'], [Th / 100, 'HEMT ÷ G₁'], [TRT / 1e6, 'room temp. ÷ G₁G₂']];
+    const rowH = [[Th, 'HEMT'], [TRT / 1e4, 'room temp. ÷ G₁']];
+    const sT = CRYO.friis([{ T: Ta, GdB: 20 }, { T: Th, GdB: 40 }, { T: TRT, GdB: 30 }]);
+    const sH = CRYO.friis([{ T: Th, GdB: 40 }, { T: TRT, GdB: 30 }]);
+    $('o4a').textContent = Ta.toFixed(2) + ' K'; $('o4b').textContent = Th.toFixed(1) + ' K';
+    const Ts = on ? sT : sH;
+    $('r4s').textContent = Ts.toFixed(3) + ' K';
+    $('r4p').textContent = (Ts / CRYO.hfk(f)).toFixed(2) + ' photons';
+    $('r4i').textContent = (Ts / sT).toFixed(1) + ' ×';
+    const { ctx, W, H } = fit(cv); ctx.clearRect(0, 0, W, H);
+    const narrow = W < 560, m = { l: narrow ? 16 : 168, r: 24, t: 26, b: 44 }, bw = W - m.l - m.r;
+    const xmax = Math.max(1, Math.ceil(Math.max(sH, sT) * 1.15 * 2) / 2), X = v => m.l + v / xmax * bw;
+    const rows = [[rowT, sT, 'TWPA first', on], [rowH, sH, 'HEMT first', !on]];
+    const rowH_ = (H - m.t - m.b) / 2, bh = narrow ? 30 : 38;
+    // grid
+    ctx.font = `400 11px ${MONO}`; ctx.lineWidth = 1;
+    const st = xmax > 4 ? 1 : 0.5;
+    for (let v = 0; v <= xmax + 1e-9; v += st) {
+      const x = Math.round(X(v)) + 0.5; ctx.strokeStyle = COL.li; ctx.beginPath(); ctx.moveTo(x, m.t); ctx.lineTo(x, H - m.b + 4); ctx.stroke();
+      ctx.fillStyle = COL.mu; ctx.textAlign = 'center'; ctx.textBaseline = 'top'; ctx.fillText(v.toFixed(st < 1 ? 1 : 0), x, H - m.b + 8);
+    }
+    ctx.font = `400 12px ${SANS}`; ctx.textAlign = 'right'; ctx.textBaseline = 'alphabetic'; ctx.fillStyle = COL.mu; ctx.fillText('noise temperature (K)', W - m.r, H - 6);
+    const shades = ['#121212', '#7d7d78', '#c4c4bd'];
+    rows.forEach(([segs, tot, name, act], i) => {
+      const yc = m.t + rowH_ * (i + 0.5) + (narrow ? 8 : 0), y0 = yc - bh / 2;
+      ctx.globalAlpha = act ? 1 : 0.3;
+      ctx.font = `500 13px ${SANS}`; ctx.fillStyle = COL.fg;
+      if (narrow) { ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic'; ctx.fillText(name, m.l, y0 - 7); }
+      else { ctx.textAlign = 'right'; ctx.textBaseline = 'middle'; ctx.fillText(name, m.l - 14, yc); }
+      let x = 0;
+      segs.forEach(([v], k) => { ctx.fillStyle = shades[k]; ctx.fillRect(X(x), y0, Math.max(0, X(x + v) - X(x)), bh); x += v; });
+      ctx.font = `500 13px ${MONO}`; ctx.fillStyle = COL.fg; ctx.textAlign = 'left'; ctx.textBaseline = 'middle';
+      const lx = X(tot) + 8, txt = tot.toFixed(2) + ' K';
+      if (lx + 70 < W) ctx.fillText(txt, lx, yc); else { ctx.textAlign = 'right'; ctx.fillStyle = '#fff'; ctx.fillText(txt, X(tot) - 8, yc); }
+      // segment names
+      ctx.font = `400 11.5px ${SANS}`; ctx.textBaseline = 'top'; ctx.textAlign = 'left'; x = 0;
+      let lastEnd = -1e9;
+      segs.forEach(([v, lab], k) => {
+        const xs = X(x); x += v; const tx = Math.max(xs, lastEnd + 8);
+        if (tx + ctx.measureText(lab).width < W - 4 && (k === 0 || v / xmax > 0.004)) { ctx.fillStyle = COL.mu; ctx.fillText(lab, tx, y0 + bh + 5); lastEnd = tx + ctx.measureText(lab).width; }
+      });
+      ctx.globalAlpha = 1;
+    });
+    // quantum limit
+    const xq = Math.round(X(TQ)) + 0.5;
+    ctx.save(); ctx.setLineDash([4, 4]); ctx.strokeStyle = COL.fa; ctx.beginPath(); ctx.moveTo(xq, m.t - 6); ctx.lineTo(xq, H - m.b); ctx.stroke(); ctx.restore();
+    ctx.font = `400 11.5px ${SANS}`; ctx.fillStyle = COL.mu; ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic';
+    ctx.fillText('quantum limit hf/2kB = ' + TQ.toFixed(2) + ' K', xq + 5, m.t - 8);
+  }
+  bT.addEventListener('click', () => { on = !on; bT.setAttribute('aria-pressed', on ? 'true' : 'false'); bT.textContent = on ? 'TWPA in the line' : 'TWPA removed'; draw(); });
+  sA.addEventListener('input', draw); sB.addEventListener('input', draw);
+  watchSize(cv, draw); draw();
+})();
+
+addEventListener('load', () => {
+  if (window.renderMathInElement) renderMathInElement(document.body, { delimiters: [{ left: '$$', right: '$$', display: true }, { left: '\\(', right: '\\)', display: false }], throwOnError: false });
+});
+</script>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+
+const C = window.CRYO;
+const TAU = Math.PI * 2, D2R = Math.PI / 180;
+const sstep = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
+const fade = (z, [a, b, c, d]) => (a < 0 ? 1 : sstep(a, b, z)) * (d > 1 ? 1 : 1 - sstep(c, d, z));
+const lerp = (a, b, t) => a + (b - a) * t;
+const clamp = (x, a, b) => Math.min(b, Math.max(a, x));
+const STAGE = 0xe9e9e4, ACC = 0xcf1f25;
+const V3 = (x, y, z) => new THREE.Vector3(x, y, z);
+const UP = V3(0, 1, 0);
+
+/* ---------- geometry helpers ---------- */
+function prep(g) {
+  if (g.index) { const n = g.toNonIndexed(); g.dispose(); g = n; }
+  for (const k of Object.keys(g.attributes)) if (k !== 'position' && k !== 'normal') g.deleteAttribute(k);
+  if (!g.attributes.normal) g.computeVertexNormals();
+  g.morphAttributes = {};
+  return g;
+}
+class Bucket {
+  constructor() { this.m = new Map(); }
+  add(mat, g) { g = prep(g); if (!this.m.has(mat)) this.m.set(mat, []); this.m.get(mat).push(g); return this; }
+  build(parent, { dy = 0, cast = true, recv = true } = {}) {
+    const out = [];
+    for (const [mat, list] of this.m) {
+      const g = mergeGeometries(list); if (dy) g.translate(0, dy, 0);
+      const mesh = new THREE.Mesh(g, mat); mesh.castShadow = cast; mesh.receiveShadow = recv; parent.add(mesh); out.push(mesh);
+      for (const x of list) x.dispose();
+    }
+    this.m.clear(); return out;
+  }
+}
+const cylY = (r, y0, y1, x = 0, z = 0, seg = 16) => new THREE.CylinderGeometry(r, r, Math.abs(y1 - y0), seg).translate(x, (y0 + y1) / 2, z);
+const hexY = (r, y0, y1, x = 0, z = 0) => cylY(r, y0, y1, x, z, 6);
+const boxG = (w, h, d, x = 0, y = 0, z = 0) => new THREE.BoxGeometry(w, h, d).translate(x, y, z);
+const rbox = (w, h, d, r, x = 0, y = 0, z = 0) => new RoundedBoxGeometry(w, h, d, 2, r).translate(x, y, z);
+const tube = (curve, r, n = 24, rs = 8) => new THREE.TubeGeometry(curve, n, r, rs, false);
+function cylAx(r, A, B, seg = 12) {
+  const d = B.clone().sub(A), L = d.length(), g = new THREE.CylinderGeometry(r, r, L, seg).translate(0, L / 2, 0);
+  g.applyQuaternion(new THREE.Quaternion().setFromUnitVectors(UP, d.normalize())); return g.translate(A.x, A.y, A.z);
+}
+/* lathe of a closed profile [[r, y, smooth?], ...] traversed anticlockwise in the (r, y) plane, starting mid-edge.
+   Corners are duplicated so that every face keeps its own normal: crisp edges. */
+function lathePts(prof) {
+  const pts = [];
+  prof.forEach((p, i) => { const v = new THREE.Vector2(Math.max(0, p[0]), p[1]); pts.push(v); if (i > 0 && !p[2]) pts.push(v.clone()); });
+  pts.push(new THREE.Vector2(Math.max(0, prof[0][0]), prof[0][1]));
+  return pts;
+}
+function capGeo(prof, phi, sign) {
+  const contour = prof.map(p => new THREE.Vector2(p[0], p[1]));
+  const tris = THREE.ShapeUtils.triangulateShape(contour, []);
+  const s = Math.sin(phi), c = Math.cos(phi), n = V3(sign * c, 0, -sign * s);
+  const P = i => V3(prof[i][0] * s, prof[i][1], prof[i][0] * c);
+  const pos = [], nor = [], u = V3(0, 0, 0), v = V3(0, 0, 0);
+  for (const [a, b, d] of tris) {
+    const A = P(a); let B = P(b), D = P(d);
+    u.subVectors(B, A); v.subVectors(D, A); if (u.cross(v).dot(n) < 0) [B, D] = [D, B];
+    for (const q of [A, B, D]) { pos.push(q.x, q.y, q.z); nor.push(n.x, n.y, n.z); }
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute('normal', new THREE.Float32BufferAttribute(nor, 3));
+  return g;
+}
+function shell(prof, seg = 96, phiStart = 0, phiLen = TAU) {
+  const parts = [prep(new THREE.LatheGeometry(lathePts(prof), seg, phiStart, phiLen))];
+  if (phiLen < TAU - 1e-6) parts.push(capGeo(prof, phiStart, -1), capGeo(prof, phiStart + phiLen, 1));
+  return mergeGeometries(parts);
+}
+const discProf = (R, t, c = 0.2) => [[R, -t / 2], [R, -c], [R - c, 0], [0, 0], [0, -t], [R - c, -t], [R, -t + c]];
+function arcPts(cx, cy, r, a0, a1, n = 6) { const o = []; for (let i = 0; i <= n; i++) { const a = a0 + (a1 - a0) * i / n; o.push([cx + r * Math.cos(a), cy + r * Math.sin(a), true]); } return o; }
+function rrShape(w, d, r) {
+  const s = new THREE.Shape(), x = w / 2, z = d / 2;
+  s.moveTo(-x + r, -z); s.lineTo(x - r, -z); s.absarc(x - r, -z + r, r, -Math.PI / 2, 0, false);
+  s.lineTo(x, z - r); s.absarc(x - r, z - r, r, 0, Math.PI / 2, false);
+  s.lineTo(-x + r, z); s.absarc(-x + r, z - r, r, Math.PI / 2, Math.PI, false);
+  s.lineTo(-x, -z + r); s.absarc(-x + r, -z + r, r, Math.PI, 1.5 * Math.PI, false); return s;
+}
+function rrPath(w, d, r) { const s = rrShape(w, d, r), p = new THREE.Path(); p.curves = s.curves; p.currentPoint = s.currentPoint; return p; }
+function extrudeY(shape, h, b = 0, cs = 8) {
+  const g = new THREE.ExtrudeGeometry(shape, { depth: h - 2 * b, bevelEnabled: b > 0, bevelThickness: b, bevelSize: b, bevelSegments: 2, curveSegments: cs });
+  g.rotateX(-Math.PI / 2); g.translate(0, b, 0); return g;
+}
+function prismXZ(outer, holes, y0, h) {   // polygon given as (x, z) pairs, extruded upwards from y0
+  const sh = new THREE.Shape(outer.map(([x, z]) => new THREE.Vector2(x, -z)));
+  for (const hp of holes) sh.holes.push(new THREE.Path(hp.map(([x, z]) => new THREE.Vector2(x, -z))));
+  const g = new THREE.ExtrudeGeometry(sh, { depth: h, bevelEnabled: false, curveSegments: 4 }); g.rotateX(-Math.PI / 2); g.translate(0, y0, 0); return g;
+}
+function stripXZ(poly, w, y0, h) {       // a strip of width w along a polyline in the (x, z) plane
+  const out = [];
+  for (let i = 0; i < poly.length - 1; i++) {
+    const [x0, z0] = poly[i], [x1, z1] = poly[i + 1], L = Math.hypot(x1 - x0, z1 - z0);
+    out.push(new THREE.BoxGeometry(L + w, h, w).rotateY(Math.atan2(-(z1 - z0), x1 - x0)).translate((x0 + x1) / 2, y0 + h / 2, (z0 + z1) / 2));
+  }
+  return out;
+}
+
+function makeMats() {
+  const S = (color, metalness, roughness, extra = {}) => new THREE.MeshStandardMaterial({ color, metalness, roughness, ...extra });
+  return {
+    gold: S(0xd9a94e, 1, 0.28, { envMapIntensity: 3.0 }), copper: S(0xb87333, 1, 0.35, { envMapIntensity: 2.0 }), steel: S(0xb8bcc2, 0.9, 0.3, { envMapIntensity: 1.4 }), steelR: S(0xa7abb1, 0.85, 0.42, { envMapIntensity: 1.3 }),
+    nbti: S(0x969ca4, 0.85, 0.36, { envMapIntensity: 1.3 }), shield: S(0xc9ccd1, 0.5, 0.5), ovc: S(0xb7bbc0, 0.6, 0.42), mu: S(0x8d9196, 0.5, 0.55),
+    dark: S(0x2b2c30, 0.55, 0.42), black: S(0x161618, 0.25, 0.6), ptfe: S(0xf1efe8, 0, 0.55), loom: S(0x6a5236, 0.3, 0.55),
+    pcb: S(0xdcd2b8, 0, 0.75), al: S(0xc9ccd1, 0.6, 0.45), si: S(0x59616e, 0.35, 0.38), via: S(0x3d3322, 0.3, 0.7),
+    red: new THREE.MeshBasicMaterial({ color: ACC, toneMapped: false })
+  };
+}
+let glowTex = null;
+function glowTexture() {
+  if (glowTex) return glowTex;
+  const c = document.createElement('canvas'); c.width = c.height = 64; const x = c.getContext('2d');
+  const g = x.createRadialGradient(32, 32, 0, 32, 32, 32);
+  g.addColorStop(0, 'rgba(255,255,255,1)'); g.addColorStop(0.25, 'rgba(255,255,255,0.75)'); g.addColorStop(0.6, 'rgba(255,255,255,0.18)'); g.addColorStop(1, 'rgba(255,255,255,0)');
+  x.fillStyle = g; x.fillRect(0, 0, 64, 64);
+  glowTex = new THREE.CanvasTexture(c); glowTex.colorSpace = THREE.SRGBColorSpace; return glowTex;
+}
+
+let dotTex = null;
+function dotTexture() {
+  if (dotTex) return dotTex;
+  const c = document.createElement('canvas'); c.width = c.height = 64; const x = c.getContext('2d');
+  const g = x.createRadialGradient(32, 32, 0, 32, 32, 32);
+  g.addColorStop(0, 'rgba(255,255,255,1)'); g.addColorStop(0.28, 'rgba(255,255,255,1)'); g.addColorStop(0.42, 'rgba(255,255,255,0.45)'); g.addColorStop(1, 'rgba(255,255,255,0)');
+  x.fillStyle = g; x.fillRect(0, 0, 64, 64);
+  dotTex = new THREE.CanvasTexture(c); dotTex.colorSpace = THREE.SRGBColorSpace; return dotTex;
+}
+/* ---------- studio: renderer, environment, soft key light with shadows, orbit controls ---------- */
+function noGL(cv) {
+  const d = document.createElement('div'); d.className = 'nogl';
+  d.textContent = 'This figure needs WebGL, which is not available in this browser.';
+  cv.replaceWith(d);
+  const ov = d.parentElement && d.parentElement.querySelector('.ov'); if (ov) ov.remove();
+}
+const LDIR = V3(-0.55, 0.78, 0.62).normalize();
+function studio(cv, o = {}) {
+  let renderer;
+  try { renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true }); } catch (e) { noGL(cv); return null; }
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  const scene = new THREE.Scene(); scene.background = new THREE.Color(STAGE);
+  const pmrem = new THREE.PMREMGenerator(renderer);
+  scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture; pmrem.dispose();
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x9d9d97, 0.55));
+  const key = new THREE.DirectionalLight(0xffffff, 1.7); key.castShadow = true;
+  key.shadow.mapSize.set(o.shadow || 1024, o.shadow || 1024); key.shadow.bias = -0.0004;
+  scene.add(key, key.target);
+  const camera = new THREE.PerspectiveCamera(o.fov || 30, 2, 0.1, 1000);
+  const controls = new OrbitControls(camera, cv);
+  controls.enableZoom = false; controls.enablePan = false; controls.enableDamping = false; controls.rotateSpeed = 0.7;
+  cv.style.touchAction = 'pan-y';
+  return { renderer, scene, camera, controls, key };
+}
+function fitShadow(key, target, half) {
+  key.target.position.copy(target); key.position.copy(target).addScaledVector(LDIR, half * 4);
+  const c = key.shadow.camera; c.left = -half; c.right = half; c.top = half; c.bottom = -half; c.near = half * 0.5; c.far = half * 9; c.updateProjectionMatrix();
+  key.shadow.normalBias = half * 0.0012; key.target.updateMatrixWorld();
+}
+/* SVG label with a leader line, kept inside the stage */
+function svgLabel(x, y, dx, dy, html, op, W, H, cls = '') {
+  const plain = html.replace(/<[^>]+>/g, '');
+  const tw = 6.9 * plain.length + 8;
+  if (dx > 0 && x + dx + tw > W - 6) dx = -dx; else if (dx < 0 && x + dx - tw < 6) dx = -dx;
+  if (y + dy < 16) dy = Math.abs(dy) + 4; else if (y + dy > H - 10) dy = -Math.abs(dy) - 4;
+  const x2 = x + dx, y2 = y + dy, anchor = dx < 0 ? 'end' : 'start', tx = x2 + (dx < 0 ? -5 : 5);
+  return `<g opacity="${op.toFixed(3)}"><line x1="${x.toFixed(1)}" y1="${y.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="#93938d" stroke-width="1"/>` +
+    `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="2.5" fill="#121212"/>` +
+    `<text class="${cls}" x="${tx.toFixed(1)}" y="${(y2 + 4).toFixed(1)}" text-anchor="${anchor}" stroke="#e9e9e4" stroke-width="4" paint-order="stroke" stroke-linejoin="round">${html}</text></g>`;
+}
+/* places labels one by one, trying alternative offsets so that their text does not overlap */
+function Placer(W, H) {
+  const rects = []; let out = '';
+  const hit = r => rects.some(q => r[0] < q[2] && r[2] > q[0] && r[1] < q[3] && r[3] > q[1]);
+  return {
+    block(x0, y0, x1, y1) { rects.push([x0, y0, x1, y1]); },
+    add(x, y, dx, dy, html, op, cls = '') {
+      const tw = 6.9 * html.replace(/<[^>]+>/g, '').length + 6;
+      const cands = [[dx, dy], [dx, dy - 16], [dx, dy + 16], [dx, dy - 32], [dx, dy + 32], [-dx, dy], [-dx, -dy], [dx * 1.6, dy - 24], [dx * 1.6, dy + 24]];
+      for (const [cx, cy] of cands) {
+        let ddx = cx, ddy = cy;
+        if (ddx > 0 && x + ddx + tw > W - 6) ddx = -ddx; else if (ddx < 0 && x + ddx - tw < 6) ddx = -ddx;
+        if (y + ddy < 16) ddy = Math.abs(ddy) + 4; else if (y + ddy > H - 10) ddy = -Math.abs(ddy) - 4;
+        const tx = x + ddx + (ddx < 0 ? -5 : 5), r = ddx < 0 ? [tx - tw, y + ddy - 9, tx, y + ddy + 6] : [tx, y + ddy - 9, tx + tw, y + ddy + 6];
+        if (!hit(r)) { rects.push(r); out += svgLabel(x, y, ddx, ddy, html, op, W, H, cls); return true; }
+      }
+      return false;
+    },
+    raw(s) { out += s; },
+    get svg() { return out; }
+  };
+}
+function lenText(cm) {
+  if (cm >= 100) return +(cm / 100).toPrecision(2) + ' m';
+  if (cm >= 1) return +cm.toPrecision(2) + ' cm';
+  return +(cm * 10).toPrecision(2) + ' mm';
+}
+function scaleBar(pxPerUnit, unitToCm, W, H) {
+  let len = 1; const want = 110 / pxPerUnit, p = Math.pow(10, Math.floor(Math.log10(want)));
+  for (const m of [1, 2, 5, 10]) if (m * p <= want) len = m * p;
+  const bl = len * pxPerUnit, x0 = 18, y0 = H - 20;
+  return `<g><line x1="${x0}" y1="${y0}" x2="${(x0 + bl).toFixed(1)}" y2="${y0}" stroke="#121212" stroke-width="1.5"/>` +
+    `<line x1="${x0}" y1="${y0 - 5}" x2="${x0}" y2="${y0 + 5}" stroke="#121212"/><line x1="${(x0 + bl).toFixed(1)}" y1="${y0 - 5}" x2="${(x0 + bl).toFixed(1)}" y2="${y0 + 5}" stroke="#121212"/>` +
+    `<text x="${x0}" y="${y0 - 10}" style="font-family:'IBM Plex Mono',monospace;fill:#121212">${lenText(len * unitToCm)}</text></g>`;
+}
+
+/* ---------- the sample package (millimetres; PCB top at y = 0, box centred on the origin) ---------- */
+function buildPackage(M, o = {}) {
+  const group = new THREE.Group(), lid = new THREE.Group(); group.add(lid);
+  const B = new Bucket(), L = new Bucket(), CH = new Bucket();
+  const HB = 16, SY = 0.5;                                // half box size; connector axis height
+  // base and circuit board
+  B.add(M.copper, extrudeY(rrShape(31.4, 31.4, 1.2), 6, 0.3).translate(0, -6.5, 0));
+  const pcbShape = () => { const s = rrShape(32, 32, 1.5), h = new THREE.Path(); h.moveTo(-3.5, -3.5); h.lineTo(3.5, -3.5); h.lineTo(3.5, 3.5); h.lineTo(-3.5, 3.5); h.lineTo(-3.5, -3.5); s.holes.push(h); return s; };
+  B.add(M.pcb, extrudeY(pcbShape(), 0.5).translate(0, -0.5, 0));
+  B.add(M.gold, extrudeY(pcbShape(), 0.035));
+  // coplanar-waveguide traces: left and right carry the feedline, front and back the two drive lines
+  const traces = [{ ax: 'x', s: -1, c: 0 }, { ax: 'x', s: 1, c: 0 }, { ax: 'z', s: 1, c: -1.2 }, { ax: 'z', s: -1, c: 1.2 }];
+  for (const t of traces) {
+    const len = HB - 3.6, mid = t.s * (3.6 + len / 2);
+    if (t.ax === 'x') { B.add(M.pcb, boxG(len, 0.04, 1.3, mid, 0.02, t.c)); B.add(M.gold, boxG(len, 0.05, 0.6, mid, 0.025, t.c)); }
+    else { B.add(M.pcb, boxG(1.3, 0.04, len, t.c, 0.02, mid)); B.add(M.gold, boxG(0.6, 0.05, len, t.c, 0.025, mid)); }
+    for (let u = 4.6; u < HB - 0.6; u += 1.2) for (const side of [-1.15, 1.15]) {
+      const px = t.ax === 'x' ? t.s * u : t.c + side, pz = t.ax === 'x' ? t.c + side : t.s * u;
+      B.add(M.gold, cylY(0.24, 0.0, 0.055, px, pz, 10)); B.add(M.via, cylY(0.13, 0.0, 0.062, px, pz, 8));
+    }
+  }
+  // SMA connectors (jack in the wall with a mated plug), built along +x and turned into place
+  const smaParts = (stub) => {
+    const P = new Bucket();
+    const cylX = (r, x0, x1, seg) => new THREE.CylinderGeometry(r, r, x1 - x0, seg).rotateZ(Math.PI / 2).translate((x0 + x1) / 2, 0, 0);
+    P.add(M.steel, cylX(4.62, 0, 2.4, 6).rotateX(Math.PI / 6));
+    P.add(M.steel, cylX(3.15, 2.4, 8.0, 28));
+    P.add(M.gold, cylX(4.62, 3.0, 8.4, 6).rotateX(Math.PI / 6));
+    P.add(M.steel, cylX(2.0, 8.4, 12.5, 20));
+    P.add(M.gold, cylX(0.42, -1.4, 0, 10));
+    P.add(M.ptfe, cylX(2.05, -0.02, 0.02, 20));
+    if (stub) P.add(M.steelR, tube(new THREE.CatmullRomCurve3([V3(12.4, 0, 0), V3(17, 0, 0), V3(20.6, 1.3, 0), V3(22, 4.6, 0), V3(22, 9, 0), V3(22, 24, 0)], false, 'centripetal'), 1.1, 40, 14));
+    return P;
+  };
+  const smaPos = [[-HB, 0, Math.PI], [HB, 0, 0], [-1.2, HB, -Math.PI / 2], [1.2, -HB, Math.PI / 2]];   // [x or c, z, rotation]
+  for (const [a, b, ry] of smaPos) {
+    const P = smaParts(!!o.stubs);
+    const x = Math.abs(a) === HB ? a : a, z = Math.abs(a) === HB ? 0 : b;
+    for (const [mat, list] of P.m) for (const g of list) B.add(mat, g.rotateY(ry).translate(x, SY, z));
+  }
+  B.build(group);
+  // the lid: a frame with a pocket and a roof, four cap screws
+  let pocket = o.pocket || 12, frame = null;
+  function frameGeo(a) {
+    const s = rrShape(32, 32, 1.5); s.holes.push(rrPath(a, a, 0.8));
+    return prep(extrudeY(s, 3.5, 0, 10));
+  }
+  const lidCu = M.copper.clone(), lidSt = M.steel.clone(), lidDk = M.dark.clone();
+  frame = new THREE.Mesh(frameGeo(pocket), lidCu); frame.castShadow = frame.receiveShadow = true; lid.add(frame);
+  L.add(lidCu, extrudeY(rrShape(31.4, 31.4, 1.2), 2.5, 0.3).translate(0, 3.5, 0));
+  for (const sx of [-1, 1]) for (const sz of [-1, 1]) { L.add(lidSt, cylY(1.5, 6.0, 7.0, 13.2 * sx, 13.2 * sz, 24)); L.add(lidDk, hexY(0.7, 6.95, 7.03, 13.2 * sx, 13.2 * sz)); }
+  L.build(lid);
+  function setGhost(o) {
+    for (const m of [lidCu, lidSt, lidDk]) { const tr = o < 0.999; if (m.transparent !== tr) { m.transparent = tr; m.depthWrite = !tr; m.needsUpdate = true; } m.opacity = o; }
+    lid.traverse(c => { if (c.isMesh) c.castShadow = o > 0.6; });
+  }
+  function setPocket(a) { pocket = a; frame.geometry.dispose(); frame.geometry = frameGeo(a); }
+  // the chip: 6 mm silicon, aluminium ground plane with windows, two transmons, resonators, feedline, drive lines
+  const tm = 0.012, rot = p => p.map(([x, z]) => [-x, -z]);
+  CH.add(M.si, boxG(6, 0.5, 6, 0, -0.25, 0));
+  const feedHole = [[-2.8, -0.32], [-2.25, -0.32], [-2.05, -0.12], [2.05, -0.12], [2.25, -0.32], [2.8, -0.32], [2.8, 0.32], [2.25, 0.32], [2.05, 0.12], [-2.05, 0.12], [-2.25, 0.32], [-2.8, 0.32]];
+  const win = [[-2.0, 0.5], [-0.4, 0.5], [-0.4, 2.15], [-1.12, 2.15], [-1.12, 2.5], [-0.92, 2.55], [-0.92, 2.85], [-1.48, 2.85], [-1.48, 2.55], [-1.28, 2.5], [-1.28, 2.15], [-2.0, 2.15]];
+  CH.add(M.al, prismXZ([[-3, -3], [3, -3], [3, 3], [-3, 3]], [feedHole, win, rot(win)], 0, tm));
+  CH.add(M.al, prismXZ([[-2.7, -0.2], [-2.3, -0.2], [-2.1, -0.04], [2.1, -0.04], [2.3, -0.2], [2.7, -0.2], [2.7, 0.2], [2.3, 0.2], [2.1, 0.04], [-2.1, 0.04], [-2.3, 0.2], [-2.7, 0.2]], [], 0, tm));
+  for (const s of [1, -1]) {
+    const P = pts => pts.map(([x, z]) => [s * x, s * z]);
+    const R = (x0, x1, z0, z1, y0 = 0, h = tm) => CH.add(M.al, prismXZ(P([[x0, z0], [x1, z0], [x1, z1], [x0, z1]]), [], y0, h));
+    R(-1.82, -1.26, 1.3, 1.95); R(-1.14, -0.58, 1.3, 1.95);                   // capacitor pads
+    R(-1.26, -1.203, 1.614, 1.626); R(-1.197, -1.14, 1.614, 1.626);           // junction leads
+    R(-1.209, -1.191, 1.611, 1.629, 0, tm * 1.5);                              // the junction
+    const meander = [[-1.92, 0.6], [-0.52, 0.6], [-0.52, 0.72], [-1.88, 0.72], [-1.88, 0.84], [-0.52, 0.84], [-0.52, 0.96], [-1.88, 0.96], [-1.88, 1.08], [-0.86, 1.08], [-0.86, 1.17]];
+    for (const g of stripXZ(P(meander), 0.03, 0, tm)) CH.add(M.al, g);
+    R(-1.06, -0.66, 1.16, 1.22);                                               // coupling pad
+    CH.add(M.al, prismXZ(P([[-1.44, 2.82], [-0.96, 2.82], [-0.96, 2.58], [-1.185, 2.48], [-1.185, 2.08], [-1.215, 2.08], [-1.215, 2.48], [-1.44, 2.58]]), [], 0, tm));
+  }
+  // wire bonds: signal bonds onto the pads, ground bonds all around
+  const bondCurve = (A, Bp, hgt) => new THREE.CubicBezierCurve3(A, V3(A.x + (Bp.x - A.x) * 0.1, A.y + hgt, A.z + (Bp.z - A.z) * 0.1), V3(A.x + (Bp.x - A.x) * 0.55, A.y + hgt * 0.95, A.z + (Bp.z - A.z) * 0.55), Bp);
+  const bond = (A, Bp, hgt) => { CH.add(M.al, tube(bondCurve(A, Bp, hgt), 0.015, 16, 6)); CH.add(M.al, boxG(0.07, 0.012, 0.04, Bp.x, Bp.y + 0.006, Bp.z)); };
+  for (const d of [-0.1, 0, 0.1]) {
+    bond(V3(-2.55, tm, d), V3(-3.75, 0.05, d), 0.32); bond(V3(2.55, tm, d), V3(3.75, 0.05, d), 0.32);
+    bond(V3(-1.2 + d, tm, 2.72), V3(-1.2 + d, 0.05, 3.75), 0.32); bond(V3(1.2 - d, tm, -2.72), V3(1.2 - d, 0.05, -3.75), 0.32);
+  }
+  for (let p = -2.6; p <= 2.61; p += 0.4) {
+    if (Math.abs(p) > 0.45) { bond(V3(-2.9, tm, p), V3(-3.95, 0.035, p), 0.26); bond(V3(2.9, tm, p), V3(3.95, 0.035, p), 0.26); }
+    if (Math.abs(p + 1.2) > 0.45) bond(V3(p, tm, 2.9), V3(p, 0.035, 3.95), 0.26);
+    if (Math.abs(p - 1.2) > 0.45) bond(V3(p, tm, -2.9), V3(p, 0.035, -3.95), 0.26);
+  }
+  CH.build(group);
+  // the path a signal takes through the package (for the travelling pulse)
+  const bc = bondCurve(V3(-2.55, tm, 0), V3(-3.75, 0.05, 0), 0.32).getPoints(10).reverse();
+  const pathIn = [V3(-28.5, SY, 0), V3(-16, SY, 0), V3(-14.6, 0.12, 0), ...bc.map(p => p.clone().setY(p.y + 0.03)), V3(-1.2, 0.04, 0)];
+  const pathOut = [V3(-1.2, 0.04, 0), ...pathIn.slice(0, -1).reverse().map(p => V3(-p.x, p.y, p.z))];
+  return { group, lid, setPocket, setGhost, pathIn, pathOut, getPocket: () => pocket };
+}
+function lidPose(lid, l) {          // lift the lid straight up, then tip it back out of the way
+  lid.position.set(0, 26 * sstep(0, 0.6, l), -14 * sstep(0.45, 1, l));
+  lid.rotation.x = -0.5 * sstep(0.45, 1, l);
+}
+
+/* ====================================================================================
+   Figure 1: the cryostat (units: centimetres; top surface of the top plate at y = 0)
+   ==================================================================================== */
+(function cryostat() {
+  const cv = $('f1'), ov = $('f1-ov'), sR = $('s1r'), sS = $('s1s'), sD = $('s1d'), cC = $('c1c'), bP = $('b1p');
+  const S = studio(cv, { shadow: 2048, fov: 30 }); if (!S) return;
+  const { renderer, scene, camera, controls, key } = S; const M = makeMats();
+  const root = new THREE.Group(); scene.add(root);
+  const PL = [
+    { y: 0, t: 2.2, R: 34, name: 'Top plate', short: 'Top', temp: '300 K' },
+    { y: -24, t: 1.0, R: 30, name: '50 K plate', short: '50 K', temp: '40–60 K' },
+    { y: -52, t: 1.0, R: 27, name: '4 K plate', short: '4 K', temp: '3–4 K' },
+    { y: -78, t: 0.9, R: 24, name: 'Still', short: 'Still', temp: '0.7–1 K' },
+    { y: -92, t: 0.8, R: 22, name: 'Cold plate', short: 'CP', temp: '50–100 mK' },
+    { y: -108, t: 1.0, R: 21, name: 'Mixing chamber', short: 'MXC', temp: '~10 mK' }
+  ];
+  const EX = 0.75; let sep = 0, rem = 0, dn = 0, cut = true;
+  const Yk = k => PL[k].y * (1 + EX * sep);
+  const plateG = PL.map(() => { const g = new THREE.Group(); root.add(g); return g; });
+  const pB = PL.map(() => new Bucket());
+  const spans = new Map();
+  function spanB(ka, offA, kb, offB) {
+    const id = `${ka}|${offA.toFixed(3)}|${kb}|${offB.toFixed(3)}`; let s = spans.get(id);
+    if (!s) { s = { ka, offA, kb, offB, b: new Bucket(), g: new THREE.Group(), ya0: PL[ka].y + offA, yb0: PL[kb].y + offB, drop: 0 }; s.L0 = s.ya0 - s.yb0; spans.set(id, s); root.add(s.g); }
+    return s;
+  }
+  const pol = (r, deg) => [r * Math.cos(deg * D2R), r * Math.sin(deg * D2R)];
+  const IN = [...Array.from({ length: 8 }, (_, i) => pol(15.5, 112 + 8.5 * i)), ...Array.from({ length: 7 }, (_, i) => pol(17.9, 118.2 + 8.5 * i))];
+  const OUT = [...Array.from({ length: 4 }, (_, i) => pol(13, 68 - 10 * i)), ...Array.from({ length: 4 }, (_, i) => pol(15.6, 63 - 10 * i))];
+  const LOOM = Array.from({ length: 4 }, (_, i) => pol(17.5, 205 + 13 * i));
+  const PT = [7, -10], PUMP = [-7, -10.5], COND = [-2.6, -12.2];
+  const tang = (x, z) => { const r = Math.hypot(x, z); return V3(-z / r, 0, x / r); };
+  const sbend = (x, z, yA, yB, amp) => { const Lh = yA - yB, o = tang(x, z).multiplyScalar(amp); return new THREE.CubicBezierCurve3(V3(x, yA, z), V3(x, yA - 0.45 * Lh, z).add(o), V3(x, yB + 0.45 * Lh, z).sub(o), V3(x, yB, z)); };
+  const orient = (g, x, z) => g.rotateY(Math.atan2(x, z));
+  const obox = (Bk, mat, w, h, d, x, y0, z, r = 0.12) => Bk.add(mat, orient(rbox(w, h, d, r), x, z).translate(x, y0 + h / 2, z));
+
+  /* plates with chamfered edges and a ring of screws */
+  PL.forEach((p, k) => {
+    pB[k].add(k === 0 ? M.steel : M.gold, shell(discProf(p.R, p.t, 0.22), 128).translate(0, p.y, 0));
+    const rr = p.R - 1.1, nb = Math.floor(TAU * rr / 3.4);
+    for (let i = 0; i < nb; i++) { const a = TAU * (i + 0.5) / nb; pB[k].add(M.steel, cylY(0.32, p.y, p.y + 0.22, rr * Math.cos(a), rr * Math.sin(a), 8)); }
+  });
+  /* support rods with their mounting blocks */
+  for (let k = 0; k < 5; k++) {
+    const up = PL[k], lo = PL[k + 1], rr = lo.R - 1.8, rad = k === 0 ? 0.7 : 0.45;
+    const s = spanB(k, -up.t - 0.8, k + 1, 0.8);
+    for (let i = 0; i < 8; i++) {
+      const a = (22.5 + 45 * i) * D2R, x = rr * Math.cos(a), z = rr * Math.sin(a);
+      s.b.add(M.steel, cylY(rad, lo.y + 0.8, up.y - up.t - 0.8, x, z, 16));
+      pB[k].add(M.gold, cylY(1.0, up.y - up.t - 0.8, up.y - up.t, x, z, 20));
+      pB[k + 1].add(M.gold, cylY(1.0, lo.y, lo.y + 0.8, x, z, 20));
+    }
+  }
+  /* top plate furniture: pulse-tube head, still pumping line, vacuum port */
+  {
+    const B0 = pB[0], [px, pz] = PT;
+    B0.add(M.steel, cylY(6.5, 0, 1.0, px, pz, 40));
+    B0.add(M.steelR, shell([[5, 6], [5, 12.5], ...arcPts(3.5, 12.5, 1.5, 0, Math.PI / 2, 5).slice(1), [0, 14], [0, 1], [5, 1]], 40).translate(px, 0, pz));
+    B0.add(M.steelR, rbox(5.2, 4.6, 5.2, 0.5, px, 16.3, pz));
+    B0.add(M.black, cylY(1.2, 18.6, 19.4, px, pz, 20));
+    for (const s of [-1, 1]) B0.add(M.steelR, tube(new THREE.CatmullRomCurve3([V3(px + 2.6, 16.3, pz + s * 1.2), V3(px + 6, 17, pz + s * 1.6), V3(px + 11, 21, pz - 3 + s * 1.6), V3(px + 15, 27, pz - 9 + s * 1.6)], false, 'centripetal'), 0.8, 40, 12));
+    const [ux, uz] = PUMP;
+    B0.add(M.steel, cylY(2.4, 0, 9, ux, uz, 32));
+    B0.add(M.steel, new THREE.TorusGeometry(3.5, 2.4, 16, 24, Math.PI / 2).translate(ux - 3.5, 9, uz));
+    B0.add(M.steel, cylAx(2.4, V3(ux - 3.5, 12.5, uz), V3(ux - 12, 12.5, uz), 32));
+    B0.add(M.steel, cylAx(3.6, V3(ux - 12, 12.5, uz), V3(ux - 12.8, 12.5, uz), 32));
+    B0.add(M.dark, rbox(3.2, 6.4, 6.4, 0.4, ux - 14.6, 12.5, uz));
+    B0.add(M.steel, cylY(1.5, 0, 4.2, 19, 15, 24)); B0.add(M.steel, cylY(2.4, 4.2, 4.9, 19, 15, 24));
+    B0.add(M.dark, rbox(3, 3, 3, 0.3, 19, 6.4, 15)); B0.add(M.black, cylY(0.4, 7.9, 9.4, 19, 15, 10)); B0.add(M.black, cylY(1.4, 9.4, 9.8, 19, 15, 20));
+  }
+  /* pulse tube below the top plate: one fat tube to the first stage, two thinner ones to the second */
+  {
+    const [x, z] = PT;
+    spanB(0, -PL[0].t, 1, 2.0).b.add(M.steelR, cylY(2.6, PL[1].y + 2.0, PL[0].y - PL[0].t, x, z, 28));
+    pB[1].add(M.copper, cylY(4.4, PL[1].y, PL[1].y + 2.0, x, z, 36)); pB[1].add(M.copper, cylY(2.6, PL[1].y - PL[1].t - 0.6, PL[1].y - PL[1].t, x, z, 28));
+    const s = spanB(1, -PL[1].t - 0.6, 2, 2.0);
+    for (const d of [-1.4, 1.4]) s.b.add(M.steelR, cylY(1.0, PL[2].y + 2.0, PL[1].y - PL[1].t - 0.6, x + d, z, 20));
+    pB[2].add(M.copper, cylY(3.2, PL[2].y, PL[2].y + 2.0, x, z, 32));
+  }
+  /* still pumping line and condensing line */
+  {
+    const [x, z] = PUMP, [cx, cz] = COND;
+    for (let k = 0; k < 3; k++) {
+      const offA = k === 0 ? -PL[0].t : -PL[k].t - 0.6;
+      spanB(k, offA, k + 1, 0.6).b.add(M.steel, cylY(2.4, PL[k + 1].y + 0.6, PL[k].y + offA, x, z, 32));
+      pB[k + 1].add(M.steel, cylY(3.1, PL[k + 1].y, PL[k + 1].y + 0.6, x, z, 32));
+      if (k < 2) pB[k + 1].add(M.steel, cylY(3.1, PL[k + 1].y - PL[k + 1].t - 0.6, PL[k + 1].y - PL[k + 1].t, x, z, 32));
+      const offB = k < 2 ? 0.9 : 0;
+      spanB(k, -PL[k].t, k + 1, offB).b.add(M.steel, cylY(0.22, PL[k + 1].y + offB, PL[k].y - PL[k].t, cx, cz, 10));
+      if (k < 2) pB[k + 1].add(M.copper, rbox(1.4, 0.9, 1.4, 0.1, cx, PL[k + 1].y + 0.45, cz));
+    }
+  }
+  /* dilution unit: still pot, continuous heat exchanger, step exchangers, mixing chamber */
+  const HXC = [-5.4, -7.8];
+  {
+    const [x, z] = PUMP, ys = PL[3].y - PL[3].t;
+    pB[3].add(M.copper, shell([[4.2, -3], [4.2, 0], [0, 0], [0, -5.5], [3.2, -5.5], ...arcPts(3.2, -4.5, 1.0, -Math.PI / 2, 0, 5).slice(1)], 48).translate(x, ys, z));
+    pB[3].add(M.dark, orient(rbox(1.6, 1.2, 0.6, 0.1), x + 4.2, z).translate(x + 4.3, ys - 2.6, z));
+    pB[3].add(M.copper, cylY(0.35, ys - 6.7, ys - 5.4, HXC[0], HXC[1], 10));
+    const s = spanB(3, -PL[3].t - 6.7, 4, 0.4), yA = ys - 6.7, yB = PL[4].y + 0.4, turns = 6;
+    const helix = new (class extends THREE.Curve { getPoint(t, o = new THREE.Vector3()) { const a = TAU * turns * t; return o.set(HXC[0] + 1.9 * Math.cos(a), lerp(yA, yB, t), HXC[1] + 1.9 * Math.sin(a)); } })();
+    s.b.add(M.copper, tube(helix, 0.32, 220, 10));
+    const yc = PL[4].y - PL[4].t;
+    for (let i = 0; i < 3; i++) pB[4].add(M.copper, cylY(2.4, yc - 0.5 - i * 1.5 - 0.9, yc - 0.5 - i * 1.5, -3.5, -6, 32));
+    pB[4].add(M.copper, cylY(0.45, yc - 4.6, yc, -3.5, -6, 12));
+    const ym = PL[5].y;
+    pB[5].add(M.copper, shell([[4.0, 2.5], [4.0, 5.0], [4.6, 5.0], [4.6, 5.6], [0, 5.6], [0, 0], [4.0, 0]], 64).translate(-2.5, ym, -5.5));
+    for (let i = 0; i < 12; i++) { const a = TAU * i / 12; pB[5].add(M.steel, cylY(0.28, ym + 5.6, ym + 5.85, -2.5 + 4.25 * Math.cos(a), -5.5 + 4.25 * Math.sin(a), 8)); }
+    const s2 = spanB(4, -PL[4].t - 4.6, 5, 5.6);
+    s2.b.add(M.copper, tube(new THREE.CubicBezierCurve3(V3(-3.5, s2.ya0, -6), V3(-3.5, s2.ya0 - 3, -6), V3(-2.5, s2.yb0 + 3, -5.5), V3(-2.5, s2.yb0, -5.5)), 0.45, 16, 10));
+  }
+  /* coaxial lines and looms */
+  const HC = { in: [0, 0.7, 2.6, 0.7, 2.6, 2.6], out: [0, 0.7, 3.6, 0.7, 0.7, 8.0], loom: [0, 0.5, 0.5, 0.5, 0.5, 0.5] };
+  const FEAT = { in: [], out: [] };
+  function lineSpans(list, type, mats, rad) {
+    list.forEach(([x, z], i) => {
+      for (let k = 0; k < 5; k++) {
+        const up = PL[k], offA = type === 'loom' ? -up.t : -up.t - 0.7, offB = HC[type][k + 1];
+        const s = spanB(k, offA, k + 1, offB);
+        const cu = sbend(x, z, up.y + offA, PL[k + 1].y + offB, ((i + k) % 2 ? 1 : -1) * (type === 'loom' ? 0.5 : 0.75));
+        s.b.add(mats[k], tube(cu, rad, 28, 8));
+        if (i === 0 && type !== 'loom') FEAT[type][k] = { s, cu };
+      }
+    });
+  }
+  lineSpans(IN, 'in', [M.steel, M.steel, M.steel, M.steel, M.steel], 0.11);
+  lineSpans(OUT, 'out', [M.steel, M.steel, M.nbti, M.nbti, M.nbti], 0.11);
+  lineSpans(LOOM, 'loom', [M.loom, M.loom, M.loom, M.loom, M.loom], 0.26);
+  const bulkTop = (Bk, x, z, y) => { Bk.add(M.steel, hexY(0.46, y, y + 0.3, x, z)); Bk.add(M.steel, cylY(0.3, y, y + 0.7, x, z, 12)); };
+  const bulkBot = (Bk, x, z, y, t) => { Bk.add(M.steel, cylY(0.3, y - t - 0.7, y - t, x, z, 12)); Bk.add(M.steel, hexY(0.46, y - t - 0.3, y - t, x, z)); };
+  const atten = (Bk, x, z, y) => { Bk.add(M.steel, hexY(0.46, y, y + 0.35, x, z)); Bk.add(M.dark, cylY(0.42, y + 0.35, y + 2.0, x, z, 20)); Bk.add(M.steel, cylY(0.44, y + 1.92, y + 2.04, x, z, 20)); Bk.add(M.steel, cylY(0.3, y + 2.0, y + 2.6, x, z, 12)); };
+  const topStub = (Bk, x, z) => { bulkTop(Bk, x, z, 0); Bk.add(M.steel, cylY(0.11, 0.7, 4.0, x, z, 8)); Bk.add(M.steel, hexY(0.46, 4.0, 4.7, x, z)); Bk.add(M.steel, cylY(0.3, 4.7, 5.3, x, z, 12)); bulkBot(Bk, x, z, 0, PL[0].t); };
+  const termStub = (Bk, x, z, y, t) => { Bk.add(M.steel, cylY(0.11, y - t - 2.4, y - t - 0.7, x, z, 8)); Bk.add(M.dark, cylY(0.36, y - t - 3.3, y - t - 2.4, x, z, 14)); };
+  IN.forEach(([x, z], i) => {
+    topStub(pB[0], x, z);
+    for (let k = 1; k < 6; k++) {
+      const y = PL[k].y, t = PL[k].t;
+      if (HC.in[k] > 1) atten(pB[k], x, z, y); else bulkTop(pB[k], x, z, y);
+      bulkBot(pB[k], x, z, y, t);
+    }
+    if (i > 0) termStub(pB[5], x, z, PL[5].y, PL[5].t);
+  });
+  OUT.forEach(([x, z], i) => {
+    topStub(pB[0], x, z);
+    for (let k = 1; k < 6; k++) {
+      const y = PL[k].y, t = PL[k].t, Bk = pB[k];
+      if (k === 2) {        // HEMT amplifier
+        Bk.add(M.steel, cylY(0.3, y, y + 0.4, x, z, 12)); obox(Bk, M.dark, 2.4, 2.6, 1.4, x, y + 0.4, z, 0.14);
+        Bk.add(M.steel, cylY(0.3, y + 3.0, y + 3.6, x, z, 12)); Bk.add(M.steel, hexY(0.46, y + 3.0, y + 3.3, x, z));
+        const rd = V3(x, 0, z).normalize();
+        Bk.add(M.black, orient(rbox(1.0, 0.8, 0.5, 0.08), x, z).translate(x + rd.x * 0.9, y + 2.0, z + rd.z * 0.9));
+        Bk.add(M.gold, orient(boxG(1.4, 0.5, 0.04), x, z).translate(x + rd.x * 0.71, y + 1.0, z + rd.z * 0.71));
+      } else if (k === 5) { // isolator, TWPA, isolator
+        const rd = V3(x, 0, z).normalize(), tg = tang(x, z);
+        Bk.add(M.steel, cylY(0.3, y, y + 0.4, x, z, 12));
+        obox(Bk, M.dark, 1.7, 1.6, 1.3, x, y + 0.4, z); Bk.add(M.gold, orient(boxG(1.0, 0.45, 0.04), x, z).translate(x + rd.x * 0.66, y + 1.2, z + rd.z * 0.66));
+        Bk.add(M.steel, cylY(0.3, y + 2.0, y + 2.4, x, z, 12));
+        obox(Bk, M.dark, 2.4, 2.6, 1.3, x, y + 2.4, z, 0.14);
+        Bk.add(M.copper, orient(boxG(1.8, 2.0, 0.04), x, z).translate(x + rd.x * 0.66, y + 3.7, z + rd.z * 0.66));
+        Bk.add(M.steel, cylAx(0.3, V3(x, y + 3.7, z).addScaledVector(tg, 1.2), V3(x, y + 3.7, z).addScaledVector(tg, 1.9), 12));
+        Bk.add(M.steel, cylY(0.3, y + 5.0, y + 5.4, x, z, 12));
+        obox(Bk, M.dark, 1.7, 1.6, 1.3, x, y + 5.4, z); Bk.add(M.gold, orient(boxG(1.0, 0.45, 0.04), x, z).translate(x + rd.x * 0.66, y + 6.2, z + rd.z * 0.66));
+        Bk.add(M.steel, cylY(0.3, y + 7.0, y + 8.0, x, z, 12)); Bk.add(M.steel, hexY(0.46, y + 7.0, y + 7.3, x, z));
+      } else bulkTop(Bk, x, z, y);
+      bulkBot(Bk, x, z, y, t);
+    }
+    if (i > 0) termStub(pB[5], x, z, PL[5].y, PL[5].t);
+  });
+  LOOM.forEach(([x, z]) => {
+    obox(pB[0], M.black, 2.2, 1.2, 1.0, x, 0, z, 0.15);
+    for (let k = 1; k < 6; k++) obox(pB[k], M.copper, 1.4, 0.5, 1.4, x, PL[k].y, z, 0.08);
+    obox(pB[5], M.black, 2.0, 1.0, 0.9, x, PL[5].y + 0.5, z, 0.12);
+  });
+  /* below the mixing chamber: cold finger, filter, sample package, featured coax routes */
+  const ym = PL[5].y, tM = PL[5].t, PK = V3(0, -125.35, 3.4);
+  {
+    const Bk = pB[5];
+    Bk.add(M.gold, cylY(2.4, ym - tM - 0.6, ym - tM, 0, -0.5, 36));
+    Bk.add(M.gold, rbox(2.4, 16.6, 1.0, 0.1, 0, (ym - tM - 0.6 - 126) / 2, -0.5));
+    Bk.add(M.gold, rbox(6.4, 1.0, 7.8, 0.12, 0, -126.5, 2.9));
+  }
+  const [xi, zi] = IN[0], [xo, zo] = OUT[0];
+  const cr = pts => new THREE.CatmullRomCurve3(pts, false, 'centripetal');
+  const inA = cr([V3(xi, ym - tM - 0.7, zi), V3(xi, ym - tM - 1.6, zi - 0.6), V3(-5.0, -112.0, 7.0), V3(-4.5, -113.4, 3.9), V3(-4.5, -114.3, 3.4)]);
+  const inB = cr([V3(-4.5, -118.9, 3.4), V3(-4.5, -123.4, 3.4), V3(-4.2, -124.85, 3.4), V3(-3.55, -125.3, 3.4), V3(-2.85, -125.3, 3.4)]);
+  const outA = cr([V3(2.85, -125.3, 3.4), V3(3.55, -125.3, 3.4), V3(4.2, -124.85, 3.4), V3(4.5, -123.4, 3.4), V3(4.5, -114.5, 3.6), V3(4.6, -112.3, 6.5), V3(xo, ym - tM - 1.6, zo - 0.6), V3(xo, ym - tM - 0.7, zo)]);
+  pB[5].add(M.copper, tube(inA, 0.11, 40, 8)); pB[5].add(M.copper, tube(inB, 0.11, 40, 8)); pB[5].add(M.copper, tube(outA, 0.11, 80, 8));
+  pB[5].add(M.dark, cylY(0.55, -118.4, -114.8, -4.5, 3.4, 24)); pB[5].add(M.copper, cylY(0.6, -114.8, -114.3, -4.5, 3.4, 24)); pB[5].add(M.copper, cylY(0.6, -118.9, -118.4, -4.5, 3.4, 24));
+  const pkg = buildPackage(M, { pocket: 12 }); pkg.group.scale.setScalar(0.1); pkg.group.position.copy(PK); plateG[5].add(pkg.group);
+  pkg.group.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
+
+  /* finalise the merged geometry: plates translate, spans stretch between their two anchors */
+  PL.forEach((p, k) => pB[k].build(plateG[k]));
+  for (const s of spans.values()) s.b.build(s.g, { dy: -s.yb0 });
+
+  /* shields: still, 4 K, 50 K, vacuum can; each a lathed shell with a flange, full or cut away */
+  const SH = [
+    { k: 0, r: 32.5, off: -39, mat: M.ovc, name: 'Vacuum can, 300 K', a: 0, b: 0.3 },
+    { k: 1, r: 29, off: -34, mat: M.shield, name: '50 K shield', a: 0.22, b: 0.52 },
+    { k: 2, r: 26, off: -31, mat: M.shield, name: '4 K shield', a: 0.44, b: 0.74 },
+    { k: 3, r: 23, off: -28, mat: M.shield, name: 'Still shield', a: 0.66, b: 0.96 }
+  ];
+  function shieldProf(r, Lh) {
+    const th = 0.35, Ro = r + th, rf = r + 1.3, ft = 0.6, bt = 0.5, rc = 2.0, ri = rc - th;
+    return [[Ro, -Lh / 2], [Ro, -ft], [rf, -ft], [rf, 0], [r, 0], [r, -Lh + bt + ri], ...arcPts(r - ri, -Lh + bt + ri, ri, 0, -Math.PI / 2, 6).slice(1), [0, -Lh + bt], [0, -Lh], [Ro - rc, -Lh], ...arcPts(Ro - rc, -Lh + rc, rc, -Math.PI / 2, 0, 6).slice(1)];
+  }
+  for (const sh of SH) {
+    const top = PL[sh.k].y - PL[sh.k].t, s = spanB(sh.k, -PL[sh.k].t, 5, sh.off), Lh = top - (PL[5].y + sh.off);
+    sh.s = s; sh.mat = sh.mat.clone();
+    const prof = shieldProf(sh.r, Lh);
+    sh.full = new THREE.Mesh(shell(prof, 128).translate(0, top - s.yb0, 0), sh.mat);
+    sh.half = new THREE.Mesh(shell(prof, 72, Math.PI / 2, Math.PI).translate(0, top - s.yb0, 0), sh.mat);
+    for (const m of [sh.full, sh.half]) { m.castShadow = true; m.receiveShadow = true; s.g.add(m); }
+  }
+  const mu = { mat: M.mu.clone() };
+  {
+    const prof = [[7.55, -10], [7.55, 0], [3.0, 0], [3.0, -0.3], [7.3, -0.3], [7.3, -20.2], [0, -20.2], [0, -20.5], [7.55, -20.5]];
+    mu.full = new THREE.Mesh(shell(prof, 72).translate(0, ym - tM - 0.85, 2.8), mu.mat);
+    mu.half = new THREE.Mesh(shell(prof, 48, Math.PI / 2, Math.PI).translate(0, ym - tM - 0.85, 2.8), mu.mat);
+    for (const m of [mu.full, mu.half]) { m.castShadow = true; m.receiveShadow = true; plateG[5].add(m); }
+  }
+  function setFade(o, mat, meshes) {
+    const tr = o < 0.999;
+    if (mat.transparent !== tr) { mat.transparent = tr; mat.depthWrite = !tr; mat.needsUpdate = true; }
+    mat.opacity = o; for (const m of meshes) m.castShadow = o > 0.6;
+  }
+
+  /* the travelling pulse: a red bead with a glow, along the featured input line and back up the output line */
+  const bead = new THREE.Mesh(new THREE.SphereGeometry(1, 20, 14), M.red);
+  const glow = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTexture(), color: ACC, transparent: true, depthWrite: false, toneMapped: false }));
+  bead.visible = glow.visible = false; scene.add(bead, glow);
+  const pieces = [];
+  const pc = (obj, pts, P, where, opt = {}) => pieces.push({ obj, pts, P: Array.isArray(P) ? P : pts.map(() => P), where, ...opt });
+  const span = (type, k) => FEAT[type][k];
+  const spanPts = (f, rev) => { const p = f.cu.getSpacedPoints(30).map(v => v.clone().setY(v.y - f.s.yb0)); return rev ? p.reverse() : p; };
+  const lin = (a, b, n) => Array.from({ length: n }, (_, i) => lerp(a, b, i / (n - 1)));
+  const vy = (x, y, z) => V3(x, y, z);
+  {
+    const Y = k => PL[k].y, T = k => PL[k].t;
+    pc(plateG[0], [vy(xi, 6.0, zi), vy(xi, -T(0) - 0.7, zi)], -70, 'Leaving the room-temperature electronics');
+    const gapIn = [[-70, -72, 'Stainless-steel coax, 300 K → 50 K'], [-72, -73, 'Coax, 50 K → 4 K'], [-93, -94, 'Coax, 4 K → still'], [-94, -94.5, 'Coax, still → cold plate'], [-104.5, -105, 'Coax, cold plate → mixing chamber']];
+    const plateIn = [null, [-72, -72, -72, '50 K plate: clamped, no attenuator'], [-73, -93, -93, '4 K plate: 20 dB attenuator'], [-94, -94, -94, 'Still: clamped, no attenuator'], [-94.5, -104.5, -104.5, 'Cold plate: 10 dB attenuator'], [-105, -125, -125, 'Mixing chamber: 20 dB attenuator']];
+    for (let k = 0; k < 5; k++) {
+      const f = span('in', k), pts = spanPts(f, false); pc(f.s.g, pts, lin(gapIn[k][0], gapIn[k][1], pts.length), gapIn[k][2]);
+      const q = plateIn[k + 1], top = Y(k + 1) + HC.in[k + 1];
+      pc(plateG[k + 1], [vy(xi, top, zi), vy(xi, Y(k + 1) + 0.35, zi), vy(xi, Y(k + 1) - T(k + 1) - 0.7, zi)], q.slice(0, 3), q[3]);
+    }
+    pc(plateG[5], inA.getSpacedPoints(30), -125, 'Into the magnetic shield');
+    pc(plateG[5], [vy(-4.5, -114.3, 3.4), vy(-4.5, -118.9, 3.4)], [-125, -126], 'Low-pass and infrared filter: −1 dB');
+    pc(plateG[5], inB.getSpacedPoints(24), -126, 'Copper coax to the sample package');
+    pc(pkg.group, pkg.pathIn, -126, 'Connector, circuit board, wire bond, chip', { dur: 1.6 });
+    pc(pkg.group, [pkg.pathIn[pkg.pathIn.length - 1], pkg.pathIn[pkg.pathIn.length - 1]], -126, 'At the chip: about −126 dBm, ~50 photons per µs', { dur: 1.4, hold: true });
+    pc(pkg.group, pkg.pathOut, -126, 'Out of the chip through the other connector', { dur: 1.4 });
+    const oA = outA.getSpacedPoints(50); pc(plateG[5], oA, lin(-126, -126.5, oA.length), 'Copper coax up to the mixing-chamber plate');
+    pc(plateG[5], [vy(xo, Y(5) - T(5) - 0.7, zo), vy(xo, Y(5) + 0.4, zo), vy(xo, Y(5) + 2.0, zo)], [-126.5, -126.5, -127], 'Isolator: −0.5 dB, blocks noise going down');
+    pc(plateG[5], [vy(xo, Y(5) + 2.0, zo), vy(xo, Y(5) + 2.4, zo), vy(xo, Y(5) + 5.0, zo), vy(xo, Y(5) + 5.4, zo)], [-127, -127, -107, -107], 'TWPA: +20 dB, close to the quantum limit');
+    pc(plateG[5], [vy(xo, Y(5) + 5.4, zo), vy(xo, Y(5) + 7.0, zo), vy(xo, Y(5) + 8.0, zo)], [-107, -107.5, -107.5], 'Second isolator: −0.5 dB');
+    const gapOut = [[-69, -70, 'Coax, 50 K → 300 K'], [-68, -69, 'Coax, 4 K → 50 K'], [-107.5, -108, 'Superconducting NbTi coax'], [-107.5, -107.5, 'Superconducting NbTi coax'], [-107.5, -107.5, 'Superconducting NbTi coax']];
+    for (let k = 4; k >= 0; k--) {
+      const f = span('out', k), pts = spanPts(f, true); pc(f.s.g, pts, lin(gapOut[k][0], gapOut[k][1], pts.length), gapOut[k][2]);
+      if (k === 2) pc(plateG[2], [vy(xo, Y(2) - T(2) - 0.7, zo), vy(xo, Y(2) + 0.4, zo), vy(xo, Y(2) + 3.0, zo), vy(xo, Y(2) + 3.6, zo)], [-108, -108, -68, -68], '4 K plate: HEMT amplifier, +40 dB');
+      else if (k > 0) pc(plateG[k], [vy(xo, Y(k) - T(k) - 0.7, zo), vy(xo, Y(k) + 0.7, zo)], k === 1 ? -69 : -107.5, k === 1 ? '50 K plate: clamped' : (k === 3 ? 'Still: clamped' : 'Cold plate: clamped'));
+    }
+    pc(plateG[0], [vy(xo, -T(0) - 0.7, zo), vy(xo, 6.0, zo)], -70, 'Back at room temperature: −70 dBm');
+    for (const p of pieces) {
+      let len = 0; for (let i = 1; i < p.pts.length; i++) len += p.pts[i].distanceTo(p.pts[i - 1]);
+      const cum = [0]; for (let i = 1; i < p.pts.length; i++) cum.push(cum[i - 1] + p.pts[i].distanceTo(p.pts[i - 1]));
+      p.cum = cum; p.len = len; if (!p.dur) p.dur = 0.22 + len / 42;
+    }
+  }
+  const pulse = { on: false, t: 0, i: 0, P: null, where: '' };
+  const v3 = V3(0, 0, 0), wpos = V3(0, 0, 0);
+  function pulseState() {
+    let t = pulse.t, i = 0;
+    while (i < pieces.length && t > pieces[i].dur) { t -= pieces[i].dur; i++; }
+    if (i >= pieces.length) return null;
+    const p = pieces[i], u = clamp(t / p.dur, 0, 1), d = p.hold ? p.len : u * p.len;
+    let j = 1; while (j < p.cum.length - 1 && p.cum[j] < d) j++;
+    const seg = p.cum[j] - p.cum[j - 1], w = seg > 0 ? (d - p.cum[j - 1]) / seg : 1;
+    v3.copy(p.pts[j - 1]).lerp(p.pts[j], w);
+    p.obj.localToWorld(wpos.copy(v3));
+    return { pos: wpos, P: lerp(p.P[j - 1], p.P[j], w), where: p.where, hold: p.hold, tt: t };
+  }
+
+  /* camera, framing and the three sliders */
+  const FOV = 30, tanV = Math.tan(FOV * D2R / 2);
+  let W = 1, H = 1, dist = 300, d0 = 300, d1 = 6, az = 0.5, polOff = 0, placing = false;
+  const T0 = V3(0, -60, 0), T1 = V3(0, 0, 0), target = V3(0, 0, 0), sph = new THREE.Spherical();
+  const polBase = () => 1.31 - 0.6 * sstep(0.35, 1, dn);
+  const remEff = () => Math.max(rem, 1.02 * sstep(0.0, 0.34, dn));
+  function update() {
+    PL.forEach((p, k) => { plateG[k].position.y = Yk(k) - p.y; });
+    for (const s of spans.values()) { const ya = Yk(s.ka) + s.offA, yb = Yk(s.kb) + s.offB; s.g.position.y = yb - s.drop; s.g.scale.y = (ya - yb) / s.L0; }
+    const r = remEff();
+    for (const sh of SH) {
+      const u = sstep(sh.a, sh.b, r), o = 1 - sstep(sh.a + 0.45 * (sh.b - sh.a), sh.b, r);
+      sh.s.drop = 70 * u * u; sh.full.visible = !cut && o > 0.003; sh.half.visible = cut && o > 0.003;
+      setFade(o, sh.mat, [sh.full, sh.half]);
+      const ya = Yk(sh.s.ka) + sh.s.offA, yb = Yk(sh.s.kb) + sh.s.offB; sh.s.g.position.y = yb - sh.s.drop; sh.s.g.scale.y = (ya - yb) / sh.s.L0;
+    }
+    const om = 1 - Math.max(sstep(0.88, 1, rem), sstep(0.44, 0.56, dn));
+    mu.full.visible = !cut && om > 0.003; mu.half.visible = cut && om > 0.003; setFade(om, mu.mat, [mu.full, mu.half]);
+    lidPose(pkg.lid, sstep(0.84, 0.97, dn));
+    root.updateMatrixWorld(true);
+  }
+  function frame() {
+    const top = 22, bot = Yk(5) - lerp(39.5, 24, sstep(0.75, 1, remEff())), half = (top - bot) / 2 * 1.03, asp = W / H;
+    d0 = Math.max(half / tanV, 40 / (tanV * asp)) + 34;
+    T0.set(0, (top + bot) / 2, 0);
+    pkg.group.getWorldPosition(T1); T1.y += 0.05;
+    d1 = 1.35 / (tanV * Math.min(asp, 1.4));
+  }
+  function place() {
+    placing = true;
+    update(); frame();
+    dist = d0 * Math.pow(d1 / d0, dn);
+    target.copy(T1).lerp(T0, (dist - d1) / (d0 - d1));
+    const pb = polBase(); controls.minPolarAngle = pb - 0.5; controls.maxPolarAngle = Math.min(pb + 0.42, 1.95);
+    sph.set(dist, clamp(pb + polOff, controls.minPolarAngle, controls.maxPolarAngle), az);
+    camera.position.setFromSpherical(sph).add(target); controls.target.copy(target);
+    camera.near = Math.max(0.05, dist * 0.03); camera.far = dist * 3 + 400; camera.updateProjectionMatrix();
+    controls.update(); placing = false;
+  }
+  controls.addEventListener('change', () => { if (placing) return; az = controls.getAzimuthalAngle(); polOff = controls.getPolarAngle() - polBase(); render(); });
+
+  /* labels */
+  const right = V3(0, 0, 0), lp = V3(0, 0, 0);
+  const narrow = () => W < 560;
+  const wl = (obj, x, y, z) => obj.localToWorld(lp.set(x, y, z)).clone();
+  const LBL = [];
+  const TN = ['300 K', '~50 K', '~4 K', '~0.8 K', '~0.1 K', '~10 mK'];
+  PL.forEach((p, k) => LBL.push({ t: () => narrow() ? TN[k] : p.name + ' · ' + p.temp, at: () => V3(right.x * p.R, Yk(k) - p.t / 2, right.z * p.R), d: [28, 0], op: () => k < 5 ? 1 - sstep(0.16, 0.3, dn) : 1 - sstep(0.52, 0.66, dn), cls: 'f' }));
+  const SHY = [12, 30, 62, 88];
+  SH.forEach((sh, i) => LBL.push({ t: () => sh.name, at: () => V3(-right.x * (sh.r + 0.4), -SHY[i] * (1 + EX * sep) - sh.s.drop, -right.z * (sh.r + 0.4)), d: [-30, 0], op: () => (narrow() ? 0 : 1) * (cut || i === 0 ? 1 : 0) * (1 - sstep(0, 0.1, Math.max(0, remEff() - sh.a))) }));
+  LBL.push({ t: () => narrow() ? 'Pulse tube' : 'Pulse-tube cold head', at: () => V3(PT[0] + 5, 9, PT[1]), d: [44, -18], op: () => 1 - sstep(0.12, 0.24, dn) });
+  const compOp = () => sstep(0.5, 0.8, remEff()) * (1 - sstep(0.12, 0.26, dn));
+  const comp = (t, f, to) => LBL.push({ t: () => t, at: f, to, d: [0, 0], op: compOp });
+  const side = (k, s, up) => () => V3(s * right.x * (PL[k].R + 4), Yk(k) + up, s * right.z * (PL[k].R + 4));
+  comp('Attenuator, −20 dB', () => wl(plateG[2], xi, PL[2].y + 1.2, zi), side(2, -1, 5));
+  comp('−10 dB', () => wl(plateG[4], xi, PL[4].y + 1.2, zi), side(4, -1, 4));
+  comp('−20 dB', () => wl(plateG[5], xi, PL[5].y + 1.2, zi), side(5, -1, 4));
+  comp('HEMT, +40 dB', () => wl(plateG[2], xo, PL[2].y + 1.7, zo), side(2, 1, 7));
+  comp('TWPA, +20 dB', () => wl(plateG[5], xo, PL[5].y + 3.7, zo), side(5, 1, 7.5));
+  const dOp = r => () => fade(dn, r);
+  LBL.push({ t: () => 'Magnetic shield', at: () => wl(plateG[5], -7.55 * right.x, -122, 2.8 - 7.55 * right.z), d: [-34, 0], op: () => fade(dn, [0.26, 0.34, 0.44, 0.52]) });
+  LBL.push({ t: () => 'Cold finger', at: () => wl(plateG[5], 0, -118, -0.5), d: [36, -20], op: dOp([0.36, 0.48, 0.8, 0.88]) });
+  LBL.push({ t: () => 'Infrared filter', at: () => wl(plateG[5], -4.5, -116.6, 3.4), d: [-36, -14], op: dOp([0.42, 0.54, 0.8, 0.88]) });
+  LBL.push({ t: () => 'Sample package', at: () => wl(plateG[5], 1.2, -124.7, 4.9), d: [36, 18], op: dOp([0.42, 0.54, 0.84, 0.9]) });
+  LBL.push({ t: () => 'Chip, 6 mm', at: () => pkg.group.localToWorld(lp.set(2.6, 0.02, 2.6)).clone(), d: [40, 26], op: dOp([0.9, 0.97, 2, 2]) });
+  LBL.push({ t: () => 'Wire bonds', at: () => pkg.group.localToWorld(lp.set(-3.2, 0.25, 0)).clone(), d: [-34, -30], op: dOp([0.92, 0.99, 2, 2]) });
+  LBL.push({ t: () => 'Lid', at: () => pkg.lid.localToWorld(lp.set(8, 6, 8)).clone(), d: [36, -20], op: dOp([0.9, 0.97, 2, 2]) });
+  function overlay(bs) {
+    right.set(1, 0, 0).applyQuaternion(camera.quaternion); right.y = 0; right.normalize();
+    const pl = Placer(W, H); pl.block(0, H - 40, 140, H);
+    if (bs) {
+      const p = bs.pos.clone().project(camera);
+      if (p.z < 1) pl.add((p.x + 1) / 2 * W, (1 - p.y) / 2 * H, 22, -24, `<tspan class="m a">${mn(bs.P.toFixed(Math.abs(bs.P % 1) > 0.01 ? 1 : 0))} dBm</tspan>`, 1);
+    }
+    for (const L of LBL) {
+      const op = L.op(); if (op < 0.01) continue;
+      const p = L.at(); p.project(camera);
+      if (p.z > 1 || Math.abs(p.x) > 1.1 || Math.abs(p.y) > 1.1) continue;
+      const x = (p.x + 1) / 2 * W, y = (1 - p.y) / 2 * H;
+      let [dx, dy] = L.d;
+      if (L.to) { const q = L.to().project(camera); dx = (q.x + 1) / 2 * W - x; dy = (1 - q.y) / 2 * H - y; }
+      pl.add(x, y, dx, dy, L.t(), op, L.cls || '');
+    }
+    pl.raw(scaleBar(H / (2 * dist * tanV), 1, W, H));
+    ov.innerHTML = pl.svg;
+  }
+  function outputs() {
+    const r = remEff(), n = SH.filter(sh => sstep(sh.a, sh.b, r) < 0.5).length;
+    $('o1r').textContent = n === 4 ? 'all in place' : n === 0 ? 'all removed' : `${n} of 4 left`;
+    $('o1s').textContent = '×' + (1 + EX * sep).toFixed(2);
+    $('o1d').textContent = 'view ' + lenText(2 * dist * tanV * Math.max(1, W / H));
+  }
+  let bstate = null;
+  function render() {
+    fitShadow(key, controls.target, Math.max(dist * tanV * Math.max(1, W / H) * 1.25, 1.2));
+    if (bstate) {
+      const rad = Math.max(0.012, dist * 0.0058) * (0.65 + 0.55 * clamp((bstate.P + 130) / 62, 0, 1)) * (bstate.hold ? 1 + 0.25 * Math.sin(bstate.tt * 9) : 1);
+      bead.position.copy(bstate.pos); bead.scale.setScalar(rad); glow.position.copy(bstate.pos); glow.scale.setScalar(rad * 9);
+      bead.visible = glow.visible = true;
+    } else bead.visible = glow.visible = false;
+    renderer.render(scene, camera); overlay(bstate);
+  }
+  const loop = Loop(dt => {
+    pulse.t += dt; bstate = pulseState();
+    if (!bstate) { pulse.on = false; $('r1w').textContent = 'Back at room temperature, after +60 dB of gain'; $('r1p').textContent = '−70 dBm'; bP.disabled = false; }
+    else { $('r1p').textContent = mn(bstate.P.toFixed(Math.abs(bstate.P % 1) > 0.01 ? 1 : 0)) + ' dBm'; $('r1w').textContent = bstate.where; }
+    render();
+  }, () => pulse.on);
+  bP.addEventListener('click', () => {
+    pulse.on = true; pulse.t = 0; bP.disabled = true;
+    if (!cut && remEff() < 0.9) { cut = true; cC.checked = true; place(); }
+    loop.kick();
+  });
+  const onSlide = () => { rem = +sR.value; sep = +sS.value; dn = +sD.value; place(); outputs(); if (pulse.on) bstate = pulseState(); render(); };
+  for (const el of [sR, sS, sD]) el.addEventListener('input', onSlide);
+  cC.addEventListener('change', () => { cut = cC.checked; place(); render(); });
+  function resize() {
+    W = cv.clientWidth; H = cv.clientHeight; if (!W || !H) return; renderer.setSize(W, H, false); camera.aspect = W / H;
+    if (W < 560) camera.setViewOffset(W, H, Math.round(W * 0.09), 0, W, H); else camera.clearViewOffset();
+    place(); outputs(); render();
+  }
+  new ResizeObserver(resize).observe(cv);
+  watchVisible(cv, v => loop.setVisible(v));
+  $('r1p').textContent = '−70 dBm'; $('r1w').textContent = 'Press “Send a pulse”';
+})();
+
+/* ====================================================================================
+   Figure 2: the mixing chamber, cut away (units: centimetres, schematic)
+   ==================================================================================== */
+(function mixing() {
+  const cv = $('f2'), ov = $('f2-ov'), sN = $('s2n'), sQ = $('s2q'), sC = $('s2c'), bP = $('b2p');
+  const S = studio(cv, { shadow: 1024, fov: 30 }); if (!S) return;
+  const { renderer, scene, camera, controls, key } = S; const M = makeMats();
+  const B = new Bucket();
+  B.add(M.gold, shell(discProf(7.5, 0.7, 0.18), 96).translate(0, -2.8, 0));
+  B.add(M.gold, shell(discProf(6.5, 0.6, 0.16), 96).translate(0, 14, 0));
+  B.add(M.steel, cylY(0.85, 13.4, 23, 1.0, -1.0, 24));
+  for (let i = 0; i < 16; i++) { const a = TAU * (i + 0.5) / 16; B.add(M.steel, cylY(0.22, -2.8, -2.62, 6.6 * Math.cos(a), 6.6 * Math.sin(a), 8)); B.add(M.steel, cylY(0.22, 14, 14.18, 5.7 * Math.cos(a), 5.7 * Math.sin(a), 8)); }
+  const Rh = 2.2, N = 4.5, yH0 = 3.3, yH1 = 8.3, aH = TAU * N / (yH1 - yH0);
+  const helixPt = (y, ph, o = V3(0, 0, 0)) => o.set(Rh * Math.cos(aH * y + ph), y, Rh * Math.sin(aH * y + ph));
+  const HelixCurve = class extends THREE.Curve { constructor(ph, down) { super(); this.ph = ph; this.down = down; } getPoint(t, o = new THREE.Vector3()) { return helixPt(this.down ? lerp(yH1, yH0, t) : lerp(yH0, yH1, t), this.ph, o); } };
+  const hIn = new HelixCurve(Math.PI, true), hOut = new HelixCurve(0, false);
+  const cr = pts => new THREE.CatmullRomCurve3(pts, false, 'centripetal');
+  const hInTop = hIn.getPoint(0), hInBot = hIn.getPoint(1), hOutBot = hOut.getPoint(0), hOutTop = hOut.getPoint(1);
+  const condC = cr([V3(-4.2, 22.5, 0), V3(-4.2, 12, 0), V3(-4.2, 9.4, 0), V3(-3.4, hInTop.y + 0.3, hInTop.z * 0.5), hInTop]);
+  const INL = V3(-1.4, 1.5, -1.0), OUTL = V3(1.6, -2.25, -1.0), STI = V3(1.6, 9.6, -1.2);
+  const inletC = cr([hInBot, V3(hInBot.x * 0.8, 2.9, hInBot.z * 0.8), V3(INL.x, 2.45, INL.z), INL]);
+  const outletC = cr([OUTL, V3(OUTL.x, 0.5, OUTL.z), V3(OUTL.x, 2.45, OUTL.z), V3(hOutBot.x * 0.85, 2.95, hOutBot.z * 0.85), hOutBot]);
+  const toStillC = cr([hOutTop, V3(hOutTop.x * 0.9, 8.75, hOutTop.z * 0.9), V3(STI.x, 9.1, STI.z), STI]);
+  const glassCu = new THREE.MeshStandardMaterial({ color: 0xb87333, metalness: 0.35, roughness: 0.32, transparent: true, opacity: 0.42, depthWrite: false });
+  const tubes = new Bucket();
+  tubes.add(glassCu, tube(hIn, 0.2, 260, 10)); tubes.add(glassCu, tube(hOut, 0.26, 260, 12));
+  tubes.add(glassCu, tube(inletC, 0.2, 30, 10)); tubes.add(glassCu, tube(outletC, 0.26, 50, 12)); tubes.add(glassCu, tube(toStillC, 0.26, 24, 12));
+  B.add(M.steel, tube(condC, 0.2, 60, 10));
+  const heatMat = new THREE.MeshStandardMaterial({ color: 0x2b2c30, metalness: 0.4, roughness: 0.45, emissive: new THREE.Color(ACC), emissiveIntensity: 0 });
+  const heater = new THREE.Mesh(rbox(1.4, 0.6, 0.9, 0.08), heatMat); heater.position.set(5.0, -2.5, 2.2); heater.rotation.y = 0.5; heater.castShadow = true; scene.add(heater);
+  B.add(M.dark, rbox(0.9, 0.5, 0.9, 0.08, -5.0, -2.55, 2.4)); B.add(M.gold, cylY(0.06, -2.3, -1.6, -5.2, 2.4, 6)); B.add(M.gold, cylY(0.06, -2.3, -1.6, -4.8, 2.4, 6));
+  B.add(M.black, cylY(0.07, -2.3, -2.25, -5.0, 2.4, 6));
+  const statics = new THREE.Group(); scene.add(statics); B.build(statics); tubes.build(statics, { cast: false });
+  // cut-away pieces, rebuilt when the cut changes
+  const liq = (color, opacity) => new THREE.MeshStandardMaterial({ color, metalness: 0, roughness: 0.18, transparent: true, opacity, depthWrite: false });
+  const mcProf = [[3.4, -0.2], [3.4, 1.9], [3.8, 1.9], [3.8, 2.4], [0, 2.4], [0, 2.0], [3.1, 2.0], [3.1, -2.5], [0, -2.5], [0, -2.8], [3.4, -2.8]];
+  const stProf = [[3.0, 11], [3.0, 13.4], [2.75, 13.4], [2.75, 9.25], [0, 9.25], [0, 9.0], [3.0, 9.0]];
+  const vol = (r, y0, y1) => [[r, (y0 + y1) / 2], [r, y1], [0, y1], [0, y0], [r, y0]];
+  const YB = 0.35;
+  const parts = [
+    { prof: mcProf, mat: M.copper, seg: 96 },
+    { prof: stProf, mat: M.copper, seg: 96 },
+    { prof: vol(3.08, -2.48, YB - 0.006), mat: liq(0x7d9bb8, 0.34), seg: 72, liquid: true },
+    { prof: vol(3.08, YB + 0.006, 1.98), mat: liq(0xc9d6e2, 0.36), seg: 72, liquid: true },
+    { prof: vol(3.09, YB - 0.006, YB + 0.006), mat: liq(0x3f5f80, 0.75), seg: 72, liquid: true },
+    { prof: vol(2.73, 9.27, 11.2), mat: liq(0x7d9bb8, 0.34), seg: 72, liquid: true },
+    { prof: vol(2.74, 11.194, 11.206), mat: liq(0x3f5f80, 0.6), seg: 72, liquid: true }
+  ];
+  for (const p of parts) { p.mesh = new THREE.Mesh(new THREE.BufferGeometry(), p.mat); p.mesh.castShadow = !p.liquid; p.mesh.receiveShadow = !p.liquid; p.mesh.renderOrder = p.liquid ? 2 : 0; scene.add(p.mesh); }
+  let cutA = 0;
+  function rebuild() {
+    const remA = cutA * 210 * D2R;
+    for (const p of parts) { p.mesh.geometry.dispose(); p.mesh.geometry = remA > 0.01 ? shell(p.prof, p.seg, remA / 2, TAU - remA) : shell(p.prof, p.seg); }
+  }
+  // atoms
+  const sphere = new THREE.IcosahedronGeometry(1, 2);
+  const he3M = new THREE.MeshStandardMaterial({ color: 0x1e2024, metalness: 0.2, roughness: 0.35 });
+  const he4M = new THREE.MeshStandardMaterial({ color: 0xece8dc, metalness: 0, roughness: 0.6 });
+  const NF = 96, NB3 = 70, ND3 = 12, NS3 = 5, NB4 = 170, NS4 = 70;
+  const he3 = new THREE.InstancedMesh(sphere, he3M, NF + NB3 + ND3 + NS3), he4 = new THREE.InstancedMesh(sphere, he4M, NB4 + NS4);
+  he3.castShadow = he4.castShadow = false; scene.add(he3, he4);
+  const hash = (a, b, c) => { const s = Math.sin(a * 127.1 + b * 311.7 + c * 74.7) * 43758.5453; return s - Math.floor(s); };
+  const rnd = (() => { let s = 7; return () => (s = (s * 16807) % 2147483647) / 2147483647; })();
+  const inCyl = (r, y0, y1) => [r * Math.sqrt(rnd()), TAU * rnd(), lerp(y0, y1, rnd()), rnd() * TAU];   // [radius, angle, y, phase]
+  const kept = a => { const h = cutA * 105 * D2R; a = ((a % TAU) + TAU) % TAU; return a >= h - 0.03 && a <= TAU - h + 0.03; };
+  const keptAngle = u => { const h = cutA * 105 * D2R; return h + (TAU - 2 * h) * u; };
+  const bulk3 = [...Array.from({ length: NB3 }, () => inCyl(2.85, YB + 0.15, 1.85)), ...Array.from({ length: ND3 }, () => inCyl(2.85, -2.35, YB - 0.15)), ...Array.from({ length: NS3 }, () => inCyl(2.5, 9.4, 11.0))];
+  const bulk4 = [...Array.from({ length: NB4 }, () => inCyl(2.9, -2.38, YB - 0.1)), ...Array.from({ length: NS4 }, () => inCyl(2.55, 9.38, 11.08))];
+  const W8 = [0.08, 0.2, 0.04, 0.12, 0.12, 0.06, 0.18, 0.03, 0.07, 0.1], CUM = [0]; for (const w of W8) CUM.push(CUM[CUM.length - 1] + w);
+  const tmpA = V3(0, 0, 0), tmpB = V3(0, 0, 0);
+  function flowPos(u, i, out) {
+    const cyc = Math.floor(u), f = u - cyc; let k = 0; while (k < 9 && f >= CUM[k + 1]) k++;
+    const s = (f - CUM[k]) / W8[k], r1 = hash(i, cyc, 1), r2 = hash(i, cyc, 2), r3 = hash(i, cyc, 3), r4 = hash(i, cyc, 4);
+    const ac = keptAngle(r2), aS = keptAngle(r4), rc = 0.6 + 2.0 * Math.sqrt(r1), rs = 0.5 + 1.9 * Math.sqrt(r3);
+    const xc = rc * Math.sin(ac), zc = rc * Math.cos(ac), xs = rs * Math.sin(aS), zs = rs * Math.cos(aS);
+    switch (k) {
+      case 0: return condC.getPointAt(s, out);
+      case 1: return hIn.getPoint(s, out);
+      case 2: return inletC.getPointAt(s, out);
+      case 3: { const e = s * s * (3 - 2 * s); return out.set(lerp(INL.x, xc, e) + 0.12 * Math.sin(9 * s + i), lerp(INL.y, YB, s), lerp(INL.z, zc, e) + 0.12 * Math.cos(7 * s + i)); }
+      case 4: { const e = s * s * (3 - 2 * s); return out.set(lerp(xc, OUTL.x, e) + 0.1 * Math.sin(8 * s + i), lerp(YB, OUTL.y, Math.sqrt(s)) - 0.4 * Math.sin(Math.PI * s), lerp(zc, OUTL.z, e)); }
+      case 5: return outletC.getPointAt(s, out);
+      case 6: return hOut.getPoint(s, out);
+      case 7: return toStillC.getPointAt(s, out);
+      case 8: { const e = s * s * (3 - 2 * s); return out.set(lerp(STI.x, xs, e), lerp(STI.y, 11.2, s), lerp(STI.z, zs, e)); }
+      default: { if (s < 0.25) { const e = s / 0.25; return out.set(lerp(xs, 1.0, e), lerp(11.2, 13.3, e), lerp(zs, -1.0, e)); } return out.set(1.0 + 0.25 * Math.sin(20 * s + i), lerp(13.3, 23, (s - 0.25) / 0.75), -1.0 + 0.25 * Math.cos(17 * s + i)); }
+    }
+  }
+  const segOf = u => { const f = u - Math.floor(u); let k = 0; while (k < 9 && f >= CUM[k + 1]) k++; return k; };
+  // flashes where an atom crosses the phase boundary
+  const rings = Array.from({ length: 14 }, () => { const m = new THREE.Mesh(new THREE.RingGeometry(0.8, 1, 40).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ color: 0xffffff, transparent: true, opacity: 0, depthWrite: false, toneMapped: false, side: THREE.DoubleSide })); m.visible = false; m.renderOrder = 3; scene.add(m); return { m, t: 9 }; });
+  let ringI = 0;
+  const flash = p => { const r = rings[ringI++ % rings.length]; r.t = 0; r.m.position.set(p.x, YB + 0.012, p.z); r.m.visible = true; };
+  let phase = 0, tclock = 0;
+  const prevSeg = new Int8Array(NF).fill(-1);
+  const DM = new THREE.Matrix4(), DP = V3(0, 0, 0), DQ = new THREE.Quaternion(), DS = V3(1, 1, 1);
+  function setAtoms(dt) {
+    for (let i = 0; i < NF; i++) {
+      const u = phase + i / NF, k = segOf(u);
+      flowPos(u, i, DP);
+      if (dt > 0 && prevSeg[i] === 3 && k === 4) flash(DP);
+      prevSeg[i] = k;
+      DM.compose(DP, DQ, DS.setScalar(0.12)); he3.setMatrixAt(i, DM);
+    }
+    bulk3.forEach(([r, a, y, ph], j) => { DP.set(r * Math.sin(a) + 0.08 * Math.sin(tclock * 1.3 + ph), y + 0.06 * Math.sin(tclock * 1.7 + 2 * ph), r * Math.cos(a) + 0.08 * Math.cos(tclock * 1.1 + ph)); DM.compose(DP, DQ, DS.setScalar(kept(a) ? 0.12 : 0)); he3.setMatrixAt(NF + j, DM); });
+    bulk4.forEach(([r, a, y, ph], j) => { DP.set(r * Math.sin(a) + 0.05 * Math.sin(tclock * 1.6 + ph), y + 0.04 * Math.sin(tclock * 2.1 + 2 * ph), r * Math.cos(a) + 0.05 * Math.cos(tclock * 1.4 + ph)); DM.compose(DP, DQ, DS.setScalar(kept(a) ? 0.1 : 0)); he4.setMatrixAt(j, DM); });
+    he3.instanceMatrix.needsUpdate = he4.instanceMatrix.needsUpdate = true;
+    for (const r of rings) { if (r.t > 0.9) { r.m.visible = false; continue; } r.t += dt; const e = r.t / 0.9; r.m.scale.setScalar(0.12 + 0.55 * e); r.m.material.opacity = 0.85 * (1 - e); }
+  }
+  // the model
+  let nd = 500e-6, Q = 4e-6, playing = !RM;
+  function readParams() {
+    nd = +sN.value * 1e-6; Q = 1e-6 * Math.pow(10, +sQ.value); cutA = +sC.value;
+    $('o2n').textContent = sN.value + ' µmol/s'; $('o2q').textContent = fmtW(Q); $('o2c').textContent = Math.round(cutA * 210) + '°';
+    const T = C.Tbase(nd, Q);
+    $('r2t').textContent = fmtT(T); $('r2a').textContent = fmtW(C.Qmc(nd, 0.02)); $('r2b').textContent = fmtW(C.Qmc(nd, 0.1));
+    heatMat.emissiveIntensity = 0.15 + 1.6 * (+sQ.value) / 3;
+  }
+  // camera
+  const FOV = 30, tanV = Math.tan(FOV * D2R / 2); let W = 1, H = 1;
+  const target = V3(0, 7.0, 0); let started = false;
+  function placeCam() {
+    const asp = W / H, half = 13.4, d = Math.max(half / tanV, 10 / (tanV * asp)) + 4;
+    const sph = started ? new THREE.Spherical().setFromVector3(camera.position.clone().sub(controls.target)) : new THREE.Spherical(d, 1.27, 0.42); started = true;
+    sph.radius = d; controls.target.copy(target); camera.position.setFromSpherical(sph).add(target);
+    camera.near = 1; camera.far = 300; camera.updateProjectionMatrix(); controls.minPolarAngle = 0.55; controls.maxPolarAngle = 1.75; controls.update();
+  }
+  const tempTxt = () => `<tspan class="m a">${fmtT(C.Tbase(nd, Q))}</tspan>`;
+  const LB = [
+    { t: () => `Thermometer · ${tempTxt()}`, n: () => `T = ${tempTxt()}`, p: V3(-5.0, -2.3, 2.4), d: [-34, 26] },
+    { t: 'Still · ~0.7 K', n: 'Still, ~0.7 K', p: V3(3.0, 11.8, 0), d: [36, -8] },
+    { t: '³He vapour, pumped to room temperature', n: '³He vapour out', p: V3(1.85, 18.5, -1.0), d: [32, -10] },
+    { t: 'Returning ³He, condensed', n: '³He back in', p: V3(-4.2, 17.5, 0), d: [-30, -10] },
+    { t: 'Heat exchanger', n: 'Heat exchanger', p: V3(2.45, 6.3, 0), d: [40, 0] },
+    { t: 'Concentrated phase · nearly pure ³He', n: 'Concentrated', p: V3(-3.08, 1.3, 0), d: [-34, -14] },
+    { t: 'Dilute phase · 6.6 % ³He in ⁴He', n: 'Dilute, 6.6 % ³He', p: V3(-3.08, -1.2, 0), d: [-34, 12] },
+    { t: 'Phase boundary', p: V3(3.1, YB, 0), d: [44, 2] },
+    { t: 'Mixing chamber', p: V3(3.4, -1.8, 0.6), d: [44, 14] },
+    { t: 'Heater', p: V3(5.0, -2.2, 2.2), d: [30, 26] }
+  ];
+  function overlay() {
+    const nar = W < 520, pl = Placer(W, H);
+    for (const L of LB) {
+      const txt = nar ? L.n : L.t; if (!txt) continue;
+      const p = L.p.clone().project(camera); if (p.z > 1) continue;
+      pl.add((p.x + 1) / 2 * W, (1 - p.y) / 2 * H, L.d[0] * (nar ? 0.7 : 1), L.d[1], typeof txt === 'function' ? txt() : txt, 1);
+    }
+    ov.innerHTML = pl.svg;
+  }
+  function render() { fitShadow(key, target, 16); renderer.render(scene, camera); overlay(); }
+  const loop = Loop(dt => { phase += dt * (nd / 500e-6) / 15; tclock += dt; setAtoms(dt); render(); }, () => playing);
+  controls.addEventListener('change', render);
+  sN.addEventListener('input', () => { readParams(); if (!playing) render(); });
+  sQ.addEventListener('input', () => { readParams(); if (!playing) render(); });
+  sC.addEventListener('input', () => { readParams(); rebuild(); setAtoms(0); render(); });
+  bP.addEventListener('click', () => { playing = !playing; setBtn(bP, playing); loop.kick(); });
+  function resize() { W = cv.clientWidth; H = cv.clientHeight; if (!W || !H) return; renderer.setSize(W, H, false); camera.aspect = W / H; placeCam(); render(); }
+  readParams(); rebuild(); setAtoms(0); setBtn(bP, playing);
+  camera.position.set(0, 0, 1); new ResizeObserver(resize).observe(cv);
+  watchVisible(cv, v => loop.setVisible(v));
+})();
+
+/* ====================================================================================
+   Figure 3: thermal photons along one input line (units: centimetres, schematic)
+   ==================================================================================== */
+(function chain() {
+  const cv = $('f3'), ov = $('f3-ov'), cb = $('f3b'), bP = $('b3p');
+  const SL = ['s3a', 's3b', 's3c', 's3d', 's3e'].map($), sF = $('s3f');
+  const S = studio(cv, { shadow: 1024, fov: 30 }); if (!S) return;
+  const { renderer, scene, camera, controls, key } = S; const M = makeMats();
+  const ST = [
+    { name: 'Top plate', short: '300 K', T: 300, y: 15 }, { name: '50 K plate', short: '50 K', T: 50, y: 9 }, { name: '4 K plate', short: '4 K', T: 4, y: 3 },
+    { name: 'Still', short: 'Still', T: 0.8, y: -3 }, { name: 'Cold plate', short: 'CP', T: 0.1, y: -9 }, { name: 'Mixing chamber', short: 'MXC', T: 0.01, y: -15 }
+  ];
+  const TP = 0.5, B = new Bucket();
+  ST.forEach((s, k) => {
+    B.add(k ? M.gold : M.steel, shell(discProf(k ? 5.4 : 6.0, TP, 0.12), 96).translate(0, s.y, 0));
+    for (let i = 0; i < 14; i++) { const a = TAU * (i + 0.5) / 14, r = (k ? 5.4 : 6.0) - 0.6; B.add(M.steel, cylY(0.2, s.y, s.y + 0.14, r * Math.cos(a), r * Math.sin(a), 8)); }
+    B.add(M.steel, cylY(0.3, s.y - TP - 0.4, s.y - TP, 0, 0, 12)); B.add(M.steel, hexY(0.45, s.y - TP - 0.25, s.y - TP, 0, 0));
+    if (k > 0) for (let i = 0; i < 4; i++) { const a = TAU * (i + 0.5) / 4; B.add(M.steel, cylY(0.22, s.y, ST[k - 1].y - TP, 4.6 * Math.cos(a), 4.6 * Math.sin(a), 10)); }
+  });
+  B.add(M.steel, cylY(0.15, 15, 19.5, 0, 0, 10)); B.add(M.steel, hexY(0.45, 19.5, 20.1, 0, 0));
+  B.add(M.copper, rbox(2.6, 1.2, 2.6, 0.12, 0, -21.0, 0)); B.add(M.steel, cylY(0.3, -20.4, -19.9, 0, 0, 12));
+  const statics = new THREE.Group(); scene.add(statics); B.build(statics);
+  // attenuators and coax segments, resized from the sliders
+  const unitCyl = (r, seg) => new THREE.CylinderGeometry(r, r, 1, seg).translate(0, 0.5, 0);
+  const atts = ST.map((s, k) => {
+    if (!k) return null;
+    const nut = new THREE.Mesh(new THREE.CylinderGeometry(0.45, 0.45, 0.35, 6).translate(0, 0.175, 0), M.steel), body = new THREE.Mesh(unitCyl(0.42, 24), M.dark), top = new THREE.Mesh(unitCyl(0.3, 14), M.steel), ring = new THREE.Mesh(new THREE.CylinderGeometry(0.44, 0.44, 0.1, 24), M.steel);
+    for (const m of [nut, body, top, ring]) { m.castShadow = m.receiveShadow = true; scene.add(m); }
+    nut.position.y = s.y; return { nut, body, top, ring, h: 0 };
+  });
+  const coax = ST.map(() => { const m = new THREE.Mesh(unitCyl(0.15, 10), M.steel); m.castShadow = m.receiveShadow = true; scene.add(m); return m; });
+  // photon clouds
+  const MAXP = 150, clouds = ST.map(() => {
+    const g = new THREE.BufferGeometry(), pos = new Float32Array(MAXP * 3);
+    g.setAttribute('position', new THREE.BufferAttribute(pos, 3));
+    const pts = new THREE.Points(g, new THREE.PointsMaterial({ size: 1.9, map: dotTexture(), color: ACC, transparent: true, depthWrite: false, toneMapped: false, sizeAttenuation: true }));
+    pts.frustumCulled = false; scene.add(pts);
+    const seed = Array.from({ length: MAXP }, () => [0.55 + 2.0 * Math.sqrt(Math.random()), Math.random() * TAU, Math.random(), 0.35 + 0.65 * Math.random()]);
+    return { pts, g, pos, seed, count: 0, y0: 0, y1: 0 };
+  });
+  let f = 5e9, dB = [0, 20, 0, 10, 20], ns = [], playing = !RM, tclock = 0;
+  const attH = d => d > 0 ? 0.35 + 0.3 + 0.06 * d + 0.45 : 0.8;
+  function layout() {
+    ST.forEach((s, k) => {
+      if (!k) return;
+      const a = atts[k], d = dB[k - 1], h = attH(d); a.h = h;
+      const bl = d > 0 ? 0.3 + 0.06 * d : 0;
+      a.body.visible = a.ring.visible = d > 0; a.body.position.y = s.y + 0.35; a.body.scale.y = Math.max(bl, 1e-3);
+      a.ring.position.y = s.y + 0.35 + bl; a.top.position.y = s.y + 0.35 + bl; a.top.scale.y = h - 0.35 - bl;
+    });
+    ST.forEach((s, k) => {
+      const yTop = s.y - TP - 0.4, yBot = k < 5 ? ST[k + 1].y + atts[k + 1].h : -19.9;
+      coax[k].position.y = yBot; coax[k].scale.y = yTop - yBot;
+      clouds[k].y0 = yBot + 0.25; clouds[k].y1 = yTop - 0.1;
+    });
+  }
+  function compute() {
+    f = +sF.value * 1e9; dB = SL.map(s => +s.value);
+    ns = C.chain(f, ST.slice(1).map((s, k) => ({ dB: dB[k], T: s.T })));
+    SL.forEach((s, k) => { $('o' + s.id.slice(1)).textContent = dB[k] + ' dB'; });
+    $('o3f').textContent = (+sF.value).toFixed(2) + ' GHz';
+    const n = ns[5], kappa = TAU * 1e6;
+    $('r3n').textContent = fmtN(n); $('r3t').textContent = fmtT(C.Teff(f, n));
+    const tphi = 1 / C.gphi(n, kappa, kappa);
+    $('r3p').textContent = tphi >= 1e-3 ? (tphi * 1e3).toPrecision(3) + ' ms' : (tphi * 1e6).toPrecision(3) + ' µs';
+    // region k (below plate k) carries the occupation after stage k; the top plate has no attenuator
+    clouds.forEach((c, k) => { c.count = Math.round(clamp(22 * (Math.log10(ns[k]) + 3), 0, MAXP)); c.g.setDrawRange(0, c.count); });
+    layout(); drawBars();
+  }
+  function moveClouds() {
+    for (const c of clouds) {
+      for (let i = 0; i < c.count; i++) {
+        const [r, a, y, v] = c.seed[i];
+        const fy = ((y - tclock * 0.09 * v) % 1 + 1) % 1, aa = a + 0.35 * Math.sin(tclock * 0.7 * v + i);
+        c.pos[3 * i] = r * Math.cos(aa); c.pos[3 * i + 1] = lerp(c.y0, c.y1, fy); c.pos[3 * i + 2] = r * Math.sin(aa);
+      }
+      c.g.attributes.position.needsUpdate = true;
+    }
+  }
+  const FOV = 30, tanV = Math.tan(FOV * D2R / 2); let W = 1, H = 1;
+  const target = V3(0, -0.5, 0); let started = false;
+  function placeCam() {
+    const asp = W / H, d = (Math.max(22.5 / tanV, 11 / (tanV * asp)) + 4) * (W < 520 ? 1.08 : 1);
+    const sph = started ? new THREE.Spherical().setFromVector3(camera.position.clone().sub(controls.target)) : new THREE.Spherical(d, 1.2, 0.5); started = true;
+    sph.radius = d; controls.target.copy(target); camera.position.setFromSpherical(sph).add(target);
+    camera.near = 1; camera.far = 400; camera.updateProjectionMatrix(); controls.minPolarAngle = 0.7; controls.maxPolarAngle = 1.7; controls.update();
+  }
+  const right = V3(0, 0, 0), TL = ['300 K', '50 K', '4 K', '0.8 K', '0.1 K', '10 mK'];
+  function overlay() {
+    right.set(1, 0, 0).applyQuaternion(camera.quaternion); right.y = 0; right.normalize();
+    const nar = W < 520, pl = Placer(W, H);
+    const P = (x, y, z) => { const p = V3(x, y, z).project(camera); return [(p.x + 1) / 2 * W, (1 - p.y) / 2 * H]; };
+    ST.forEach((st, k) => {
+      const R = k ? 5.4 : 6.0, [x, y] = P(-right.x * R, st.y - TP / 2, -right.z * R);
+      const tl = nar ? TL[k] : k === 0 ? 'Top plate · 300 K' : `${k < 3 ? st.name : st.name + ' · ' + TL[k]} · <tspan class="a">${dB[k - 1]} dB</tspan>`;
+      pl.add(x, y, nar ? -16 : -24, 0, tl, 1, 'f');
+    });
+    ST.forEach((st, k) => {
+      const c = clouds[k], ym = (c.y0 + c.y1) / 2, [x2, y2] = P(right.x * 2.7, ym, right.z * 2.7);
+      const txt = k === 5 ? `${nar ? 'chip' : 'at the chip'}: <tspan class="m b">n = ${fmtN(ns[k])}</tspan>` : `<tspan class="m">n = ${fmtN(ns[k])}</tspan>`;
+      pl.add(x2, y2, nar ? 22 : 30, 0, txt, 1);
+    });
+    ov.innerHTML = pl.svg;
+  }
+  function render() { fitShadow(key, target, 26); renderer.render(scene, camera); overlay(); }
+  function drawBars() {
+    const { ctx, W: bw, H: bh } = fit(cb); ctx.clearRect(0, 0, bw, bh);
+    const m = { l: 48, r: 14, t: 34, b: 34 }, pw = bw - m.l - m.r, ph = bh - m.t - m.b, lo = -5, hi = 4;
+    const Y = v => m.t + ph - (Math.log10(Math.max(v, 1e-12)) - lo) / (hi - lo) * ph;
+    ctx.font = `400 11px ${MONO}`; ctx.lineWidth = 1;
+    for (let e = lo; e <= hi; e++) {
+      const y = Math.round(Y(Math.pow(10, e))) + 0.5; ctx.strokeStyle = e === 0 ? COL.l2 : COL.li; ctx.beginPath(); ctx.moveTo(m.l, y); ctx.lineTo(m.l + pw, y); ctx.stroke();
+      if ((e - lo) % (ph < 200 ? 3 : 1) === 0) { ctx.fillStyle = COL.mu; ctx.textAlign = 'right'; ctx.textBaseline = 'middle'; ctx.fillText('10' + supN(e), m.l - 6, y); }
+    }
+    ctx.font = `400 12px ${SANS}`; ctx.fillStyle = COL.mu; ctx.textAlign = 'left'; ctx.textBaseline = 'alphabetic'; ctx.fillText('photons per mode, after each stage', 10, 20);
+    const nb = ns.length, slot = pw / nb, w = Math.min(28, slot * 0.55);
+    ns.forEach((n, k) => {
+      const xc = m.l + slot * (k + 0.5), y = Y(n), yb = Y(Math.pow(10, lo));
+      ctx.fillStyle = k === nb - 1 ? COL.ac : COL.fg; ctx.fillRect(xc - w / 2, Math.min(y, yb), w, Math.abs(yb - y));
+      if (k > 0) { const yt = Y(C.nth(f, ST[k].T)); if (yt > m.t && yt < m.t + ph) { ctx.strokeStyle = COL.fa; ctx.lineWidth = 2; ctx.beginPath(); ctx.moveTo(xc - w / 2 - 5, yt); ctx.lineTo(xc + w / 2 + 5, yt); ctx.stroke(); ctx.lineWidth = 1; } }
+      ctx.font = `400 11px ${SANS}`; ctx.fillStyle = COL.mu; ctx.textAlign = 'center'; ctx.textBaseline = 'top'; ctx.fillText(ST[k].short, xc, m.t + ph + 8);
+    });
+  }
+  const loop = Loop(dt => { tclock += dt; moveClouds(); render(); }, () => playing);
+  controls.addEventListener('change', render);
+  for (const el of [...SL, sF]) el.addEventListener('input', () => { compute(); moveClouds(); render(); });
+  bP.addEventListener('click', () => { playing = !playing; setBtn(bP, playing); loop.kick(); });
+  function resize() { W = cv.clientWidth; H = cv.clientHeight; if (!W || !H) return; renderer.setSize(W, H, false); camera.aspect = W / H; placeCam(); render(); }
+  compute(); moveClouds(); setBtn(bP, playing);
+  camera.position.set(0, 0, 1); new ResizeObserver(resize).observe(cv); watchSize(cb, drawBars);
+  watchVisible(cv, v => loop.setVisible(v));
+})();
+
+/* ====================================================================================
+   Figure 5: the sample package (units: millimetres)
+   ==================================================================================== */
+(function packageFig() {
+  const cv = $('f5'), ov = $('f5-ov'), sL = $('s5l'), sZ = $('s5z'), sA = $('s5a'), cM = $('c5m');
+  const S = studio(cv, { shadow: 2048, fov: 30 }); if (!S) return;
+  const { renderer, scene, camera, controls, key } = S; const M = makeMats();
+  const pkg = buildPackage(M, { pocket: 12, stubs: true }); scene.add(pkg.group);
+  pkg.group.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
+  const floor = new THREE.Mesh(new THREE.PlaneGeometry(1000, 1000).rotateX(-Math.PI / 2), new THREE.ShadowMaterial({ opacity: 0.14 })); floor.position.y = -6.52; floor.receiveShadow = true; scene.add(floor);
+  // the lowest pocket mode: |E| ~ sin(pi x/a) sin(pi z/a), drawn as a red sheet in the pocket
+  const mc = document.createElement('canvas'); mc.width = mc.height = 64; { const x = mc.getContext('2d'), im = x.createImageData(64, 64); for (let j = 0; j < 64; j++) for (let i = 0; i < 64; i++) { const v = Math.sin(Math.PI * (i + 0.5) / 64) * Math.sin(Math.PI * (j + 0.5) / 64), o = 4 * (j * 64 + i); im.data[o] = im.data[o + 1] = im.data[o + 2] = 255; im.data[o + 3] = Math.round(255 * 0.8 * v * v); } x.putImageData(im, 0, 0); }
+  const modeTex = new THREE.CanvasTexture(mc); modeTex.colorSpace = THREE.SRGBColorSpace;
+  const sheet = new THREE.Mesh(new THREE.PlaneGeometry(1, 1).rotateX(-Math.PI / 2), new THREE.MeshBasicMaterial({ map: modeTex, color: ACC, transparent: true, depthWrite: false, toneMapped: false, side: THREE.DoubleSide }));
+  sheet.position.y = 1.75; sheet.renderOrder = 5; scene.add(sheet);
+  const FOV = 30, tanV = Math.tan(FOV * D2R / 2);
+  let W = 1, H = 1, lidU = 0, zoom = 0, dist = 200, az = 0.62, polOff = 0, placing = false;
+  const T0 = V3(0, 1.0, 0), T1 = V3(-1.2, 0, 1.45), target = V3(0, 0, 0), sph = new THREE.Spherical();
+  const polBase = () => lerp(1.0, 0.62, sstep(0.25, 1, zoom));
+  const lidNeed = () => sstep(0.06, 0.3, zoom);
+  function place() {
+    placing = true;
+    const asp = W / H, d0 = Math.max(47 / (tanV * asp), 30 / tanV) + 12, d1 = 1.15 / (tanV * Math.min(asp, 1.4));
+    dist = d0 * Math.pow(d1 / d0, zoom);
+    target.copy(T1).lerp(T0, (dist - d1) / (d0 - d1));
+    const pb = polBase(); controls.minPolarAngle = Math.max(0.15, pb - 0.55); controls.maxPolarAngle = Math.min(pb + 0.45, 1.5);
+    sph.set(dist, clamp(pb + polOff, controls.minPolarAngle, controls.maxPolarAngle), az);
+    camera.position.setFromSpherical(sph).add(target); controls.target.copy(target);
+    camera.near = Math.max(0.01, dist * 0.02); camera.far = dist * 4 + 300; camera.updateProjectionMatrix();
+    controls.update(); placing = false;
+  }
+  function apply() {
+    lidPose(pkg.lid, lidU);
+    const a = pkg.getPocket(); sheet.scale.set(a, 1, a);
+    sheet.visible = cM.checked && lidU < 0.5; sheet.material.opacity = 1 - sstep(0.05, 0.5, lidU);
+    const fb = C.fbox(a / 1000, a / 1000) / 1e9;
+    $('o5a').textContent = a.toFixed(1) + ' mm'; $('r5f').textContent = fb.toFixed(1) + ' GHz';
+    $('r5v').textContent = fb > 12 ? 'well above qubits and resonators (4–8 GHz)' : fb > 8 ? 'just above the 4–8 GHz band: too close for comfort' : 'inside the 4–8 GHz band: the box would couple to qubits and resonators';
+    $('o5l').textContent = lidU < 0.01 ? 'closed' : 'lifted ' + Math.round(26 * sstep(0, 0.6, lidU)) + ' mm';
+    const vw = 2 * dist * tanV * Math.max(1, W / H); $('o5z').textContent = 'view ' + (vw >= 10 ? vw.toFixed(0) : vw.toPrecision(2)) + ' mm';
+    pkg.setGhost(cM.checked ? 0.28 : 1);
+  }
+  controls.addEventListener('change', () => { if (placing) return; az = controls.getAzimuthalAngle(); polOff = controls.getPolarAngle() - polBase(); render(); });
+  const lp = V3(0, 0, 0), wl = (obj, x, y, z) => obj.localToWorld(lp.set(x, y, z)).clone();
+  const LB = [
+    { t: 'Copper lid', at: () => wl(pkg.lid, -10, 6, 10), d: [-36, -24], op: () => (1 - sstep(0.3, 0.6, lidU)) * (1 - sstep(0.1, 0.2, zoom)) },
+    { t: 'Copper base', at: () => V3(-10, -4, 16), d: [-36, 18], op: () => (W < 520 ? 0 : 1) * (1 - sstep(0.1, 0.2, zoom)) },
+    { t: 'Circuit board', at: () => V3(10, -0.25, 16), d: [30, 26], op: () => 1 - sstep(0.12, 0.22, zoom) },
+    { t: 'SMA connector', at: () => V3(-22, 4.2, 0), d: [-30, -30], op: () => 1 - sstep(0.1, 0.2, zoom) },
+    { t: 'Coaxial cable', at: () => V3(38, 16, 0), d: [30, -10], op: () => 1 - sstep(0.1, 0.2, zoom) },
+    { t: () => `Pocket, ${pkg.getPocket().toFixed(0)} × ${pkg.getPocket().toFixed(0)} mm`, at: () => wl(pkg.lid, pkg.getPocket() / 2, 0, pkg.getPocket() / 2), d: [36, 26], op: () => sstep(0.6, 0.9, lidU) * (1 - sstep(0.12, 0.22, zoom)) },
+    { t: 'Coplanar-waveguide trace', at: () => V3(-9.5, 0.05, 0), d: [-20, -46], op: () => sstep(0.5, 0.8, lidU) * fade(zoom, [-1, 0, 0.3, 0.42]) },
+    { t: 'Via fence', at: () => V3(-6.4, 0.06, 1.15), d: [-26, 44], op: () => (W < 520 ? 0 : 1) * fade(zoom, [0.12, 0.2, 0.3, 0.4]) },
+    { t: 'Chip, 6 × 6 mm', at: () => V3(2.5, 0.02, 2.5), d: [40, 30], op: () => sstep(0.6, 0.9, lidU) * fade(zoom, [-1, 0, 0.42, 0.52]) },
+    { t: 'Wire bonds', at: () => V3(-3.15, 0.3, 0.1), d: [-36, -34], op: () => fade(zoom, [0.22, 0.3, 0.6, 0.7]) },
+    { t: 'Ground bonds', at: () => V3(3.4, 0.25, -2.2), d: [36, -30], op: () => fade(zoom, [0.22, 0.3, 0.52, 0.6]) },
+    { t: 'Feedline', at: () => V3(0.4, 0.012, 0), d: [36, -28], op: () => fade(zoom, [0.4, 0.5, 2, 2]) },
+    { t: 'Readout resonator', at: () => V3(-1.88, 0.012, 0.9), d: [-40, -6], op: () => fade(zoom, [0.48, 0.58, 2, 2]) },
+    { t: 'Transmon: two pads', at: () => V3(-1.6, 0.012, 1.75), d: [-40, 22], op: () => fade(zoom, [0.48, 0.58, 2, 2]) },
+    { t: 'Drive line', at: () => V3(-1.2, 0.012, 2.3), d: [36, 22], op: () => fade(zoom, [0.48, 0.58, 2, 2]) },
+    { t: 'Josephson junction', at: () => V3(-1.2, 0.018, 1.62), d: [44, -26], op: () => fade(zoom, [0.78, 0.88, 2, 2]) }
+  ];
+  function overlay() {
+    const pl = Placer(W, H); pl.block(0, H - 40, 140, H);
+    for (const L of LB) {
+      const op = L.op(); if (op < 0.01) continue;
+      const p = L.at().project(camera); if (p.z > 1 || Math.abs(p.x) > 1.1 || Math.abs(p.y) > 1.1) continue;
+      pl.add((p.x + 1) / 2 * W, (1 - p.y) / 2 * H, L.d[0], L.d[1], typeof L.t === 'function' ? L.t() : L.t, op);
+    }
+    pl.raw(scaleBar(H / (2 * dist * tanV), 0.1, W, H));
+    ov.innerHTML = pl.svg;
+  }
+  function render() { fitShadow(key, target, Math.max(dist * tanV * Math.max(1, W / H) * 1.3, 0.5)); renderer.render(scene, camera); overlay(); }
+  sL.addEventListener('input', () => { lidU = Math.max(+sL.value, lidNeed()); sL.value = lidU; apply(); render(); });
+  sZ.addEventListener('input', () => { zoom = +sZ.value; if (lidU < lidNeed()) { lidU = lidNeed(); sL.value = lidU; } place(); apply(); render(); });
+  sA.addEventListener('input', () => { pkg.setPocket(+sA.value); apply(); render(); });
+  cM.addEventListener('change', () => { apply(); render(); });
+  function resize() { W = cv.clientWidth; H = cv.clientHeight; if (!W || !H) return; renderer.setSize(W, H, false); camera.aspect = W / H; place(); apply(); render(); }
+  new ResizeObserver(resize).observe(cv);
+})();
+</script>
+</body>
+</html>
