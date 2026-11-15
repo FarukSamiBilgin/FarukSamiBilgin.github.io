@@ -1,0 +1,1419 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Taking a quantum computer apart — Faruk Sami Bilgin</title>
+<meta name="description" content="An interactive three-dimensional teardown of a superconducting quantum computer, from the closed dilution refrigerator down to the atoms of a Josephson junction, driven by one slider.">
+<meta property="og:title" content="Taking a quantum computer apart">
+<meta property="og:description" content="A dilution refrigerator taken apart one layer at a time, down to the chip, the junction and its oxide barrier, a few atoms thick.">
+<meta name="color-scheme" content="light">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect width='32' height='32' fill='%230a0a0a'/%3E%3Cg fill='%23f2f2f0'%3E%3Ccircle cx='9' cy='11' r='1.8'/%3E%3Ccircle cx='16' cy='11' r='1.8'/%3E%3Ccircle cx='23' cy='11' r='1.8'/%3E%3Ccircle cx='12.5' cy='17' r='1.8'/%3E%3Ccircle cx='19.5' cy='17' r='1.8'/%3E%3Ccircle cx='9' cy='23' r='1.8'/%3E%3Ccircle cx='16' cy='23' r='1.8'/%3E%3Ccircle cx='23' cy='23' r='1.8'/%3E%3C/g%3E%3C/svg%3E">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans:wght@300;400;500;600&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&display=swap" rel="stylesheet">
+<script type="importmap">
+{ "imports": {
+  "three": "https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js",
+  "three/addons/": "https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/"
+} }
+</script>
+<style>
+:root{
+  --sans:"IBM Plex Sans",-apple-system,"Segoe UI",Helvetica,Arial,sans-serif;
+  --serif:"Source Serif 4",Georgia,"Times New Roman",serif;
+  --mono:"IBM Plex Mono",ui-monospace,Consolas,Menlo,monospace;
+  --bg:#f4f4f1;--fg:#121212;--muted:#5c5c57;--faint:#93938d;--line:#dbdbd5;--line2:#c4c4bd;--accent:#cf1f25;
+  --ink:#0a0a0a;--dfg:#ecebe6;--dmu:#a6a59e;--dfa:#6c6b66;--dline:#262624;--gold:#e2b65c;
+  --bar:52px;
+}
+*{box-sizing:border-box}
+html{background:var(--bg)}
+body{margin:0;background:var(--bg);color:var(--fg);font:400 19px/1.65 var(--serif);-webkit-font-smoothing:antialiased;text-rendering:optimizeLegibility}
+a{color:inherit;text-decoration-color:var(--line2);text-underline-offset:3px}
+a:hover{text-decoration-color:var(--accent)}
+.sr{position:absolute!important;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
+
+.top{position:fixed;inset:0 0 auto 0;z-index:20;height:var(--bar);display:flex;align-items:center;justify-content:space-between;padding:0 40px;font:500 12px var(--sans);letter-spacing:.16em;text-transform:uppercase;color:#f2f2f0;background:#0a0a0a;border-bottom:1px solid #262626}
+.top a{text-decoration:none}
+
+.col{max-width:728px;margin:0 auto;padding:0 24px}
+.head{padding-top:148px;padding-bottom:20px}
+.kicker{font:500 12px/1.4 var(--sans);letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+h1{font:600 clamp(40px,8.2vw,64px)/1.02 var(--sans);letter-spacing:-.035em;margin:22px 0 22px}
+.dek{font-size:21px;line-height:1.5;color:var(--muted);margin:0 0 26px}
+.by{font:400 15px var(--sans);color:var(--muted);padding-bottom:30px;border-bottom:1px solid var(--line)}
+.by b{font-weight:500;color:var(--fg)}
+article p{margin:0 0 1.05em}
+.intro{padding-top:28px;padding-bottom:40px}
+.hint{font:400 15px/1.55 var(--sans);color:var(--muted)}
+.hint kbd{font:500 12.5px var(--mono);border:1px solid var(--line2);border-bottom-width:2px;border-radius:4px;padding:0 5px;background:#fff;color:var(--fg)}
+
+/* the teardown: a tall scroll track with a sticky, full-viewport stage */
+.tear{position:relative;background:var(--ink)}
+.stage{position:sticky;top:var(--bar);height:calc(100vh - var(--bar));height:calc(100svh - var(--bar));overflow:hidden;color:var(--dfg);
+  background:radial-gradient(110% 85% at 40% 42%,#151514 0%,#0d0d0c 55%,#0a0a0a 100%)}
+.stage canvas{position:absolute;inset:0;width:100%;height:100%;display:block;cursor:grab;touch-action:pan-y;outline:none}
+.stage canvas:active{cursor:grabbing}
+.ov{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;overflow:visible}
+.ov text{font:400 12.5px var(--sans);fill:#e9e8e2}
+.ov .m{font-family:var(--mono);font-size:12px}
+.ov .g{fill:var(--gold)}
+.ov .b{font-weight:500;fill:#fbfaf6}
+.ov .t{font:500 12.5px var(--mono);fill:var(--gold)}
+.nogl{position:absolute;inset:0;display:grid;place-items:center;padding:24px;font:400 15px var(--sans);color:var(--dmu);text-align:center}
+
+.scale{position:absolute;left:22px;top:18px;font:500 12px var(--mono);color:#dcdad3;pointer-events:none;letter-spacing:.02em}
+.scale .sb{display:block;height:7px;border:1.5px solid #dcdad3;border-top:0;margin-top:5px;width:80px;transition:width .12s linear}
+.scale .sl{font:500 10.5px var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--dfa);display:block;margin-bottom:3px}
+
+.steps{position:absolute;top:14px;right:14px;bottom:76px;width:262px;display:flex;flex-direction:column;pointer-events:none}
+.steps .sh{font:500 10.5px var(--sans);letter-spacing:.16em;text-transform:uppercase;color:var(--dfa);padding:6px 10px 6px;pointer-events:auto}
+.stoggle{display:none}
+.steps ol{list-style:none;margin:0;padding:4px;overflow:auto;pointer-events:auto;background:rgba(12,12,11,.62);border:1px solid var(--dline);border-radius:10px;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);scrollbar-width:thin;scrollbar-color:#333 transparent}
+.sbtn{display:flex;align-items:baseline;gap:10px;width:100%;text-align:left;background:none;border:0;border-radius:6px;color:var(--dmu);font:400 13px/1.3 var(--sans);padding:5.5px 9px;cursor:pointer}
+.sbtn .n{font:500 11px var(--mono);color:var(--dfa);min-width:1.7em}
+.sbtn:hover{color:#f5f4ef;background:rgba(255,255,255,.04)}
+.sbtn.done{color:#cfcdc6}
+.sbtn[aria-current=step]{background:rgba(226,182,92,.14);color:#fbfaf6}
+.sbtn[aria-current=step] .n{color:var(--gold)}
+.sbtn:focus-visible,.dbtn:focus-visible,.stoggle:focus-visible{outline:2px solid var(--gold);outline-offset:1px}
+
+.cap{position:absolute;left:18px;bottom:76px;width:min(410px,calc(100% - 320px));background:rgba(12,12,11,.74);border:1px solid var(--dline);border-radius:10px;padding:14px 17px 15px;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+.cap .ck{font:500 11px/1.3 var(--mono);letter-spacing:.05em;color:var(--gold)}
+.cap .ck span{color:var(--dfa)}
+.cap h2{font:600 19px/1.22 var(--sans);letter-spacing:-.012em;margin:5px 0 6px;color:#fbfaf6}
+.cap p{font:400 14.2px/1.52 var(--sans);color:#cbc9c2;margin:0}
+
+.ctl{position:absolute;left:0;right:0;bottom:0;height:62px;display:flex;align-items:center;gap:12px;padding:0 18px;background:linear-gradient(to top,rgba(10,10,10,.96),rgba(10,10,10,.78));border-top:1px solid #1d1d1b}
+.ctl .lab{font:500 11.5px var(--sans);letter-spacing:.14em;text-transform:uppercase;color:var(--dmu);white-space:nowrap}
+.ctl input[type=range]{flex:1;min-width:60px;accent-color:var(--gold);height:22px;margin:0}
+.ctl input[type=range]:focus-visible{outline:2px solid var(--gold);outline-offset:3px}
+.ctl .pos{font:500 12px var(--mono);color:var(--gold);min-width:4.6em;text-align:right}
+.dbtn{font:500 13px/1 var(--sans);color:#ecebe6;background:transparent;border:1px solid #3a3a37;border-radius:999px;padding:8px 14px;cursor:pointer;white-space:nowrap}
+.dbtn:hover{border-color:#8d8b84}
+.dbtn:disabled{opacity:.35;cursor:default;border-color:#3a3a37}
+.dbtn .i{font-family:var(--mono)}
+
+.after{padding-top:56px}
+.further{margin-top:48px;border-top:1px solid var(--line2);padding-top:22px}
+.further h3{font:500 12px/1.4 var(--sans);letter-spacing:.16em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+.further ul{list-style:none;margin:0;padding:0}
+.further li{padding:11px 0;border-bottom:1px solid var(--line);font:400 15.5px/1.5 var(--sans);color:var(--muted)}
+.further li a{color:var(--fg);font-weight:500;text-decoration:none;border-bottom:1px solid var(--line2)}
+.further li a:hover{border-color:var(--accent)}
+
+footer{margin-top:90px;background:#0a0a0a;color:#9b9b96;font:400 14.5px/1.6 var(--sans);padding:60px 0 90px;border-top:1px solid #262626}
+footer .in{max-width:1028px;margin:0 auto;padding:0 24px;display:grid;grid-template-columns:1fr auto;gap:24px 48px}
+footer p{margin:0 0 8px;max-width:42em}
+footer a{color:#f2f2f0;text-decoration-color:#3a3a38}
+footer .r{text-align:right}
+
+@media (max-width:980px){
+  .steps{width:224px}
+  .cap{width:min(380px,calc(100% - 272px))}
+}
+@media (max-width:720px){
+  .top{padding:0 16px;letter-spacing:.1em}
+  .top .long{display:none}
+  body{font-size:18px}
+  .col{padding-left:16px;padding-right:16px}
+  .head{padding-top:110px}
+  .dek{font-size:19px}
+  .scale{left:14px;top:58px}
+  .steps{left:10px;right:10px;top:10px;bottom:auto;width:auto;max-height:calc(100% - 90px)}
+  .steps .sh{display:none}
+  .stoggle{display:flex;align-items:center;justify-content:space-between;gap:10px;width:100%;pointer-events:auto;font:500 13px/1.2 var(--sans);color:#f3f2ed;background:rgba(12,12,11,.8);border:1px solid var(--dline);border-radius:10px;padding:9px 12px;cursor:pointer;text-align:left;backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px)}
+  .stoggle .n{font:500 11.5px var(--mono);color:var(--gold);margin-right:8px}
+  .stoggle .chev{font:500 12px var(--mono);color:var(--dmu)}
+  .steps ol{display:none;margin-top:6px;max-height:min(58vh,440px);background:rgba(12,12,11,.92)}
+  .steps.open ol{display:block}
+  .cap{left:8px;right:8px;bottom:60px;width:auto;padding:8px 11px 9px}
+  .cap .ck{font-size:10.5px}
+  .cap h2{font-size:15px;margin:2px 0 3px}
+  .cap p{font-size:12.5px;line-height:1.42}
+  .ov text{font-size:11px}
+  .ov .m,.ov .t{font-size:10.5px}
+  .ctl{height:56px;gap:7px;padding:0 10px}
+  .ctl .lab,.ctl .pos{display:none}
+  .dbtn{padding:8px 11px}
+  .dbtn .w{display:none}
+  footer .in{grid-template-columns:1fr}
+  footer .r{text-align:left}
+}
+</style>
+</head>
+<body>
+
+<div class="top"><a href="../">Faruk Sami Bilgin</a><a href="../#contents">Notes<span class="long"> on quantum devices</span></a></div>
+
+<article>
+<header class="head col">
+  <div class="kicker">A teardown · Notes on quantum devices</div>
+  <h1>Taking a quantum computer apart</h1>
+  <p class="dek">A superconducting quantum computer is mostly refrigerator. The qubits are patches of aluminium on a chip a few millimetres across; keeping them quantum takes a machine taller than a person, colder than outer space, and wired with dozens of cables that must not let any heat in. Here it comes apart one layer at a time, from the closed cryostat down to the few atoms that make a qubit a qubit.</p>
+  <div class="by"><b>Faruk Sami Bilgin</b> · November 2026</div>
+</header>
+<div class="col intro">
+  <p>Each step removes one part and says what it was for. Notice the pattern as you go down: every layer exists to keep heat, noise or stray radiation away from the layer inside it, and every stage is colder and smaller than the one around it, until the last thing left is a barrier of oxide a few atoms thick.</p>
+  <p class="hint">Scroll, drag the slider at the bottom of the figure, or use <kbd>←</kbd> <kbd>→</kbd> to step. Drag the model to turn it.</p>
+</div>
+
+<section class="tear" id="tear" aria-label="Interactive teardown of a dilution refrigerator">
+  <div class="stage" id="stage">
+    <canvas id="cv" role="img" aria-label="Three-dimensional model of a dilution refrigerator, closed."></canvas>
+    <svg class="ov" id="ov" aria-hidden="true"></svg>
+    <div class="scale" id="scale" aria-hidden="true"><span class="sl">Scale</span><span id="scaleT">1 m</span><span class="sb" id="scaleB"></span></div>
+    <nav class="steps" id="steps" aria-label="Teardown steps">
+      <div class="sh">Steps</div>
+      <button class="stoggle" id="stoggle" type="button" aria-expanded="false" aria-controls="slist"><span><span class="n" id="stogN">01</span><span id="stogT">The closed cryostat</span></span><span class="chev" aria-hidden="true">▾</span></button>
+      <ol id="slist"></ol>
+    </nav>
+    <div class="cap" id="cap" aria-live="polite">
+      <div class="ck" id="capK">Step 1 of 16</div>
+      <h2 id="capT">The closed cryostat</h2>
+      <p id="capP"></p>
+    </div>
+    <div class="ctl">
+      <button class="dbtn" id="prev" type="button" aria-label="Previous step"><span class="i" aria-hidden="true">←</span><span class="w"> Previous</span></button>
+      <label class="lab" for="master">Take it apart</label>
+      <input type="range" id="master" min="0" max="1" step="0.0005" value="0" aria-label="Take it apart">
+      <output class="pos" id="pos" for="master">1 / 16</output>
+      <button class="dbtn" id="next" type="button" aria-label="Next step"><span class="w">Next </span><span class="i" aria-hidden="true">→</span></button>
+      <button class="dbtn" id="reset" type="button">Reset<span class="w"> view</span></button>
+    </div>
+  </div>
+</section>
+
+<div class="col after">
+  <p>Going back up, the order is the logic of the whole machine. The barrier is the qubit's only nonlinear element, and it works only while nothing breaks the Cooper pairs that tunnel through it and nothing excites the circuit around it. So the film is aluminium, superconducting below about 1.2 K; the chip sits in a closed copper box inside a magnetic shield; the lines that reach it are attenuated and filtered stage by stage; the amplifiers that listen to it are cold and close; and the whole stack is wrapped in shields at successively lower temperatures, inside a vacuum. Everything above the junction is there so that the junction sees almost nothing but the pulses we send it.</p>
+  <section class="further" aria-labelledby="further-h">
+    <h3 id="further-h">Further in my notes</h3>
+    <ul>
+      <li><a href="../cryostat/">The machine around a qubit</a> — the dilution refrigerator, its attenuators and amplifiers and the sample box, with the numbers worked out.</li>
+      <li><a href="../josephson/">The Josephson junction</a> — from phase and the Josephson relations to the transmon and Rabi oscillations.</li>
+      <li><a href="../">Notes on quantum devices</a> — the contents page.</li>
+    </ul>
+  </section>
+</div>
+</article>
+
+<footer>
+  <div class="in">
+    <div>
+      <p>Faruk Sami Bilgin — independent researcher in quantum devices.</p>
+      <p>Every part on this page is modelled in your browser. Sizes are not to scale between steps: each step is drawn at its own scale, shown by the scale bar, and features too small to see are sometimes enlarged. Temperatures, attenuations and gains are typical values; every system differs.</p>
+    </div>
+    <div class="r">
+      <p><a href="../">Notes on quantum devices</a></p>
+      <p><a href="../cryostat/">The machine around a qubit</a></p>
+      <p><a href="../josephson/">The Josephson junction</a></p>
+    </div>
+  </div>
+</footer>
+<noscript><p style="text-align:center;font:400 15px sans-serif">The teardown needs JavaScript and WebGL.</p></noscript>
+
+<script type="module">
+import * as THREE from 'three';
+import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+import { RoundedBoxGeometry } from 'three/addons/geometries/RoundedBoxGeometry.js';
+import { mergeGeometries } from 'three/addons/utils/BufferGeometryUtils.js';
+
+/* ====================================================================================
+   The steps. Each owns one window of the master value [0, 1]; its parts move only
+   inside that window, so one step finishes before the next begins.
+   ==================================================================================== */
+const STEPS = [
+  { title: 'The closed cryostat', meta: '300 K · about 1.6 m tall',
+    text: 'This is the machine as it stands in the lab: a steel vacuum can hanging from a top plate at room temperature. On top sit the head of the pulse-tube cooler, which does the first cooling, and the lines that pump the helium mixture round.' },
+  { title: 'The vacuum can', meta: '300 K · holds the vacuum',
+    text: 'Two dozen bolts hold the outer vacuum can to the top plate. The can stays at room temperature; its job is to hold a vacuum, so that no gas can carry heat to the cold parts inside.' },
+  { title: 'The 50 K shield', meta: 'about 50 K',
+    text: 'Inside hangs a radiation shield bolted to the first cold plate. A surface at room temperature radiates about 46 mW per square centimetre; this shield catches that heat and hands it to the first stage of the pulse tube.' },
+  { title: 'The 4 K shield', meta: 'about 4 K',
+    text: 'The next shield hangs from the 4 K plate, cooled by the second stage of the pulse tube. A surface at 4 K radiates about twenty thousand times less than one at 50 K.' },
+  { title: 'The still shield', meta: 'about 0.8 K',
+    text: 'The last shield, gold-plated copper, hangs from the still plate below one kelvin. Behind it the coldest stages see almost no thermal radiation at all.' },
+  { title: 'The chandelier', meta: 'five stages · plates 40–70 cm across',
+    text: 'This is the part in every photograph: gold-plated copper plates, each colder than the one above, hung on thin stainless-steel rods that carry little heat. Dozens of semi-rigid coaxial cables run down through them; their loops let each cable shrink as it cools without pulling on its connectors.' },
+  { title: 'Five temperatures', meta: '50 K → 4 K → 0.8 K → 0.1 K → 10 mK',
+    text: 'Pulled apart, the stages are about 50 K, 4 K, the still at 0.8 K, the cold plate at 0.1 K and the mixing chamber at 10 mK. Each has a smaller cooling budget than the one above it: watts at 4 K, microwatts at the bottom.' },
+  { title: 'Input attenuators', meta: 'drive and readout lines · typical values',
+    text: 'Every line that carries pulses down to the chip passes through attenuators, typically −20 dB at 4 K, −10 dB on the cold plate and −20 dB at the mixing chamber. Each one absorbs the thermal noise coming from the warmer stage above and adds only its own, colder noise.' },
+  { title: 'Output amplifiers', meta: 'readout lines · typical values',
+    text: 'The answer from the chip comes back up separate lines. At the mixing chamber, isolators stop noise travelling down and a travelling-wave parametric amplifier (TWPA) adds about 20 dB close to the quantum limit; at 4 K a HEMT transistor amplifier adds about 40 dB more.' },
+  { title: 'The dilution unit', meta: 'still ≈ 0.8 K · mixing chamber ≈ 10 mK',
+    text: 'Everything below one kelvin is cooled here. In the mixing chamber a liquid of almost pure ³He floats on a dilute phase of ³He in ⁴He; ³He atoms crossing into the dilute phase absorb heat, and the still distils them off so that they can be pumped round again.' },
+  { title: 'The magnetic shield', meta: 'about 10 mK',
+    text: 'Below the mixing-chamber plate a can of high-permeability metal keeps magnetic fields away from the chip, because flux trapped in a superconducting film causes loss. Inside it, a gold-plated copper cold finger holds the sample box.' },
+  { title: 'The sample box', meta: 'copper box · 32 mm',
+    text: 'Four small cap screws hold the lid of the copper sample box. The lid closes a small cavity over the chip, kept small so that its microwave modes lie well above the qubit frequencies.' },
+  { title: 'The chip comes out', meta: 'chip 6 × 6 mm · bonds 25 µm',
+    text: 'The chip sits in a pocket of a circuit board, joined to it by aluminium wire bonds 25 µm thick: a few carry signals, the many others tie the chip’s ground to the board. With the bonds cut, the chip lifts out.' },
+  { title: 'The chip', meta: 'film ≈ 100 nm on 0.5 mm of silicon',
+    text: 'The circuit is an aluminium film about 100 nm thick on a silicon substrate. A feedline crosses the chip; each of the two transmons is a pair of capacitor pads joined by a junction, read out through a quarter-wave resonator, the meander, that couples to the feedline.' },
+  { title: 'The junction', meta: 'overlap ≈ 200 nm · barrier ≈ 1–2 nm',
+    text: 'Between the pads, two thin leads meet. Where they overlap, over an area about 200 nm across, the bottom aluminium electrode is covered with its own oxide and the top electrode lies on it. Lift the top electrode and the barrier is left: amorphous AlOx, 1 to 2 nm thick.' },
+  { title: 'Atoms', meta: 'a = 4.05 Å · barrier a few atoms thick',
+    text: 'At the scale of atoms the electrodes are aluminium crystals, face-centred cubic with a lattice constant of 4.05 Å, and the barrier is a disordered layer of aluminium and oxygen a few atoms thick. Cooper pairs tunnel through it; this barrier is the qubit’s only nonlinear element.' }
+];
+const N = STEPS.length;
+const REST = i => i === N - 1 ? 1 : (i + 0.965) / N;     // where a step's motion has finished
+
+/* ---------- small helpers ---------- */
+const $ = id => document.getElementById(id);
+const RM = !!(window.matchMedia && matchMedia('(prefers-reduced-motion: reduce)').matches);
+const TAU = Math.PI * 2, D2R = Math.PI / 180;
+const sstep = (a, b, x) => { const t = Math.min(1, Math.max(0, (x - a) / (b - a))); return t * t * (3 - 2 * t); };
+const ease = t => t * t * t * (t * (t * 6 - 15) + 10);
+const lerp = (a, b, t) => a + (b - a) * t;
+const clamp = (x, a, b) => Math.min(b, Math.max(a, x));
+const V3 = (x, y, z) => new THREE.Vector3(x, y, z);
+const UP = V3(0, 1, 0);
+const pol = (r, deg) => [r * Math.cos(deg * D2R), r * Math.sin(deg * D2R)];
+function mulberry32(a) { return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let t = Math.imul(a ^ a >>> 15, 1 | a); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+
+/* ---------- geometry helpers (from the cryostat article, extended) ---------- */
+function prep(g) {
+  if (g.index) { const n = g.toNonIndexed(); g.dispose(); g = n; }
+  for (const k of Object.keys(g.attributes)) if (k !== 'position' && k !== 'normal') g.deleteAttribute(k);
+  if (!g.attributes.normal) g.computeVertexNormals();
+  g.morphAttributes = {}; return g;
+}
+function prepI(g) {
+  for (const k of Object.keys(g.attributes)) if (k !== 'position' && k !== 'normal') g.deleteAttribute(k);
+  if (!g.attributes.normal) g.computeVertexNormals();
+  g.morphAttributes = {}; return g;
+}
+class Bucket {           // collects geometry per material and merges it into one mesh per material
+  constructor(indexed = false) { this.m = new Map(); this.ix = indexed; }
+  add(mat, g) { g = this.ix ? prepI(g) : prep(g); if (!this.m.has(mat)) this.m.set(mat, []); this.m.get(mat).push(g); return this; }
+  build(parent, { dy = 0, cast = true, recv = true } = {}) {
+    const out = [];
+    for (const [mat, list] of this.m) {
+      const g = mergeGeometries(list); if (dy) g.translate(0, dy, 0); g.computeBoundingSphere();
+      const mesh = new THREE.Mesh(g, mat); mesh.castShadow = cast; mesh.receiveShadow = recv; parent.add(mesh); out.push(mesh);
+      for (const x of list) x.dispose();
+    }
+    this.m.clear(); return out;
+  }
+}
+const merge = list => mergeGeometries(list.map(prep));
+const cylY = (r, y0, y1, x = 0, z = 0, seg = 16) => new THREE.CylinderGeometry(r, r, Math.abs(y1 - y0), seg).translate(x, (y0 + y1) / 2, z);
+const hexY = (r, y0, y1, x = 0, z = 0) => cylY(r, y0, y1, x, z, 6);
+const boxG = (w, h, d, x = 0, y = 0, z = 0) => new THREE.BoxGeometry(w, h, d).translate(x, y, z);
+const rbox = (w, h, d, r, x = 0, y = 0, z = 0) => new RoundedBoxGeometry(w, h, d, 2, r).translate(x, y, z);
+const tube = (curve, r, n = 24, rs = 8) => new THREE.TubeGeometry(curve, n, r, rs, false);
+const cr = pts => new THREE.CatmullRomCurve3(pts, false, 'centripetal');
+function cylAx(r, A, B, seg = 12) {
+  const d = B.clone().sub(A), L = d.length(), g = new THREE.CylinderGeometry(r, r, L, seg).translate(0, L / 2, 0);
+  g.applyQuaternion(new THREE.Quaternion().setFromUnitVectors(UP, d.normalize())); return g.translate(A.x, A.y, A.z);
+}
+/* lathe of a closed profile [[r, y, smooth?], ...] traversed anticlockwise in the (r, y) plane, starting mid-edge */
+function lathePts(prof) {
+  const pts = [];
+  prof.forEach((p, i) => { const v = new THREE.Vector2(Math.max(0, p[0]), p[1]); pts.push(v); if (i > 0 && !p[2]) pts.push(v.clone()); });
+  pts.push(new THREE.Vector2(Math.max(0, prof[0][0]), prof[0][1]));
+  return pts;
+}
+function capGeo(prof, phi, sign) {
+  const contour = prof.map(p => new THREE.Vector2(p[0], p[1]));
+  const tris = THREE.ShapeUtils.triangulateShape(contour, []);
+  const s = Math.sin(phi), c = Math.cos(phi), n = V3(sign * c, 0, -sign * s);
+  const P = i => V3(prof[i][0] * s, prof[i][1], prof[i][0] * c);
+  const pos = [], nor = [], u = V3(0, 0, 0), v = V3(0, 0, 0);
+  for (const [a, b, d] of tris) {
+    const A = P(a); let B = P(b), D = P(d);
+    u.subVectors(B, A); v.subVectors(D, A); if (u.cross(v).dot(n) < 0) [B, D] = [D, B];
+    for (const q of [A, B, D]) { pos.push(q.x, q.y, q.z); nor.push(n.x, n.y, n.z); }
+  }
+  const g = new THREE.BufferGeometry();
+  g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3)); g.setAttribute('normal', new THREE.Float32BufferAttribute(nor, 3));
+  return g;
+}
+function shell(prof, seg = 96, phiStart = 0, phiLen = TAU) {
+  const parts = [prep(new THREE.LatheGeometry(lathePts(prof), seg, phiStart, phiLen))];
+  if (phiLen < TAU - 1e-6) parts.push(capGeo(prof, phiStart, -1), capGeo(prof, phiStart + phiLen, 1));
+  return mergeGeometries(parts);
+}
+const discProf = (R, t, c = 0.2) => [[R, -t / 2], [R, -c], [R - c, 0], [0, 0], [0, -t], [R - c, -t], [R, -t + c]];
+const rimProf = (R, t) => [[R, -t / 2], [R, 0.55], [R - 0.3, 0.85], [R - 1.1, 0.85], [R - 1.1, 0.3], [R - 2.0, 0.3], [R - 2.0, -t - 0.5], [R - 0.3, -t - 0.5], [R, -t - 0.2]];
+const vol = (r, y0, y1) => [[r, (y0 + y1) / 2], [r, y1], [0, y1], [0, y0], [r, y0]];
+function arcPts(cx, cy, r, a0, a1, n = 6) { const o = []; for (let i = 0; i <= n; i++) { const a = a0 + (a1 - a0) * i / n; o.push([cx + r * Math.cos(a), cy + r * Math.sin(a), true]); } return o; }
+function rrShape(w, d, r) {
+  const s = new THREE.Shape(), x = w / 2, z = d / 2;
+  s.moveTo(-x + r, -z); s.lineTo(x - r, -z); s.absarc(x - r, -z + r, r, -Math.PI / 2, 0, false);
+  s.lineTo(x, z - r); s.absarc(x - r, z - r, r, 0, Math.PI / 2, false);
+  s.lineTo(-x + r, z); s.absarc(-x + r, z - r, r, Math.PI / 2, Math.PI, false);
+  s.lineTo(-x, -z + r); s.absarc(-x + r, -z + r, r, Math.PI, 1.5 * Math.PI, false); return s;
+}
+function rrPath(w, d, r) { const s = rrShape(w, d, r), p = new THREE.Path(); p.curves = s.curves; p.currentPoint = s.currentPoint; return p; }
+function extrudeY(shape, h, b = 0, cs = 8) {
+  const g = new THREE.ExtrudeGeometry(shape, { depth: h - 2 * b, bevelEnabled: b > 0, bevelThickness: b, bevelSize: b, bevelSegments: 2, curveSegments: cs });
+  g.rotateX(-Math.PI / 2); g.translate(0, b, 0); return g;
+}
+function prismXZ(outer, holes, y0, h) {
+  const sh = new THREE.Shape(outer.map(([x, z]) => new THREE.Vector2(x, -z)));
+  for (const hp of holes) sh.holes.push(new THREE.Path(hp.map(([x, z]) => new THREE.Vector2(x, -z))));
+  const g = new THREE.ExtrudeGeometry(sh, { depth: h, bevelEnabled: false, curveSegments: 4 }); g.rotateX(-Math.PI / 2); g.translate(0, y0, 0); return g;
+}
+function stripXZ(poly, w, y0, h) {
+  const out = [];
+  for (let i = 0; i < poly.length - 1; i++) {
+    const [x0, z0] = poly[i], [x1, z1] = poly[i + 1], L = Math.hypot(x1 - x0, z1 - z0);
+    out.push(new THREE.BoxGeometry(L + w, h, w).rotateY(Math.atan2(-(z1 - z0), x1 - x0)).translate((x0 + x1) / 2, y0 + h / 2, (z0 + z1) / 2));
+  }
+  return out;
+}
+let glowTex = null;
+function glowTexture() {
+  if (glowTex) return glowTex;
+  const c = document.createElement('canvas'); c.width = c.height = 64; const x = c.getContext('2d');
+  const g = x.createRadialGradient(32, 32, 0, 32, 32, 32);
+  g.addColorStop(0, 'rgba(255,255,255,1)'); g.addColorStop(0.22, 'rgba(255,255,255,0.7)'); g.addColorStop(0.6, 'rgba(255,255,255,0.14)'); g.addColorStop(1, 'rgba(255,255,255,0)');
+  x.fillStyle = g; x.fillRect(0, 0, 64, 64);
+  glowTex = new THREE.CanvasTexture(c); glowTex.colorSpace = THREE.SRGBColorSpace; return glowTex;
+}
+/* a dark studio for reflections: a warm gradient dome with a few soft boxes, so that gold reads as gold on black */
+function studioEnv() {
+  const s = new THREE.Scene(), geo = new THREE.SphereGeometry(50, 48, 24), pos = geo.attributes.position, col = [];
+  for (let i = 0; i < pos.count; i++) {
+    const y = pos.getY(i) / 50;
+    if (y > 0) col.push(lerp(0.2, 0.62, y), lerp(0.16, 0.55, y), lerp(0.11, 0.45, y));
+    else col.push(lerp(0.2, 0.1, -y), lerp(0.16, 0.07, -y), lerp(0.11, 0.045, -y));
+  }
+  geo.setAttribute('color', new THREE.Float32BufferAttribute(col, 3));
+  s.add(new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ vertexColors: true, side: THREE.BackSide })));
+  const panel = (w, h, x, y, z, c, k) => { const m = new THREE.Mesh(new THREE.PlaneGeometry(w, h), new THREE.MeshBasicMaterial({ color: new THREE.Color(c).multiplyScalar(k), side: THREE.DoubleSide })); m.position.set(x, y, z); m.lookAt(0, 0, 0); s.add(m); };
+  panel(44, 16, 0, 40, 16, 0xfff0d8, 3.0);
+  panel(9, 46, -42, 4, 12, 0xffe0b0, 2.6);
+  panel(9, 46, 40, 2, -18, 0xffd49a, 2.2);
+  panel(9, 46, 30, 0, 34, 0xfff4e6, 1.6);
+  panel(36, 9, 0, -32, 28, 0xffb45e, 1.5);
+  panel(22, 22, 8, 12, -45, 0xc9dcff, 1.1);
+  return s;
+}
+function makeMats() {
+  const S = (color, metalness, roughness, extra = {}) => new THREE.MeshStandardMaterial({ color, metalness, roughness, ...extra });
+  return {
+    gold: S(0xe0b257, 1, 0.24, { envMapIntensity: 2.0 }), goldR: S(0xcf9d45, 1, 0.36, { envMapIntensity: 1.3 }),
+    copper: S(0xc47e45, 1, 0.3, { envMapIntensity: 1.8 }), steel: S(0xc2c6cc, 1, 0.27, { envMapIntensity: 1.25 }), steelR: S(0xa8acb2, 0.95, 0.42, { envMapIntensity: 1.1 }),
+    coax: S(0xd3d6db, 1, 0.22, { envMapIntensity: 1.35 }), coaxCu: S(0xc98a52, 1, 0.26, { envMapIntensity: 1.4 }), nbti: S(0x9aa0a8, 0.95, 0.33, { envMapIntensity: 1.1 }),
+    screw: S(0xb9bdc3, 1, 0.3, { envMapIntensity: 1.2 }),
+    ovc: S(0xb4b9bf, 0.95, 0.3, { envMapIntensity: 1.6 }), alS: S(0xd2d5d9, 0.9, 0.42, { envMapIntensity: 1.0 }), alS2: S(0xbcc0c5, 0.9, 0.36, { envMapIntensity: 1.0 }),
+    mu: S(0x80858b, 0.75, 0.48), dark: S(0x232428, 0.5, 0.4), black: S(0x101012, 0.3, 0.6), ptfe: S(0xf1efe8, 0, 0.55), loom: S(0x6a5236, 0.3, 0.55),
+    pcb: S(0xd9cdb2, 0, 0.68), al: S(0xd3d6db, 0.92, 0.24, { envMapIntensity: 1.15 }), si: S(0x353a43, 0.3, 0.36, { envMapIntensity: 0.8 }), via: S(0x3d3322, 0.3, 0.7),
+    ox: S(0xe3a843, 0.05, 0.45, { emissive: 0x5a3200, emissiveIntensity: 0.7 }),
+    atAl: S(0xc9ced6, 0.55, 0.32, { envMapIntensity: 1.0 }), atAlO: S(0x8fb0d4, 0.2, 0.4), atO: S(0xd8473d, 0.05, 0.42)
+  };
+}
+function setFade(mat, o) {
+  const tr = o < 0.999;
+  if (mat.transparent !== tr) { mat.transparent = tr; mat.depthWrite = !tr; mat.needsUpdate = true; }
+  mat.opacity = o;
+}
+
+/* hex-socket cap screws, instanced; in units of the head diameter */
+const _d = new THREE.Object3D(), _q = new THREE.Quaternion();
+function screwGeos(LD) {
+  const metal = merge([new THREE.CylinderGeometry(0.5, 0.5, 0.56, 18).translate(0, 0.28, 0), new THREE.CylinderGeometry(0.43, 0.5, 0.08, 18).translate(0, 0.6, 0), new THREE.CylinderGeometry(0.29, 0.29, LD, 10).translate(0, -LD / 2, 0)]);
+  const sock = prep(new THREE.CylinderGeometry(0.235, 0.235, 0.04, 6).translate(0, 0.625, 0));
+  return { metal, sock };
+}
+class ScrewSet {
+  /* items: { p: base point (underside of the head), a: axis pointing out of the hole, fly: extra displacement when flying out } */
+  constructor(parent, M, items, D, LD, turns = 4) {
+    const g = screwGeos(LD);
+    this.a = new THREE.InstancedMesh(g.metal, M.screw, items.length); this.b = new THREE.InstancedMesh(g.sock, M.black, items.length);
+    for (const m of [this.a, this.b]) { m.castShadow = true; m.receiveShadow = true; m.frustumCulled = false; parent.add(m); }
+    this.items = items.map(it => ({ ...it, q: new THREE.Quaternion().setFromUnitVectors(UP, it.a.clone().normalize()) }));
+    this.D = D; this.L = LD * D; this.turns = turns; this.p = -1; this.update(0);
+  }
+  update(p) {
+    if (p === this.p) return; this.p = p;
+    const vis = p < 0.999; this.a.visible = this.b.visible = vis; if (!vis) return;
+    const pu = sstep(0, 0.62, p), pf = sstep(0.62, 1, p), s = this.D * Math.max(1e-4, 1 - sstep(0.55, 1, pf));
+    this.items.forEach((it, i) => {
+      _d.position.copy(it.p).addScaledVector(it.a, this.L * 1.04 * pu).addScaledVector(it.fly, pf * pf);
+      _q.setFromAxisAngle(UP, -this.turns * TAU * pu - 3 * pf);
+      _d.quaternion.copy(it.q).multiply(_q); _d.scale.setScalar(s); _d.updateMatrix();
+      this.a.setMatrixAt(i, _d.matrix); this.b.setMatrixAt(i, _d.matrix);
+    });
+    this.a.instanceMatrix.needsUpdate = this.b.instanceMatrix.needsUpdate = true;
+  }
+}
+/* repeated parts that can move one by one (attenuators, amplifiers...) */
+class Movers {
+  constructor(parent, parts, items) {
+    this.items = items;
+    this.meshes = parts.map(([g, mat]) => { const m = new THREE.InstancedMesh(g, mat, items.length); m.castShadow = true; m.receiveShadow = true; m.frustumCulled = false; parent.add(m); return m; });
+    this.set(null);
+  }
+  set(fn) {
+    this.items.forEach((it, i) => {
+      const o = fn ? fn(i, it) : null;
+      _d.position.set(it.x + (o ? o[0] : 0), it.y + (o ? o[1] : 0), it.z + (o ? o[2] : 0));
+      _d.rotation.set(o ? o[3] : 0, it.ry, 0, 'YXZ'); _d.scale.setScalar(o && o[4] !== undefined ? Math.max(1e-4, o[4]) : 1); _d.updateMatrix();
+      for (const m of this.meshes) m.setMatrixAt(i, _d.matrix);
+    });
+    for (const m of this.meshes) m.instanceMatrix.needsUpdate = true;
+  }
+}
+function staticInst(parent, geo, mat, items, cast = true) {      // items: [x, y, z, ry]
+  const m = new THREE.InstancedMesh(geo, mat, items.length);
+  items.forEach(([x, y, z, ry = 0], i) => { _d.position.set(x, y, z); _d.rotation.set(0, ry, 0); _d.scale.setScalar(1); _d.updateMatrix(); m.setMatrixAt(i, _d.matrix); });
+  m.instanceMatrix.needsUpdate = true; m.castShadow = cast; m.receiveShadow = true; m.computeBoundingSphere(); parent.add(m); return m;
+}
+
+/* ====================================================================================
+   Sample package, chip, junction and atoms (millimetres; PCB top at y = 0)
+   ==================================================================================== */
+function buildJJ(M, mats) {          // micrometres; junction overlap at the origin, substrate at y = 0
+  const g = new THREE.Group();
+  const a = [Math.SQRT1_2, Math.SQRT1_2], b = [-Math.SQRT1_2, Math.SQRT1_2], w = 0.2;
+  const Sb = [-2 * a[0], -2 * a[1]], St = [-2 * b[0], -2 * b[1]];
+  const t1 = 0.035, tox = 0.002, t2 = 0.05, ramp = 0.04;
+  const psiA = Math.atan2(-a[1], a[0]), psiB = Math.atan2(-b[1], b[0]);
+  const leadPts = (P0, P1, w0, w1) => {
+    const dx = P1[0] - P0[0], dz = P1[1] - P0[1], L = Math.hypot(dx, dz), d = [dx / L, dz / L], n = [-d[1], d[0]];
+    const E = [P1[0] + d[0] * 0.06, P1[1] + d[1] * 0.06];
+    return [[P0[0] + n[0] * w0 / 2, P0[1] + n[1] * w0 / 2], [E[0] + n[0] * w1 / 2, E[1] + n[1] * w1 / 2], [E[0] - n[0] * w1 / 2, E[1] - n[1] * w1 / 2], [P0[0] - n[0] * w0 / 2, P0[1] - n[1] * w0 / 2]];
+  };
+  const bottom = new THREE.Mesh(merge([prismXZ(leadPts([-61, 0], Sb, 9, w), [], 0, t1), new THREE.BoxGeometry(2.38, t1, w).translate((-2.08 + 0.3) / 2, t1 / 2, 0).rotateY(psiA)]), mats.al);
+  const topLead = new THREE.Mesh(prep(prismXZ(leadPts([61, 0], St, 9, w), [], 0, t2)), mats.al);
+  const e = t1 + tox + 0.001;
+  const prof = [[-2.08, 0], [-w / 2 - ramp, 0], [-w / 2, e], [w / 2, e], [w / 2 + ramp, 0], [0.3, 0], [0.3, t2], [w / 2 + ramp, t2], [w / 2, e + t2], [-w / 2, e + t2], [-w / 2 - ramp, t2], [-2.08, t2]];
+  const topG = new THREE.ExtrudeGeometry(new THREE.Shape(prof.map(([u, v]) => new THREE.Vector2(u, v))), { depth: w, bevelEnabled: false }).translate(0, 0, -w / 2).rotateY(psiB);
+  const top = new THREE.Mesh(prep(topG), mats.al);
+  const ox = new THREE.Mesh(prep(new THREE.BoxGeometry(2.38, tox, w + 0.004).translate((-2.08 + 0.3) / 2, t1 + tox / 2, 0).rotateY(psiA)), mats.ox);
+  for (const m of [bottom, topLead, top, ox]) { m.castShadow = true; m.receiveShadow = true; g.add(m); }
+  return { g, top, t1, tox, t2 };
+}
+function buildAtoms(M) {             // ångström; centre of the oxide at the origin
+  const g = new THREE.Group();
+  const a = 4.05, nc = 6, nz = 3, hw = nc * a / 2, tOx = 17;
+  const rnd = mulberry32(20261115);
+  const metal = [], basis = [[0, 0, 0], [0.5, 0.5, 0], [0.5, 0, 0.5], [0, 0.5, 0.5]];
+  for (const sg of [-1, 1]) for (let i = 0; i < nc; i++) for (let j = 0; j < nc; j++) for (let k = 0; k < nz; k++) for (const bb of basis)
+    metal.push(V3((i + bb[0] + 0.25) * a - hw, sg * (tOx / 2 + (k + bb[1] + 0.25) * a), (j + bb[2] + 0.25) * a - hw));
+  const near = metal.filter(p => Math.abs(p.y) < tOx / 2 + 2.6);
+  const ox = []; let tries = 0;
+  while (ox.length < 760 && tries < 16000) {
+    tries++;
+    const p = V3((rnd() * 2 - 1) * (hw - 0.7), (rnd() * 2 - 1) * (tOx / 2 + 0.2), (rnd() * 2 - 1) * (hw - 0.7));
+    let ok = true;
+    for (const q of ox) if (q.distanceToSquared(p) < 3.7) { ok = false; break; }
+    if (ok) for (const q of near) if (q.distanceToSquared(p) < 5.3) { ok = false; break; }
+    if (ok) ox.push(p);
+  }
+  const oxAl = [], oxO = [];
+  ox.forEach(p => (rnd() < 0.4 ? oxAl : oxO).push(p));
+  const sg = new THREE.SphereGeometry(1, 18, 12);
+  const sets = [[metal, M.atAl, 1.3], [oxAl, M.atAlO, 0.74], [oxO, M.atO, 1.08]].map(([list, mat, r]) => {
+    const m = new THREE.InstancedMesh(sg, mat, list.length); m.castShadow = true; m.receiveShadow = true; m.frustumCulled = false; g.add(m);
+    return { m, list, r };
+  });
+  let last = -1;
+  function update(p) {
+    if (p === last) return; last = p;
+    for (const S of sets) {
+      S.list.forEach((q, i) => { const t0 = 0.02 + 0.6 * (q.y + 22) / 44; const s = S.r * Math.max(1e-4, sstep(t0, t0 + 0.32, p)); _d.position.copy(q); _d.rotation.set(0, 0, 0); _d.scale.setScalar(s); _d.updateMatrix(); S.m.setMatrixAt(i, _d.matrix); });
+      S.m.instanceMatrix.needsUpdate = true; S.m.visible = p > 0.001;
+    }
+  }
+  /* Cooper pairs: a cartoon of paired electrons tunnelling across the barrier */
+  const pairMat = new THREE.MeshBasicMaterial({ color: 0xbff1ff, toneMapped: false, transparent: true, depthTest: false });
+  const pairs = new THREE.InstancedMesh(new THREE.SphereGeometry(1, 16, 12), pairMat, 8); pairs.frustumCulled = false; pairs.renderOrder = 10; g.add(pairs);
+  const glows = [0, 1, 2, 3].map(() => { const s = new THREE.Sprite(new THREE.SpriteMaterial({ map: glowTexture(), color: 0x6fd8ff, transparent: true, depthWrite: false, depthTest: false, blending: THREE.AdditiveBlending, toneMapped: false })); s.renderOrder = 11; g.add(s); return s; });
+  const PP = [[-6.5, 4.5], [5.5, -6.5], [7, 6.5], [-2.5, -3.5]];
+  function animate(t, on) {
+    pairs.visible = on; glows.forEach(s => (s.visible = on)); if (!on) return;
+    PP.forEach(([x, z], i) => {
+      const s = (t * 0.13 + i / 4) % 1, y = lerp(-24, 24, s), v = sstep(0, 0.12, s) * (1 - sstep(0.86, 1, s));
+      const sp = t * 2.4 + i * 1.7, cx = Math.cos(sp) * 1.15, cz = Math.sin(sp) * 1.15;
+      for (const [k, sg] of [[0, 1], [1, -1]]) { _d.position.set(x + sg * cx, y, z + sg * cz); _d.rotation.set(0, 0, 0); _d.scale.setScalar(0.62 * Math.max(v, 1e-4)); _d.updateMatrix(); pairs.setMatrixAt(2 * i + k, _d.matrix); }
+      glows[i].position.set(x, y, z); glows[i].scale.setScalar(6.5 * Math.max(v, 1e-4)); glows[i].material.opacity = 0.55 * v * (Math.abs(y) < tOx / 2 ? 1.25 : 0.8);
+    });
+    pairs.instanceMatrix.needsUpdate = true;
+  }
+  return { g, update, animate, hw, tOx, a };
+}
+function buildPackage(M) {
+  const group = new THREE.Group(), base = new THREE.Group(), lid = new THREE.Group(), chip = new THREE.Group(), film = new THREE.Group(), metal = new THREE.Group(), bonds = new THREE.Group();
+  group.add(base, lid, chip, bonds); chip.add(film); film.add(metal);
+  const B = new Bucket(), L = new Bucket(), MT = new Bucket(), BD = new Bucket();
+  const HB = 16, SY = 0.5;
+  B.add(M.copper, extrudeY(rrShape(31.4, 31.4, 1.2), 6, 0.3).translate(0, -6.5, 0));
+  const pcbShape = () => { const s = rrShape(32, 32, 1.5), h = new THREE.Path(); h.moveTo(-3.5, -3.5); h.lineTo(3.5, -3.5); h.lineTo(3.5, 3.5); h.lineTo(-3.5, 3.5); h.lineTo(-3.5, -3.5); s.holes.push(h); return s; };
+  B.add(M.pcb, extrudeY(pcbShape(), 0.5).translate(0, -0.5, 0));
+  B.add(M.gold, extrudeY(pcbShape(), 0.035));
+  B.add(M.copper, boxG(7, 0.02, 7, 0, -0.51, 0));
+  const traces = [{ ax: 'x', s: -1, c: 0 }, { ax: 'x', s: 1, c: 0 }, { ax: 'z', s: 1, c: -1.2 }, { ax: 'z', s: -1, c: 1.2 }];
+  for (const t of traces) {
+    const len = HB - 3.6, mid = t.s * (3.6 + len / 2);
+    if (t.ax === 'x') { B.add(M.pcb, boxG(len, 0.04, 1.3, mid, 0.02, t.c)); B.add(M.gold, boxG(len, 0.05, 0.6, mid, 0.025, t.c)); }
+    else { B.add(M.pcb, boxG(1.3, 0.04, len, t.c, 0.02, mid)); B.add(M.gold, boxG(0.6, 0.05, len, t.c, 0.025, mid)); }
+    for (let u = 4.6; u < HB - 0.6; u += 1.2) for (const side of [-1.15, 1.15]) {
+      const px = t.ax === 'x' ? t.s * u : t.c + side, pz = t.ax === 'x' ? t.c + side : t.s * u;
+      B.add(M.gold, cylY(0.24, 0.0, 0.055, px, pz, 10)); B.add(M.via, cylY(0.13, 0.0, 0.062, px, pz, 8));
+    }
+  }
+  const smaParts = () => {
+    const P = new Bucket();
+    const cylX = (r, x0, x1, seg) => new THREE.CylinderGeometry(r, r, x1 - x0, seg).rotateZ(Math.PI / 2).translate((x0 + x1) / 2, 0, 0);
+    P.add(M.steel, cylX(4.62, 0, 2.4, 6).rotateX(Math.PI / 6)); P.add(M.steel, cylX(3.15, 2.4, 8.0, 28));
+    P.add(M.gold, cylX(4.62, 3.0, 8.4, 6).rotateX(Math.PI / 6)); P.add(M.steel, cylX(2.0, 8.4, 12.5, 20));
+    P.add(M.gold, cylX(0.42, -1.4, 0, 10)); P.add(M.ptfe, cylX(2.05, -0.02, 0.02, 20));
+    P.add(M.coaxCu, tube(cr([V3(12.4, 0, 0), V3(17, 0, 0), V3(20.6, 1.3, 0), V3(22, 4.6, 0), V3(22, 9, 0), V3(22, 24, 0)]), 1.1, 40, 14));
+    return P;
+  };
+  for (const [x, z, ry] of [[-HB, 0, Math.PI], [HB, 0, 0], [-1.2, HB, -Math.PI / 2], [1.2, -HB, Math.PI / 2]]) {
+    const P = smaParts();
+    for (const [mat, list] of P.m) for (const g of list) B.add(mat, g.rotateY(ry).translate(x, SY, z));
+  }
+  B.build(base);
+  /* the lid: a frame with a pocket and a roof; its four cap screws are separate */
+  const lidCu = M.copper.clone();
+  const fs = rrShape(32, 32, 1.5); fs.holes.push(rrPath(12, 12, 0.8));
+  L.add(lidCu, extrudeY(fs, 3.5, 0, 10));
+  L.add(lidCu, extrudeY(rrShape(31.4, 31.4, 1.2), 2.5, 0.3).translate(0, 3.5, 0));
+  for (const sx of [-1, 1]) for (const sz of [-1, 1]) L.add(lidCu, cylY(1.75, 5.96, 6.0, 13.2 * sx, 13.2 * sz, 20));
+  L.build(lid);
+  const lidScrews = new ScrewSet(group, M, [-1, 1].flatMap(sx => [-1, 1].map(sz => ({ p: V3(13.2 * sx, 6.0, 13.2 * sz), a: UP, fly: V3(sx * 16, 22, sz * 16) }))), 3.0, 3.0, 5);
+  /* the chip: silicon, an aluminium film with windows, two transmons, resonators, feedline, drive lines */
+  const si = new THREE.Mesh(prep(boxG(6, 0.5, 6, 0, -0.25, 0)), M.si); si.castShadow = si.receiveShadow = true; chip.add(si);
+  const TM = 1e-4, rot = p => p.map(([x, z]) => [-x, -z]);
+  const feedHole = [[-2.8, -0.32], [-2.3, -0.32], [-2.1, -0.035], [2.1, -0.035], [2.3, -0.32], [2.8, -0.32], [2.8, 0.32], [2.3, 0.32], [2.1, 0.035], [-2.1, 0.035], [-2.3, 0.32], [-2.8, 0.32]];
+  const win = [[-2.05, 0.11], [-0.35, 0.11], [-0.35, 2.2], [-1.13, 2.2], [-1.13, 2.5], [-0.93, 2.55], [-0.93, 2.85], [-1.47, 2.85], [-1.47, 2.55], [-1.27, 2.5], [-1.27, 2.2], [-2.05, 2.2]];
+  MT.add(M.al, prismXZ([[-3, -3], [3, -3], [3, 3], [-3, 3]], [feedHole, win, rot(win)], 0, TM));
+  MT.add(M.al, prismXZ([[-2.7, -0.2], [-2.3, -0.2], [-2.1, -0.012], [2.1, -0.012], [2.3, -0.2], [2.7, -0.2], [2.7, 0.2], [2.3, 0.2], [2.1, 0.012], [-2.1, 0.012], [-2.3, 0.2], [-2.7, 0.2]], [], 0, TM));
+  for (const s of [1, -1]) {
+    const P = pts => pts.map(([x, z]) => [s * x, s * z]);
+    const R = (x0, x1, z0, z1) => MT.add(M.al, prismXZ(P([[x0, z0], [x1, z0], [x1, z1], [x0, z1]]), [], 0, TM));
+    R(-1.82, -1.26, 1.3, 1.95); R(-1.14, -0.58, 1.3, 1.95);                       // capacitor pads
+    R(-1.06, -0.66, 1.17, 1.23);                                                   // coupling claw
+    const meander = [[-0.34, 0.19], [-1.9, 0.19], [-1.9, 0.4], [-0.55, 0.4], [-0.55, 0.62], [-0.86, 0.62], [-0.86, 1.18]];
+    for (const g of stripXZ(P(meander), 0.02, 0, TM)) MT.add(M.al, g);
+    MT.add(M.al, prismXZ(P([[-1.44, 2.82], [-0.96, 2.82], [-0.96, 2.58], [-1.19, 2.48], [-1.19, 2.08], [-1.21, 2.08], [-1.21, 2.48], [-1.44, 2.58]]), [], 0, TM));
+  }
+  MT.build(metal);
+  const jmats = { al: M.al.clone(), ox: M.ox.clone() };
+  const jj = [buildJJ(M, jmats), buildJJ(M, jmats)];
+  jj[0].g.position.set(-1.2, 0, 1.625); jj[1].g.position.set(1.2, 0, -1.625); jj[1].g.rotation.y = Math.PI;
+  for (const j of jj) { j.g.scale.setScalar(1e-3); film.add(j.g); }
+  /* wire bonds */
+  const bondMat = M.al.clone();
+  const bondCurve = (A, Bp, hgt) => new THREE.CubicBezierCurve3(A, V3(A.x + (Bp.x - A.x) * 0.1, A.y + hgt, A.z + (Bp.z - A.z) * 0.1), V3(A.x + (Bp.x - A.x) * 0.55, A.y + hgt * 0.95, A.z + (Bp.z - A.z) * 0.55), Bp);
+  const bond = (A, Bp, hgt) => { BD.add(bondMat, tube(bondCurve(A, Bp, hgt), 0.0125, 16, 6)); BD.add(bondMat, boxG(0.06, 0.012, 0.035, Bp.x, Bp.y + 0.006, Bp.z)); BD.add(bondMat, boxG(0.05, 0.01, 0.03, A.x, A.y + 0.005, A.z)); };
+  for (const d of [-0.1, 0, 0.1]) {
+    bond(V3(-2.55, 0, d), V3(-3.75, 0.05, d), 0.32); bond(V3(2.55, 0, d), V3(3.75, 0.05, d), 0.32);
+    bond(V3(-1.2 + d, 0, 2.72), V3(-1.2 + d, 0.05, 3.75), 0.32); bond(V3(1.2 - d, 0, -2.72), V3(1.2 - d, 0.05, -3.75), 0.32);
+  }
+  for (let p = -2.6; p <= 2.61; p += 0.4) {
+    if (Math.abs(p) > 0.45) { bond(V3(-2.9, 0, p), V3(-3.95, 0.035, p), 0.26); bond(V3(2.9, 0, p), V3(3.95, 0.035, p), 0.26); }
+    if (Math.abs(p + 1.2) > 0.45) bond(V3(p, 0, 2.9), V3(p, 0.035, 3.95), 0.26);
+    if (Math.abs(p - 1.2) > 0.45) bond(V3(p, 0, -2.9), V3(p, 0.035, -3.95), 0.26);
+  }
+  BD.build(bonds);
+  return { group, base, lid, lidCu, lidScrews, chip, film, metal, si, jj, jmats, bonds, bondMat };
+}
+
+/* ====================================================================================
+   Main
+   ==================================================================================== */
+function main() {
+  const cv = $('cv'), ov = $('ov'), stageEl = $('stage'), tear = $('tear');
+  let renderer;
+  try { renderer = new THREE.WebGLRenderer({ canvas: cv, antialias: true, alpha: true, powerPreference: 'high-performance' }); }
+  catch (e) { const d = document.createElement('div'); d.className = 'nogl'; d.textContent = 'This teardown needs WebGL, which is not available in this browser.'; cv.replaceWith(d); return; }
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio || 1, 2));
+  renderer.setClearColor(0x000000, 0);
+  renderer.toneMapping = THREE.ACESFilmicToneMapping; renderer.toneMappingExposure = 1.2;
+  renderer.shadowMap.enabled = true; renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+  const scene = new THREE.Scene();
+  const pmrem = new THREE.PMREMGenerator(renderer);
+  scene.environment = pmrem.fromScene(studioEnv(), 0.03).texture; pmrem.dispose();
+  const hemi = new THREE.HemisphereLight(0xfff3e2, 0x1a1a1c, 0.32); scene.add(hemi);
+  const key = new THREE.DirectionalLight(0xfff0dc, 2.3); key.castShadow = true;
+  key.shadow.mapSize.set(2048, 2048); key.shadow.bias = -0.0004;
+  const rimA = new THREE.DirectionalLight(0xa9c4ff, 1.5), rimB = new THREE.DirectionalLight(0xffcf8f, 1.7);
+  scene.add(key, key.target, rimA, rimA.target, rimB, rimB.target);
+  const FOV = 32, tanV = Math.tan(FOV * D2R / 2);
+  const camera = new THREE.PerspectiveCamera(FOV, 2, 0.1, 1e5);
+  const controls = new OrbitControls(camera, cv);
+  controls.enableZoom = false; controls.enablePan = false; controls.enableDamping = false; controls.rotateSpeed = 0.6;
+  controls.minPolarAngle = 0.04; controls.maxPolarAngle = Math.PI - 0.04;
+  cv.style.touchAction = 'pan-y';
+  const M = makeMats();
+  const root = new THREE.Group(); scene.add(root);
+
+  /* ---------------- the cryostat (centimetres; top surface of the top plate at y = 0) ---------------- */
+  const PL = [
+    { y: 0, t: 2.4, R: 34, name: 'Top plate', temp: '300 K' },
+    { y: -24, t: 1.2, R: 30, name: '50 K plate', temp: '40–60 K' },
+    { y: -52, t: 1.2, R: 27, name: '4 K plate', temp: '3–4 K' },
+    { y: -78, t: 1.0, R: 24, name: 'Still', temp: '≈ 0.8 K' },
+    { y: -92, t: 0.9, R: 22, name: 'Cold plate', temp: '≈ 0.1 K' },
+    { y: -108, t: 1.1, R: 21, name: 'Mixing chamber', temp: '≈ 10 mK' }
+  ];
+  const EXD = [0, 8, 18, 34, 50, 68]; let sep = 0;
+  const Yk = k => PL[k].y - EXD[k] * sep;
+  const plateG = PL.map(() => { const g = new THREE.Group(); root.add(g); return g; });
+  const plateBody = PL.map((p, k) => { const g = new THREE.Group(); plateG[k].add(g); return g; });
+  const pB = PL.map(() => new Bucket());
+  const spans = new Map();
+  function spanB(ka, offA, kb, offB) {
+    const id = `${ka}|${offA.toFixed(3)}|${kb}|${offB.toFixed(3)}`; let s = spans.get(id);
+    if (!s) { s = { ka, offA, kb, offB, b: new Bucket(), hi: new Bucket(true), lo: new Bucket(true), g: new THREE.Group(), ya0: PL[ka].y + offA, yb0: PL[kb].y + offB }; s.L0 = s.ya0 - s.yb0; spans.set(id, s); root.add(s.g); }
+    return s;
+  }
+  const PT = [7, -10], PUMP = [-7, -10.5], COND = [-2.6, -12.2], HXC = [-5.4, -7.8], MXP = [-2.5, -5.5];
+  const LOOM = Array.from({ length: 4 }, (_, i) => pol(17.5, 205 + 13 * i));
+  const RODS = Array.from({ length: 8 }, (_, i) => 22.5 + 45 * i);
+  const tang = (x, z) => { const r = Math.hypot(x, z); return V3(-z / r, 0, x / r); };
+  const orient = (g, x, z) => g.rotateY(Math.atan2(x, z));
+  const obox = (Bk, mat, w, h, d, x, y0, z, r = 0.12) => Bk.add(mat, orient(rbox(w, h, d, r), x, z).translate(x, y0 + h / 2, z));
+  const capHead = (Bk, x, y, z, D) => {
+    Bk.add(M.screw, new THREE.CylinderGeometry(0.5 * D, 0.5 * D, 0.56 * D, 14).translate(x, y + 0.28 * D, z));
+    Bk.add(M.screw, new THREE.CylinderGeometry(0.43 * D, 0.5 * D, 0.08 * D, 14).translate(x, y + 0.6 * D, z));
+    Bk.add(M.black, new THREE.CylinderGeometry(0.235 * D, 0.235 * D, 0.04 * D, 6).translate(x, y + 0.625 * D, z));
+  };
+
+  /* plates: gold-plated copper with a stepped, chamfered rim, a bolt circle and line-of-sight ports */
+  PL.forEach((p, k) => {
+    const Bk = pB[k];
+    if (k === 0) {
+      Bk.add(M.steel, shell(discProf(p.R, p.t, 0.3), 160).translate(0, p.y, 0));
+      const rr = p.R - 1.6, n = 36; for (let i = 0; i < n; i++) { const a = TAU * (i + 0.5) / n; capHead(Bk, rr * Math.cos(a), p.y, rr * Math.sin(a), 0.9); }
+      return;
+    }
+    const s = new THREE.Shape(); s.absarc(0, 0, p.R - 0.8, 0, TAU, false);
+    for (const deg of [12, 84, 156]) { const [hx, hz] = pol(0.36 * p.R, deg); const h = new THREE.Path(); h.absarc(hx, -hz, 0.08 * p.R, 0, TAU, true); s.holes.push(h); }
+    Bk.add(M.gold, extrudeY(s, p.t, 0.12, 96).translate(0, p.y - p.t, 0));
+    Bk.add(M.gold, shell(rimProf(p.R, p.t), 180).translate(0, p.y, 0));
+    const rr = p.R - 1.55, n = Math.floor(TAU * rr / 3.1);
+    for (let i = 0; i < n; i++) { const a = TAU * (i + 0.5) / n; capHead(Bk, rr * Math.cos(a), p.y + 0.3, rr * Math.sin(a), 0.48); }
+    // cylindrical heat-sink blocks on top, filters hanging below
+    for (const deg of [40, 120, 200]) {
+      const [x, z] = pol(11, deg);
+      Bk.add(M.gold, cylY(1.1, p.y, p.y + 2.2, x, z, 28)); Bk.add(M.gold, cylY(0.95, p.y + 2.2, p.y + 2.42, x, z, 28)); capHead(Bk, x, p.y + 2.42, z, 0.7);
+      for (let j = 0; j < 4; j++) { const a = TAU * j / 4 + 0.4; capHead(Bk, x + 1.55 * Math.cos(a), p.y, z + 1.55 * Math.sin(a), 0.36); }
+    }
+    if (k >= 2) for (const deg of [40, 110, 180]) {          // gold thermalisation blocks hanging under the plate
+      const [x, z] = pol(8.5, deg), yb = p.y - p.t;
+      Bk.add(M.gold, cylY(1.25, yb - 2.8, yb, x, z, 28)); Bk.add(M.gold, cylY(1.05, yb - 3.05, yb - 2.8, x, z, 28)); Bk.add(M.steel, cylY(0.3, yb - 3.6, yb - 3.05, x, z, 12));
+      for (let j = 0; j < 3; j++) { const a = TAU * j / 3 + 0.3; Bk.add(M.gold, boxG(0.5, 0.5, 0.18, x + 1.38 * Math.cos(a), yb - 1.6, z + 1.38 * Math.sin(a))); }
+    }
+    if (k >= 3) for (const deg of [65, 145]) {
+      const [x, z] = pol(11, deg), yb = p.y - p.t;
+      Bk.add(M.gold, cylY(0.85, yb - 0.45, yb, x, z, 24)); Bk.add(M.dark, cylY(0.72, yb - 3.6, yb - 0.45, x, z, 24)); Bk.add(M.gold, cylY(0.85, yb - 3.95, yb - 3.6, x, z, 24));
+      Bk.add(M.steel, cylY(0.28, yb - 4.6, yb - 3.95, x, z, 12));
+    }
+  });
+  /* support rods with their mounting blocks */
+  for (let k = 0; k < 5; k++) {
+    const up = PL[k], lo = PL[k + 1], rr = lo.R - 3.2, rad = k === 0 ? 0.7 : 0.45;
+    const s = spanB(k, -up.t - 0.8, k + 1, 0.8);
+    for (const deg of RODS) {
+      const [x, z] = pol(rr, deg);
+      s.b.add(M.steel, cylY(rad, lo.y + 0.8, up.y - up.t - 0.8, x, z, 16));
+      pB[k].add(M.gold, cylY(1.0, up.y - up.t - 0.8, up.y - up.t, x, z, 20));
+      pB[k + 1].add(M.gold, cylY(1.0, lo.y, lo.y + 0.8, x, z, 20));
+    }
+  }
+  /* top plate furniture: pulse-tube head, still pumping line, vacuum port */
+  {
+    const B0 = pB[0], [px, pz] = PT;
+    B0.add(M.steel, cylY(6.5, 0, 1.0, px, pz, 40));
+    B0.add(M.steelR, shell([[5, 6], [5, 12.5], ...arcPts(3.5, 12.5, 1.5, 0, Math.PI / 2, 5).slice(1), [0, 14], [0, 1], [5, 1]], 40).translate(px, 0, pz));
+    B0.add(M.steelR, rbox(5.2, 4.6, 5.2, 0.5, px, 16.3, pz));
+    B0.add(M.black, cylY(1.2, 18.6, 19.4, px, pz, 20));
+    for (let i = 0; i < 8; i++) { const a = TAU * i / 8; capHead(B0, px + 5.8 * Math.cos(a), 1.0, pz + 5.8 * Math.sin(a), 0.8); }
+    for (const s of [-1, 1]) B0.add(M.steelR, tube(cr([V3(px + 2.6, 16.3, pz + s * 1.2), V3(px + 6, 17, pz + s * 1.6), V3(px + 11, 21, pz - 3 + s * 1.6), V3(px + 15, 27, pz - 9 + s * 1.6)]), 0.8, 40, 12));
+    const [ux, uz] = PUMP;
+    B0.add(M.steel, cylY(2.4, 0, 9, ux, uz, 32)); B0.add(M.steel, cylY(3.4, 0, 0.8, ux, uz, 32));
+    B0.add(M.steel, new THREE.TorusGeometry(3.5, 2.4, 16, 24, Math.PI / 2).translate(ux - 3.5, 9, uz));
+    B0.add(M.steel, cylAx(2.4, V3(ux - 3.5, 12.5, uz), V3(ux - 12, 12.5, uz), 32));
+    B0.add(M.steel, cylAx(3.6, V3(ux - 12, 12.5, uz), V3(ux - 12.8, 12.5, uz), 32));
+    B0.add(M.dark, rbox(3.2, 6.4, 6.4, 0.4, ux - 14.6, 12.5, uz));
+    B0.add(M.steel, cylAx(2.4, V3(ux - 16.2, 12.5, uz), V3(ux - 24, 12.5, uz), 32));
+    B0.add(M.steel, cylY(1.5, 0, 4.2, 19, 15, 24)); B0.add(M.steel, cylY(2.4, 4.2, 4.9, 19, 15, 24));
+    B0.add(M.dark, rbox(3, 3, 3, 0.3, 19, 6.4, 15)); B0.add(M.black, cylY(0.4, 7.9, 9.4, 19, 15, 10)); B0.add(M.black, cylY(1.4, 9.4, 9.8, 19, 15, 20));
+    B0.add(M.steel, cylY(1.2, 0, 6.5, -20, 12, 24)); B0.add(M.steel, cylY(2.0, 6.5, 7.2, -20, 12, 24)); B0.add(M.steelR, rbox(2.6, 2.6, 2.6, 0.3, -20, 8.6, 12));
+  }
+  /* pulse tube below the top plate */
+  {
+    const [x, z] = PT;
+    spanB(0, -PL[0].t, 1, 2.0).b.add(M.steelR, cylY(2.6, PL[1].y + 2.0, PL[0].y - PL[0].t, x, z, 28));
+    pB[1].add(M.copper, cylY(4.4, PL[1].y, PL[1].y + 2.0, x, z, 36)); pB[1].add(M.copper, cylY(2.6, PL[1].y - PL[1].t - 0.6, PL[1].y - PL[1].t, x, z, 28));
+    for (let i = 0; i < 6; i++) { const a = TAU * i / 6; capHead(pB[1], x + 3.8 * Math.cos(a), PL[1].y + 2.0, z + 3.8 * Math.sin(a), 0.5); }
+    const s = spanB(1, -PL[1].t - 0.6, 2, 2.0);
+    for (const d of [-1.4, 1.4]) s.b.add(M.steelR, cylY(1.0, PL[2].y + 2.0, PL[1].y - PL[1].t - 0.6, x + d, z, 20));
+    pB[2].add(M.copper, cylY(3.2, PL[2].y, PL[2].y + 2.0, x, z, 32));
+    for (let i = 0; i < 6; i++) { const a = TAU * i / 6; capHead(pB[2], x + 2.7 * Math.cos(a), PL[2].y + 2.0, z + 2.7 * Math.sin(a), 0.45); }
+  }
+  /* still pumping line and condensing line */
+  {
+    const [x, z] = PUMP, [cx, cz] = COND;
+    for (let k = 0; k < 3; k++) {
+      const offA = k === 0 ? -PL[0].t : -PL[k].t - 0.6;
+      spanB(k, offA, k + 1, 0.6).b.add(M.steel, cylY(2.4, PL[k + 1].y + 0.6, PL[k].y + offA, x, z, 32));
+      pB[k + 1].add(M.steel, cylY(3.1, PL[k + 1].y, PL[k + 1].y + 0.6, x, z, 32));
+      if (k < 2) pB[k + 1].add(M.steel, cylY(3.1, PL[k + 1].y - PL[k + 1].t - 0.6, PL[k + 1].y - PL[k + 1].t, x, z, 32));
+      const offB = k < 2 ? 0.9 : 0;
+      spanB(k, -PL[k].t, k + 1, offB).b.add(M.steel, cylY(0.22, PL[k + 1].y + offB, PL[k].y - PL[k].t, cx, cz, 10));
+      if (k < 2) pB[k + 1].add(M.copper, rbox(1.4, 0.9, 1.4, 0.1, cx, PL[k + 1].y + 0.45, cz));
+    }
+  }
+
+  /* ---------------- the dilution unit, in separate groups so that it can come out ---------------- */
+  const DU = {};
+  const liq = (color, opacity) => new THREE.MeshStandardMaterial({ color, metalness: 0, roughness: 0.15, transparent: true, opacity, depthWrite: false });
+  const LQ = { dil: liq(0x6f9bd0, 0.5), con: liq(0xd7e6f4, 0.42), bnd: liq(0x9fd0ff, 0.85), stl: liq(0x6f9bd0, 0.5) };
+  const fullMats = { still: M.copper.clone(), mxc: M.copper.clone() };
+  const halfMesh = (prof, mat, x, y, z) => { const m = new THREE.Mesh(shell(prof, 72, Math.PI / 2, Math.PI), mat); m.position.set(x, y, z); m.castShadow = m.receiveShadow = true; return m; };
+  const fullMesh = (prof, mat, x, y, z) => { const m = new THREE.Mesh(shell(prof, 72), mat); m.position.set(x, y, z); m.castShadow = m.receiveShadow = true; return m; };
+  {
+    const [x, z] = PUMP, ys = PL[3].y - PL[3].t;
+    const g = DU.still = new THREE.Group(); plateG[3].add(g);
+    const stillProf = [[4.2, -2.75], [4.2, 0], [0, 0], [0, -0.35], [3.85, -0.35], [3.85, -4.65], ...arcPts(3.35, -4.65, 0.5, 0, -Math.PI / 2, 4).slice(1), [0, -5.15], [0, -5.5], [3.2, -5.5], ...arcPts(3.2, -4.5, 1.0, -Math.PI / 2, 0, 5).slice(1)];
+    DU.stillFull = fullMesh(stillProf, fullMats.still, x, ys, z); DU.stillHalf = halfMesh(stillProf, M.copper, x, ys, z);
+    DU.stillLiq = [halfMesh(vol(3.83, -5.13, -3.4), LQ.stl, x, ys, z)];
+    g.add(DU.stillFull, DU.stillHalf, ...DU.stillLiq);
+    const Bk = new Bucket();
+    Bk.add(M.dark, orient(rbox(1.6, 1.2, 0.6, 0.1), 4.2, 0).translate(x + 4.35, ys - 2.6, z));
+    Bk.add(M.copper, cylY(0.35, ys - 6.7, ys - 5.4, HXC[0], HXC[1], 10));
+    Bk.build(g);
+    const s = spanB(3, -PL[3].t - 6.7, 4, 0.4), yA = ys - 6.7, yB = PL[4].y + 0.4, turns = 6;
+    const helix = new (class extends THREE.Curve { getPoint(t, o = new THREE.Vector3()) { const a = TAU * turns * t; return o.set(HXC[0] + 1.9 * Math.cos(a), lerp(yA, yB, t), HXC[1] + 1.9 * Math.sin(a)); } })();
+    const helix2 = new (class extends THREE.Curve { getPoint(t, o = new THREE.Vector3()) { const a = TAU * turns * t + Math.PI; return o.set(HXC[0] + 1.9 * Math.cos(a), lerp(yA, yB, t), HXC[1] + 1.9 * Math.sin(a)); } })();
+    const hb = new Bucket(); hb.add(M.copper, tube(helix, 0.3, 220, 10)); hb.add(M.copper, tube(helix2, 0.22, 220, 8));
+    DU.hx = new THREE.Group(); s.g.add(DU.hx); hb.build(DU.hx, { dy: -s.yb0 });
+    const yc = PL[4].y - PL[4].t, sb = new Bucket();
+    for (let i = 0; i < 3; i++) sb.add(M.copper, cylY(2.4, yc - 0.5 - i * 1.5 - 0.9, yc - 0.5 - i * 1.5, -3.5, -6, 32));
+    sb.add(M.copper, cylY(0.45, yc - 4.6, yc, -3.5, -6, 12));
+    DU.steps = new THREE.Group(); plateG[4].add(DU.steps); sb.build(DU.steps);
+    const ym = PL[5].y;
+    const mxcProf = [[4.0, 2.5], [4.0, 5.0], [4.6, 5.0], [4.6, 5.6], [0, 5.6], [0, 4.8], [3.6, 4.8], [3.6, 0.4], [0, 0.4], [0, 0], [4.0, 0]];
+    const gm = DU.mxc = new THREE.Group(); plateG[5].add(gm);
+    DU.mxcFull = fullMesh(mxcProf, fullMats.mxc, MXP[0], ym, MXP[1]); DU.mxcHalf = halfMesh(mxcProf, M.copper, MXP[0], ym, MXP[1]);
+    DU.mxcLiq = [halfMesh(vol(3.58, 0.42, 2.66), LQ.dil, MXP[0], ym, MXP[1]), halfMesh(vol(3.58, 2.74, 4.78), LQ.con, MXP[0], ym, MXP[1]), halfMesh(vol(3.59, 2.66, 2.74), LQ.bnd, MXP[0], ym, MXP[1])];
+    gm.add(DU.mxcFull, DU.mxcHalf, ...DU.mxcLiq);
+    const mb = new Bucket(), mf = new Bucket(), cutDir = V3(Math.sin(0.3), 0, Math.cos(0.3));
+    for (let i = 0; i < 12; i++) { const a = TAU * (i + 0.5) / 12, c = Math.cos(a), sn = Math.sin(a); capHead(c * cutDir.x + sn * cutDir.z > 0.05 ? mf : mb, MXP[0] + 4.25 * c, ym + 5.6, MXP[1] + 4.25 * sn, 0.42); }
+    DU.mxcFront = new THREE.Group(); gm.add(DU.mxcFront); mf.build(DU.mxcFront);
+    mb.add(M.dark, orient(rbox(1.2, 0.8, 0.5, 0.08), 1, 0).translate(MXP[0] + 4.3, ym + 1.6, MXP[1]));
+    mb.build(gm);
+    const s2 = spanB(4, -PL[4].t - 4.6, 5, 5.6), lb = new Bucket();
+    lb.add(M.copper, tube(new THREE.CubicBezierCurve3(V3(-3.5, s2.ya0, -6), V3(-3.5, s2.ya0 - 3, -6), V3(-2.5, s2.yb0 + 3, -5.5), V3(-2.5, s2.yb0, -5.5)), 0.45, 16, 10));
+    DU.link = new THREE.Group(); s2.g.add(DU.link); lb.build(DU.link, { dy: -s2.yb0 });
+    DU.moving = [DU.still, DU.hx, DU.steps, DU.mxc, DU.link];
+  }
+
+  /* ---------------- coaxial lines: a dense forest with expansion loops ---------------- */
+  const LINES = [];
+  const far = (x, z, [px, pz], d) => Math.hypot(x - px, z - pz) > d;
+  const okPos = (x, z) => far(x, z, PT, 5.2) && far(x, z, PUMP, 5.4) && far(x, z, COND, 1.6) && far(x, z, HXC, 3.2) && LOOM.every(l => far(x, z, l, 2.4));
+  for (let i = 0; i < 48; i++) {
+    const deg = 3.75 + 7.5 * i; if (RODS.some(r => Math.abs(((deg - r + 540) % 360) - 180) < 5)) continue;
+    const [x, z] = pol(17.4, deg); if (okPos(x, z)) LINES.push({ x, z, deg, ring: 0 });
+  }
+  for (let i = 0; i < 48; i++) { const deg = 7.5 * i; const [x, z] = pol(14.9, deg); if (okPos(x, z)) LINES.push({ x, z, deg, ring: 1 }); }
+  const OUTDEG = [7.5, 22.5, 37.5, 52.5];
+  for (const L of LINES) L.role = (L.deg >= 100 && L.deg <= 176) ? 'in' : (L.ring === 1 && OUTDEG.includes(L.deg)) ? 'out' : 'flux';
+  const FEAT = { in: LINES.find(L => L.role === 'in' && L.ring === 1 && L.deg === 112.5), out: LINES.find(L => L.role === 'out' && L.deg === 52.5) };
+  const topOff = (L, k) => {
+    if (L.role === 'in' && (k === 2 || k === 4 || k === 5)) return 2.6;
+    if (L.role === 'out' && k === 2) return 3.6;
+    if (L.role === 'out' && k === 5) return 8.0;
+    if (L.role === 'flux' && k === 2) return 2.6;
+    if (L.role === 'flux' && k === 5) return 2.4;
+    return 0.7;
+  };
+  function coaxCurve(x, z, yA, yB, style, i, k) {
+    const th = Math.atan2(z, x), T = V3(-Math.sin(th), 0, Math.cos(th)), Rr = V3(Math.cos(th), 0, Math.sin(th)), L = yA - yB;
+    const P = (o, y) => V3(x + o.x, y, z + o.z), Z = V3(0, 0, 0);
+    const sg = (i + k) % 2 ? 1 : -1;
+    if (style === 'S') {
+      const dir = (i + k) % 3 === 0 ? Rr : T, amp = 0.75 * sg;
+      return cr([P(Z, yA), P(Z, yA - 0.12 * L), P(dir.clone().multiplyScalar(amp * 0.55), yA - 0.32 * L), P(dir.clone().multiplyScalar(amp), yA - 0.5 * L), P(dir.clone().multiplyScalar(amp * 0.55), yA - 0.68 * L), P(Z, yA - 0.88 * L), P(Z, yB)]);
+    }
+    const r = clamp(0.05 * L + 0.55, 1.0, 1.95) * [0.82, 1, 1.12][(i * 7 + k * 3) % 3] * Math.min(1, L / 9), f = [0.34, 0.5, 0.64][(i + 2 * k) % 3];
+    const yc = yA - f * L, drift = 0.38 * (i % 2 ? 1 : -1), Ts = T.clone().multiplyScalar(sg);
+    const pts = [P(Z, yA), P(Z, yA - 0.06 * L)];
+    if (yc + 1.6 * r < yA - 0.08 * L) pts.push(P(Z, yc + 1.6 * r));
+    const n = 18;
+    for (let j = 0; j <= n; j++) {
+      const ph = Math.PI + TAU * j / n;
+      const o = Ts.clone().multiplyScalar(r + r * Math.cos(ph)).addScaledVector(Rr, drift * j / n);
+      pts.push(P(o, yc + r * Math.sin(ph)));
+    }
+    const D = Rr.clone().multiplyScalar(drift);
+    if (yc - 1.6 * r > yB + 0.08 * L) pts.push(P(D, yc - 1.6 * r));
+    pts.push(P(D.clone().multiplyScalar(0.4), yB + 0.06 * L), P(Z, yB));
+    return cr(pts);
+  }
+  const lineMat = (L, k) => L.role === 'out' ? (k >= 2 ? M.nbti : M.coax) : L.role === 'flux' ? (k >= 3 && L.ring === 0 ? M.coaxCu : M.coax) : M.coax;
+  LINES.forEach((L, i) => {
+    for (let k = 0; k < 5; k++) {
+      const up = PL[k], offA = -up.t - 0.7, offB = topOff(L, k + 1), s = spanB(k, offA, k + 1, offB);
+      const style = ((i * 5 + k * 3) % 7) < 2 ? 'S' : 'pig';
+      const cu = coaxCurve(L.x, L.z, up.y + offA, PL[k + 1].y + offB, style, i, k);
+      s.hi.add(lineMat(L, k), tube(cu, 0.12, style === 'S' ? 36 : 84, 6));
+      s.lo.add(lineMat(L, k), tube(cu, 0.12, style === 'S' ? 14 : 34, 3));
+    }
+  });
+  LOOM.forEach(([x, z], i) => {
+    for (let k = 0; k < 5; k++) {
+      const s = spanB(k, -PL[k].t, k + 1, 0.5), yA = PL[k].y - PL[k].t, yB = PL[k + 1].y + 0.5, Lh = yA - yB, o = tang(x, z).multiplyScalar(((i + k) % 2 ? 1 : -1) * 0.6);
+      s.b.add(M.loom, tube(new THREE.CubicBezierCurve3(V3(x, yA, z), V3(x, yA - 0.45 * Lh, z).add(o), V3(x, yB + 0.45 * Lh, z).sub(o), V3(x, yB, z)), 0.26, 28, 8));
+    }
+  });
+  /* connectors on every plate (instanced), room-temperature stubs on top, loads under the mixing chamber */
+  {
+    const bulk = k => { const y = PL[k].y, t = PL[k].t; return merge([hexY(0.46, y, y + 0.3), cylY(0.3, y, y + 0.7, 0, 0, 12), cylY(0.3, y - t - 0.7, y - t, 0, 0, 12), hexY(0.46, y - t - 0.3, y - t)]); };
+    for (let k = 1; k < 6; k++) staticInst(plateBody[k], bulk(k), M.steel, LINES.map(L => [L.x, 0, L.z, L.deg * D2R]), false);
+    const top = merge([hexY(0.5, 0, 0.3), cylY(0.32, 0, 0.7, 0, 0, 12), cylY(0.11, 0.7, 4.0, 0, 0, 8), hexY(0.46, 4.0, 4.7), cylY(0.3, 4.7, 5.3, 0, 0, 12), cylY(0.3, -PL[0].t - 0.7, -PL[0].t, 0, 0, 12), hexY(0.5, -PL[0].t - 0.3, -PL[0].t)]);
+    staticInst(plateBody[0], top, M.steel, LINES.map(L => [L.x, 0, L.z]), true);
+    const yb = PL[5].y - PL[5].t, term = LINES.filter(L => L !== FEAT.in && L !== FEAT.out);
+    staticInst(plateBody[5], prep(cylY(0.11, yb - 2.4, yb - 0.7, 0, 0, 8)), M.coax, term.map(L => [L.x, 0, L.z]), false);
+    staticInst(plateBody[5], prep(cylY(0.36, yb - 3.3, yb - 2.4, 0, 0, 14)), M.dark, term.map(L => [L.x, 0, L.z]), false);
+    // static components on the flux lines: 20 dB at 4 K, a low-pass filter at the mixing chamber
+    const fl = LINES.filter(L => L.role === 'flux');
+    const attSteel = merge([hexY(0.46, 0, 0.35), cylY(0.44, 1.92, 2.04, 0, 0, 20), cylY(0.3, 2.0, 2.6, 0, 0, 12), hexY(0.46, 2.04, 2.3)]);
+    const attGold = prep(cylY(0.42, 0.35, 1.95, 0, 0, 24));
+    staticInst(plateBody[2], attSteel, M.steel, fl.map(L => [L.x, PL[2].y, L.z]));
+    staticInst(plateBody[2], attGold, M.gold, fl.map(L => [L.x, PL[2].y, L.z]));
+    staticInst(plateBody[5], merge([cylY(0.3, 0, 0.4, 0, 0, 12), cylY(0.3, 2.0, 2.4, 0, 0, 12), hexY(0.46, 2.0, 2.25)]), M.steel, fl.map(L => [L.x, PL[5].y, L.z]));
+    staticInst(plateBody[5], prep(cylY(0.4, 0.4, 2.0, 0, 0, 20)), M.dark, fl.map(L => [L.x, PL[5].y, L.z]));
+    LOOM.forEach(([x, z]) => {
+      obox(pB[0], M.black, 2.2, 1.2, 1.0, x, 0, z, 0.15);
+      for (let k = 1; k < 6; k++) obox(pB[k], M.copper, 1.4, 0.5, 1.4, x, PL[k].y, z, 0.08);
+      obox(pB[5], M.black, 2.0, 1.0, 0.9, x, PL[5].y + 0.5, z, 0.12);
+    });
+  }
+  /* heat-sink clamps: gold arcs that the lines pass through on the 50 K and still plates */
+  for (const ring of [0, 1]) {
+    const rl = LINES.filter(L => L.ring === ring).sort((p, q) => p.deg - q.deg), groups = [];
+    for (const L of rl) { const g = groups[groups.length - 1]; if (g && L.deg - g[g.length - 1].deg < 8) g.push(L); else groups.push([L]); }
+    const rr = ring === 0 ? 17.4 : 14.9;
+    for (const g of groups) {
+      if (g.length < 2) continue;
+      const a0 = (g[0].deg - 2.6) * D2R, a1 = (g[g.length - 1].deg + 2.6) * D2R;
+      for (const k of [1, 3]) {
+        const sh = new THREE.Shape(); sh.absarc(0, 0, rr + 0.62, -a1, -a0, false); sh.absarc(0, 0, rr - 0.62, -a0, -a1, true);
+        pB[k].add(M.gold, extrudeY(sh, 0.85, 0.06, 24).translate(0, PL[k].y, 0));
+        for (let j = 0; j < g.length - 1; j += 2) { const [x, z] = pol(rr, (g[j].deg + g[j + 1].deg) / 2); capHead(pB[k], x, PL[k].y + 0.85, z, 0.42); }
+      }
+    }
+  }
+  /* movable components: input attenuators (4 K, cold plate, mixing chamber) and output amplifier chains */
+  const INL = LINES.filter(L => L.role === 'in'), OUTL = LINES.filter(L => L.role === 'out');
+  const attParts = [[merge([hexY(0.46, 0, 0.35), cylY(0.44, 1.92, 2.04, 0, 0, 20), cylY(0.3, 2.0, 2.6, 0, 0, 12), hexY(0.46, 2.04, 2.3)]), M.steel], [prep(cylY(0.42, 0.35, 1.95, 0, 0, 24)), M.gold], [prep(cylY(0.43, 1.0, 1.25, 0, 0, 24)), M.dark]];
+  const ATT = [2, 4, 5].map(k => ({ k, mv: new Movers(plateBody[k], attParts, INL.map(L => ({ x: L.x, y: PL[k].y, z: L.z, ry: Math.atan2(L.x, L.z), rx: L.x / Math.hypot(L.x, L.z), rz: L.z / Math.hypot(L.x, L.z) }))) }));
+  const hemtParts = [
+    [merge([cylY(0.3, 0, 0.4, 0, 0, 12), cylY(0.3, 3.0, 3.6, 0, 0, 12), hexY(0.46, 3.0, 3.3)]), M.steel],
+    [prep(rbox(2.4, 2.6, 1.4, 0.14, 0, 1.7, 0)), M.dark],
+    [prep(rbox(1.0, 0.8, 0.5, 0.08, 0, 2.0, 0.9)), M.black],
+    [merge([boxG(1.4, 0.5, 0.04, 0, 1.0, 0.71), boxG(3.8, 0.22, 1.1, 0, 0.11, -1.25), boxG(2.6, 2.6, 0.18, 0, 1.4, -0.8)]), M.gold]
+  ];
+  const stackParts = [
+    [merge([cylY(0.3, 0, 0.4, 0, 0, 12), cylY(0.3, 2.0, 2.4, 0, 0, 12), cylY(0.3, 5.0, 5.4, 0, 0, 12), cylY(0.3, 7.0, 8.0, 0, 0, 12), hexY(0.46, 7.0, 7.3), cylAx(0.3, V3(1.2, 3.7, 0), V3(1.95, 3.7, 0)), hexY(0.4, 1.95, 2.25).rotateZ(Math.PI / 2).translate(0, 3.7, 0)]), M.steel],
+    [merge([rbox(1.7, 1.6, 1.3, 0.12, 0, 1.2, 0), rbox(1.7, 1.6, 1.3, 0.12, 0, 6.2, 0)]), M.dark],
+    [merge([boxG(1.0, 0.45, 0.04, 0, 1.2, 0.66), boxG(1.0, 0.45, 0.04, 0, 6.2, 0.66), rbox(2.4, 2.6, 1.3, 0.14, 0, 3.7, 0), boxG(3.8, 0.22, 1.1, 0, 0.11, -1.25), boxG(2.4, 6.6, 0.18, 0, 3.5, -0.8)]), M.gold],
+    [prep(boxG(1.8, 2.0, 0.04, 0, 3.7, 0.66)), M.copper]
+  ];
+  const outItems = k => OUTL.map(L => ({ x: L.x, y: PL[k].y, z: L.z, ry: Math.atan2(L.x, L.z), rx: L.x / Math.hypot(L.x, L.z), rz: L.z / Math.hypot(L.x, L.z) }));
+  const HEMT = new Movers(plateBody[2], hemtParts, outItems(2)), STACK = new Movers(plateBody[5], stackParts, outItems(5));
+  const mountScrews = k => new ScrewSet(plateBody[k], M, OUTL.flatMap(L => { const ry = Math.atan2(L.x, L.z), rd = V3(L.x, 0, L.z).normalize(); return [-1.45, 1.45].map(lx => ({ p: V3(lx, 0, -1.3).applyAxisAngle(UP, ry).add(V3(L.x, PL[k].y + 0.22, L.z)), a: UP, fly: V3(0, 6, 0).addScaledVector(rd, 5) })); }), 0.42, 2.4, 4);
+  const HEMTS = mountScrews(2), STACKS = mountScrews(5);
+
+  /* ---------------- below the mixing chamber: cold finger, featured lines, filter, magnetic shield, package ---------------- */
+  const sampleG = new THREE.Group(); plateG[5].add(sampleG);
+  const ym = PL[5].y, tM = PL[5].t, PK = V3(0, -125.35, 3.4);
+  {
+    const SB = new Bucket();
+    SB.add(M.gold, cylY(2.4, ym - tM - 0.6, ym - tM, 0, -0.5, 36));
+    for (let i = 0; i < 6; i++) { const a = TAU * i / 6; capHead(SB, 1.9 * Math.cos(a), ym - tM - 0.6 - 0.3, -0.5 + 1.9 * Math.sin(a), 0.32); }
+    SB.add(M.gold, rbox(2.4, 16.6, 1.0, 0.1, 0, (ym - tM - 0.6 - 126) / 2, -0.5));
+    SB.add(M.gold, rbox(6.4, 1.0, 7.8, 0.12, 0, -126.5, 2.9));
+    const [xi, zi] = [FEAT.in.x, FEAT.in.z], [xo, zo] = [FEAT.out.x, FEAT.out.z];
+    const inA = cr([V3(xi, ym - tM - 0.7, zi), V3(xi, ym - tM - 2.2, zi - 0.6), V3(-5.0, -112.6, 7.0), V3(-4.5, -113.6, 3.9), V3(-4.5, -114.3, 3.4)]);
+    const inB = cr([V3(-4.5, -118.9, 3.4), V3(-4.5, -123.4, 3.4), V3(-4.2, -124.85, 3.4), V3(-3.55, -125.3, 3.4), V3(-2.85, -125.3, 3.4)]);
+    const outA = cr([V3(2.85, -125.3, 3.4), V3(3.55, -125.3, 3.4), V3(4.2, -124.85, 3.4), V3(4.5, -123.4, 3.4), V3(4.5, -114.5, 3.6), V3(4.6, -112.6, 6.5), V3(xo, ym - tM - 2.2, zo - 0.6), V3(xo, ym - tM - 0.7, zo)]);
+    SB.add(M.coaxCu, tube(inA, 0.11, 60, 8)); SB.add(M.coaxCu, tube(inB, 0.11, 40, 8)); SB.add(M.coaxCu, tube(outA, 0.11, 90, 8));
+    SB.add(M.dark, cylY(0.55, -118.4, -114.8, -4.5, 3.4, 24)); SB.add(M.copper, cylY(0.6, -114.8, -114.3, -4.5, 3.4, 24)); SB.add(M.copper, cylY(0.6, -118.9, -118.4, -4.5, 3.4, 24));
+    // hanger posts for the magnetic shield
+    for (let i = 0; i < 6; i++) { const a = TAU * (i + 0.5) / 6; SB.add(M.gold, cylY(0.32, ym - tM - 2.0, ym - tM, 8.2 * Math.cos(a), 2.8 + 8.2 * Math.sin(a), 12)); }
+    SB.build(sampleG);
+  }
+  const muTop = ym - tM - 2.0;
+  const mu = { mat: M.mu.clone(), g: new THREE.Group() }; plateG[5].add(mu.g);
+  {
+    const prof = [[7.55, -10], [7.55, -0.4], [8.9, -0.4], [8.9, 0], [3.0, 0], [3.0, -0.3], [7.3, -0.3], [7.3, -20.2], [0, -20.2], [0, -20.5], [7.55, -20.5]];
+    mu.mesh = new THREE.Mesh(shell(prof, 96).translate(0, muTop, 2.8), mu.mat); mu.mesh.castShadow = mu.mesh.receiveShadow = true; mu.g.add(mu.mesh);
+    mu.screws = new ScrewSet(sampleG, M, Array.from({ length: 6 }, (_, i) => { const a = TAU * (i + 0.5) / 6, c = Math.cos(a), s = Math.sin(a); return { p: V3(8.2 * c, muTop - 0.4, 2.8 + 8.2 * s), a: V3(0, -1, 0), fly: V3(5 * c, -5, 5 * s) }; }), 0.5, 2.0, 4);
+  }
+  const pkg = buildPackage(M); pkg.group.scale.setScalar(0.1); pkg.group.position.copy(PK); plateG[5].add(pkg.group);
+  pkg.group.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true; } });
+  const atoms = buildAtoms(M);
+  atoms.g.position.set(0, pkg.jj[0].t1 + pkg.jj[0].tox / 2, 0); atoms.g.scale.setScalar(1e-4); pkg.jj[0].g.add(atoms.g);
+
+  /* finalise merged geometry */
+  PL.forEach((p, k) => pB[k].build(plateBody[k]));
+  for (const s of spans.values()) {
+    s.b.build(s.g, { dy: -s.yb0 });
+    s.hiM = s.hi.build(s.g, { dy: -s.yb0 }); s.loM = s.lo.build(s.g, { dy: -s.yb0, cast: false });
+  }
+
+  /* shields: vacuum can, 50 K, 4 K, still; each bolted under its plate with a ring of cap screws */
+  const SH = [
+    { k: 0, r: 32.4, off: -39, mat: M.ovc, D: 0.95, LD: 2.6, n: 24, name: 'Vacuum can' },
+    { k: 1, r: 29, off: -34, mat: M.alS, D: 0.55, LD: 2.4, n: 26, name: '50 K shield' },
+    { k: 2, r: 26, off: -31, mat: M.alS2, D: 0.5, LD: 2.4, n: 24, name: '4 K shield' },
+    { k: 3, r: 23, off: -28, mat: M.gold, D: 0.45, LD: 2.4, n: 22, name: 'Still shield' }
+  ];
+  function shieldProf(r, Lh, fw) {
+    const th = 0.35, Ro = r + th, rf = r + fw, ft = 0.6, bt = 0.5, rc = 2.0, ri = rc - th;
+    return [[Ro, -Lh / 2], [Ro, -ft], [rf, -ft], [rf, 0], [r, 0], [r, -Lh + bt + ri], ...arcPts(r - ri, -Lh + bt + ri, ri, 0, -Math.PI / 2, 6).slice(1), [0, -Lh + bt], [0, -Lh], [Ro - rc, -Lh], ...arcPts(Ro - rc, -Lh + rc, rc, -Math.PI / 2, 0, 6).slice(1)];
+  }
+  for (const sh of SH) {
+    const top = PL[sh.k].y - PL[sh.k].t, Lh = top - (PL[5].y + sh.off), fw = sh.k === 0 ? 1.5 : 1.35;
+    sh.mat = sh.mat.clone(); sh.Lh = Lh;
+    sh.mesh = new THREE.Mesh(shell(shieldProf(sh.r, Lh, fw), 160).translate(0, top, 0), sh.mat);
+    sh.mesh.castShadow = sh.mesh.receiveShadow = true; plateG[sh.k].add(sh.mesh);
+    const rs = sh.r + fw * 0.55;
+    sh.screws = new ScrewSet(plateG[sh.k], M, Array.from({ length: sh.n }, (_, i) => { const a = TAU * (i + 0.5) / sh.n, c = Math.cos(a), s = Math.sin(a); return { p: V3(rs * c, top - 0.6, rs * s), a: V3(0, -1, 0), fly: V3(9 * c, -7, 9 * s) }; }), sh.D, sh.LD, 5);
+  }
+
+  /* ====================================================================================
+     State: everything is a pure function of the master value m
+     ==================================================================================== */
+  const st = { m: 0, s: 0 };
+  const DUOUT = (() => { const az = 0.3; return V3(-Math.cos(az), 0, Math.sin(az)).multiplyScalar(58).add(V3(Math.sin(az), 0, Math.cos(az)).multiplyScalar(6)); })();
+  const CUTAZ = 0.3;
+  DU.stillHalf.rotation.y = DU.mxcHalf.rotation.y = CUTAZ; DU.stillLiq.concat(DU.mxcLiq).forEach(m => (m.rotation.y = CUTAZ));
+  let ex = 25, contF = 1, atomP = 0;
+  function apply(m) {
+    const s = m * N, P = k => clamp(s - k, 0, 1);
+    st.m = m; st.s = s;
+    // 1–4: vacuum can and shields: bolts out, then the shell slides down and fades
+    SH.forEach((sh, i) => {
+      const p = P(i + 1); sh.screws.update(sstep(0.24, 0.5, p));
+      const d = sstep(0.5, 0.93, p), o = 1 - sstep(0.45, 1, d);
+      sh.mesh.position.y = -(sh.Lh + 40) * d * d; sh.mesh.visible = o > 0.003; setFade(sh.mat, o); sh.mesh.castShadow = o > 0.6;
+    });
+    // 6: the stages separate
+    sep = sstep(0.1, 0.85, P(6));
+    PL.forEach((p, k) => { plateG[k].position.y = Yk(k) - p.y; });
+    for (const sp of spans.values()) { const ya = Yk(sp.ka) + sp.offA, yb = Yk(sp.kb) + sp.offB; sp.g.position.y = yb; sp.g.scale.y = (ya - yb) / sp.L0; }
+    // 7: input attenuators lift out, plate by plate, line by line
+    const pin = P(7), nIn = INL.length, goneIn = sstep(0, 0.14, P(8));
+    ATT.forEach((A, a) => {
+      A.mv.meshes.forEach(m => (m.visible = goneIn < 0.999));
+      A.mv.set((j, it) => {
+        const s0 = 0.12 + 0.2 * a + 0.14 * (j / Math.max(1, nIn - 1)), q = sstep(s0, s0 + 0.26, pin);
+        if (q <= 0) return null;
+        const out = 12 * sstep(0.3, 1, q) + 30 * goneIn; return [it.rx * out, 3.6 * sstep(0, 0.45, q) + 0.6 * q + 4 * goneIn, it.rz * out, -0.5 * sstep(0.3, 1, q), 1 - goneIn];
+      });
+    });
+    // 8: output chains: mount screws out, then the amplifiers lift
+    const pout = P(8); HEMTS.update(sstep(0.16, 0.42, pout)); STACKS.update(sstep(0.16, 0.42, pout));
+    const goneOut = sstep(0, 0.1, P(9));
+    for (const m of HEMT.meshes.concat(STACK.meshes)) m.visible = goneOut < 0.999;
+    const liftOut = (j, it, base) => { const s0 = base + 0.05 * j, q = sstep(s0, s0 + 0.3, pout); if (q <= 0) return null; const out = 13 * sstep(0.3, 1, q) + 30 * goneOut; return [it.rx * out, 4.0 * sstep(0, 0.45, q) + 0.6 * q + 4 * goneOut, it.rz * out, -0.3 * sstep(0.3, 1, q), 1 - goneOut]; };
+    HEMT.set((j, it) => liftOut(j, it, 0.44)); STACK.set((j, it) => liftOut(j, it, 0.5));
+    // 9: the dilution unit comes out and is cut open
+    const pdu = P(9), duo = sstep(0.08, 0.52, pdu), cut = sstep(0.58, 0.74, pdu);
+    for (const g of DU.moving) { g.position.x = DUOUT.x * duo; g.position.z = DUOUT.z * duo; }
+    for (const [full, half, liqs, fm] of [[DU.stillFull, DU.stillHalf, DU.stillLiq, fullMats.still], [DU.mxcFull, DU.mxcHalf, DU.mxcLiq, fullMats.mxc]]) {
+      full.visible = cut < 0.999; setFade(fm, 1 - cut); full.castShadow = cut < 0.4; half.visible = cut > 0.001; liqs.forEach(q => (q.visible = cut > 0.05));
+    }
+    DU.mxcFront.visible = cut < 0.5; LQ.dil.opacity = 0.5 * cut; LQ.con.opacity = 0.42 * cut; LQ.bnd.opacity = 0.85 * cut; LQ.stl.opacity = 0.5 * cut;
+    // 10: magnetic shield
+    const pmu = P(10); mu.screws.update(sstep(0.16, 0.38, pmu));
+    const dm = sstep(0.4, 0.78, pmu), om = 1 - sstep(0.5, 1, dm);
+    mu.g.position.y = -34 * dm * dm; mu.mesh.visible = om > 0.003; setFade(mu.mat, om); mu.mesh.castShadow = om > 0.6;
+    // 11: sample-box lid
+    const plid = P(11); pkg.lidScrews.update(sstep(0.22, 0.48, plid));
+    const l = sstep(0.5, 0.95, plid), lo = 1 - sstep(0.62, 1, l);
+    pkg.lid.position.set(0, 30 * sstep(0, 0.55, l), -26 * sstep(0.4, 1, l)); pkg.lid.rotation.x = -0.6 * sstep(0.4, 1, l);
+    pkg.lid.visible = lo > 0.003; setFade(pkg.lidCu, lo);
+    // 12: bonds go, the chip lifts out and turns to face us
+    const pch = P(12), bo = 1 - sstep(0.22, 0.42, pch), cl = sstep(0.45, 0.92, pch);
+    setFade(pkg.bondMat, bo); pkg.bonds.visible = bo > 0.003;
+    pkg.chip.position.y = 9 * cl; pkg.chip.rotation.y = Math.PI / 2 * cl;
+    // 13: the aluminium film separates from the substrate; 14: and settles back
+    const fsep = sstep(0.15, 0.55, P(13)) - sstep(0, 0.12, P(14));
+    pkg.film.position.y = 0.55 * fsep;
+    // 14: metal relief goes from exaggerated to true thickness; the top electrode lifts away
+    ex = lerp(25, 1, sstep(0.2, 0.55, P(14))); pkg.metal.scale.y = ex;
+    const tl = sstep(0.82, 0.96, P(14));
+    for (const j of pkg.jj) j.top.position.set(0, 0.3 * tl, 0);
+    // 15: the continuum fades, the atoms appear
+    contF = 1 - sstep(0.04, 0.2, P(15)); atomP = sstep(0.2, 0.7, P(15));
+    setFade(pkg.jmats.al, contF); setFade(pkg.jmats.ox, contF);
+    for (const j of pkg.jj) j.g.children.forEach(c => { if (c !== atoms.g) c.visible = contF > 0.003; });
+    atoms.update(atomP); atoms.g.visible = atomP > 0.001;
+    root.updateMatrixWorld(true);
+  }
+
+  /* ====================================================================================
+     Camera path: per-step poses, interpolated with easing; distance in log space
+     ==================================================================================== */
+  const WP = (obj, x = 0, y = 0, z = 0) => () => obj.localToWorld(V3(x, y, z));
+  const FX = (x, y, z) => () => V3(x, y, z);
+  const pkgC = (x, y, z) => () => pkg.group.localToWorld(V3(x, y, z));
+  const chipC = () => pkg.chip.localToWorld(V3(0, 0, 0));
+  const filmMid = () => pkg.chip.localToWorld(V3(0, pkg.film.position.y * 0.5 - 0.1, 0));
+  const jjW = () => pkg.jj[0].g.localToWorld(V3(0, pkg.jj[0].t1, 0));
+  const jjU = () => pkg.jj[0].g.localToWorld(V3(0, 0.13, 0));
+  const atomC = () => atoms.g.localToWorld(V3(0, 0, 0));
+  const mxcC = () => DU.mxc.localToWorld(V3(MXP[0], PL[5].y + 2.6, MXP[1]));
+  const duC = () => { const a = DU.still.localToWorld(V3(PUMP[0], PL[3].y - PL[3].t - 3, PUMP[1])), b = DU.mxc.localToWorld(V3(MXP[0], PL[5].y + 3, MXP[1])); return a.add(b).multiplyScalar(0.5); };
+  const KEYS = [];
+  const ck = (k, u, t, h, az, pol, w) => KEYS.push({ M: (k + u) / N, t, h, w, az, pol });
+  const FL = (r, y, az, f = 0.86) => () => V3(f * r * Math.sin(az), y, f * r * Math.cos(az));
+  ck(0, 0, FX(0, -58, 0), 106, 1.0, 1.44, 46); ck(0, 0.9, FX(0, -61, 0), 98, 0.55, 1.37, 44);
+  ck(1, 0.22, FL(33.2, -4.6, 0.5), 12, 0.5, 1.78); ck(1, 0.96, FX(0, -66, 0), 86, 0.42, 1.38, 40);
+  ck(2, 0.2, FL(29.7, -27.2, 0.38), 11, 0.38, 1.78); ck(2, 0.96, FX(0, -70, 0), 80, 0.32, 1.37, 36);
+  ck(3, 0.2, FL(26.7, -55.2, 0.26), 10, 0.26, 1.78); ck(3, 0.96, FX(0, -75, 0), 72, 0.22, 1.36, 34);
+  ck(4, 0.2, FL(23.7, -81, 0.14), 9.5, 0.14, 1.78); ck(4, 0.96, FX(0, -66, 0), 76, 0.14, 1.38, 34);
+  ck(5, 0.5, FX(0, -84, 0), 34, 0.72, 1.3); ck(5, 0.96, FX(0, -64, 0), 72, 1.35, 1.41, 36);
+  ck(6, 0.9, () => V3(0, (27 + Yk(5) - 22) / 2, 0), () => (27 - (Yk(5) - 22)) / 2 * 1.03, 0.62, 1.44, 40);
+  const midIn = (x, z) => () => V3(x, (Yk(2) + Yk(5)) / 2 + 2, z), spanH = () => (Yk(2) - Yk(5)) / 2 + 12;
+  ck(7, 0.15, () => V3(-14, Yk(2) + 2, 12), 22, 0.22, 1.3); ck(7, 0.5, () => V3(-13, (Yk(4) + Yk(5)) / 2 + 3, 11), 28, 0.3, 1.3); ck(7, 0.95, midIn(-12, 9), spanH, 0.36, 1.27, 58);
+  ck(8, 0.18, () => V3(13, Yk(2) + 2, 7), 20, -0.1, 1.3); ck(8, 0.5, () => V3(13, (Yk(4) + Yk(5)) / 2 + 4, 7), 28, -0.15, 1.3); ck(8, 0.95, midIn(14, 7), spanH, -0.2, 1.27, 58);
+  ck(9, 0.1, duC, 40, 0.34, 1.38); ck(9, 0.55, duC, 40, 0.3, 1.36); ck(9, 0.72, duC, 39, 0.3, 1.36); ck(9, 0.97, mxcC, 8.5, 0.3, 1.2);
+  ck(10, 0.2, () => sampleG.localToWorld(V3(0, -120.5, 2.8)), 15, 0.52, 1.3); ck(10, 0.95, pkgC(0, 1, 0), 6.5, 0.55, 1.12);
+  ck(11, 0.2, pkgC(0, 3, 0), 2.7, 0.62, 0.98); ck(11, 0.95, pkgC(0, 0, 0), 2.1, 0.66, 0.86);
+  ck(12, 0.2, chipC, 0.6, 0.66, 0.86); ck(12, 0.95, chipC, 0.44, 0.72, 0.5);
+  ck(13, 0.3, filmMid, 0.36, 0.86, 1.02); ck(13, 0.95, filmMid, 0.36, 0.96, 0.86);
+  ck(14, 0.3, jjW, 0.075, 0.9, 0.72); ck(14, 0.6, jjW, 1.1e-3, 0.8, 0.78); ck(14, 0.8, jjU, 6.5e-5, 0.62, 1.08); ck(14, 0.97, jjU, 6.2e-5, 0.78, 1.04);
+  ck(15, 0.55, atomC, 3.5e-7, 0.55, 1.3); ck(15, 0.97, atomC, 3.3e-7, 0.92, 1.24);
+  KEYS.sort((a, b) => a.M - b.M);
+  const hv = h => typeof h === 'function' ? h() : h;
+  let W = 1, H = 1, view = { cx: 0.5, cy: 0.5, fw: 1, fh: 1 };
+  function poseDist(K) { const h = hv(K.h), w = K.w !== undefined ? K.w : h; return Math.max(h * H / view.fh, w * H / view.fw) / tanV; }
+  function camAt(m) {
+    let i = 0; while (i < KEYS.length - 1 && KEYS[i + 1].M <= m) i++;
+    const A = KEYS[i], B = KEYS[Math.min(i + 1, KEYS.length - 1)];
+    const t = B.M > A.M ? ease(clamp((m - A.M) / (B.M - A.M), 0, 1)) : 0;
+    const tA = A.t(), tB = B.t(), dA = poseDist(A), dB = poseDist(B);
+    const d = Math.exp(lerp(Math.log(dA), Math.log(dB), t));
+    const tgt = Math.abs(Math.log(dB / dA)) > 0.6 ? tB.clone().lerp(tA, (d - dB) / (dA - dB)) : tA.clone().lerp(tB, t);
+    return { tgt, d, az: lerp(A.az, B.az, t), pol: lerp(A.pol, B.pol, t) };
+  }
+  let azOff = 0, polOff = 0, placing = false, cam = null;
+  const sph = new THREE.Spherical();
+  function place() {
+    cam = camAt(st.m);
+    sph.set(cam.d, clamp(cam.pol + polOff, 0.04, Math.PI - 0.04), cam.az + azOff);
+    camera.position.setFromSpherical(sph).add(cam.tgt); controls.target.copy(cam.tgt);
+    camera.near = cam.d * 0.025; camera.far = cam.d * 600; camera.updateProjectionMatrix();
+    placing = true; controls.update(); placing = false;
+  }
+  controls.addEventListener('change', () => {
+    if (placing || !cam) return;
+    const a = controls.getAzimuthalAngle() - cam.az; azOff = Math.atan2(Math.sin(a), Math.cos(a)); polOff = controls.getPolarAngle() - cam.pol;
+    request();
+  });
+  /* touch: one finger turns the model horizontally only, so vertical swipes still scroll the page */
+  cv.addEventListener('pointerdown', e => {
+    if (e.pointerType === 'touch') { const p = controls.getPolarAngle(); controls.minPolarAngle = controls.maxPolarAngle = p; }
+    else { controls.minPolarAngle = 0.04; controls.maxPolarAngle = Math.PI - 0.04; }
+  }, { capture: true });
+  const relax = () => { controls.minPolarAngle = 0.04; controls.maxPolarAngle = Math.PI - 0.04; };
+  cv.addEventListener('pointerup', relax); cv.addEventListener('pointercancel', relax);
+
+  /* ====================================================================================
+     Labels
+     ==================================================================================== */
+  const LB = [];
+  const lab = (t, at, d, k0, k1, cls = '') => LB.push({ t, at, d, k0, k1, cls });
+  const rgt = V3(1, 0, 0), toCam = V3(0, 0, 1);
+  const edge = (r, fy, side = 1) => () => V3(side * rgt.x * r, fy(), side * rgt.z * r);
+  const front = (r, fy) => () => V3(toCam.x * r, fy(), toCam.z * r);
+  lab('Vacuum can · 300 K', edge(32.8, () => -70, -1), [-34, 0], -1, 1.4, 'b');
+  lab('Pulse-tube cold head', WP(plateG[0], PT[0] + 3.4, 13, PT[1]), [44, -24], -1, 1.15);
+  lab('Still pumping line', WP(plateG[0], PUMP[0] - 9, 12.5, PUMP[1]), [-40, -24], -1, 1.15);
+  lab('Top plate · 300 K', edge(34, () => -1.2), [32, 10], -1, 1.15);
+  lab('Room-temperature connectors', WP(plateG[0], FEAT.in.x, 5.3, FEAT.in.z), [-46, -34], -1, 1.15);
+  lab('24 bolts', front(33.2, () => -3.0), [42, 26], 1.1, 1.62, 't');
+  lab('50 K radiation shield', front(29.8, () => -36), [44, 0], 1.9, 2.55, 'b');
+  lab('Flange bolts', front(29.8, () => -25.8), [44, 24], 2.12, 2.6, 't');
+  lab('4 K radiation shield', front(26.8, () => -64), [44, 0], 2.9, 3.55, 'b');
+  lab('Flange bolts', front(26.8, () => -53.8), [44, 24], 3.12, 3.6, 't');
+  lab('Still shield, gold-plated copper', front(23.8, () => -86), [44, 0], 3.9, 4.55, 'b');
+  lab('Flange bolts', front(23.8, () => -79.6), [44, 24], 4.12, 4.6, 't');
+  lab('Pulse tube, second stage', WP(plateG[2], PT[0], PL[2].y + 2, PT[1]), [44, -30], 5.15, 6.15);
+  lab('Coax with expansion loops', () => plateG[4].localToWorld(V3(FEAT.in.x, -85, FEAT.in.z)), [-48, -10], 5.2, 6.15);
+  lab('Stainless-steel support rods', () => { const [x, z] = pol(PL[2].R - 3.2, 112.5); return plateG[1].localToWorld(V3(x, -36, z)); }, [-48, 22], 5.2, 6.15);
+  PL.forEach((p, k) => lab(() => `${p.name} · <tspan class="m g">${p.temp}</tspan>`, () => V3(rgt.x * (p.R + 0.3), Yk(k) - p.t / 2, rgt.z * (p.R + 0.3)), [30, 0], 5.55, 7.97, 'b'));
+  const attLab = (A, txt) => () => { const j = Math.floor(INL.length * 0.35), it = A.mv.items[j]; return plateBody[A.k].localToWorld(V3(it.x + it.rx * 12, it.y + 5.6, it.z + it.rz * 12)); };
+  lab('<tspan class="t">−20 dB</tspan> · 4 K', attLab(ATT[0]), [-36, -18], 7.55, 8.3);
+  lab('<tspan class="t">−10 dB</tspan> · cold plate', attLab(ATT[1]), [-36, -18], 7.7, 8.3);
+  lab('<tspan class="t">−20 dB</tspan> · mixing chamber', attLab(ATT[2]), [-36, 18], 7.85, 8.3);
+  lab('Attenuators, typical values', () => { const it = ATT[1].mv.items[INL.length - 1]; return plateBody[4].localToWorld(V3(it.x + it.rx * 12, it.y + 2, it.z + it.rz * 12)); }, [-40, 30], 7.85, 8.3);
+  const outLab = (mv, k, dy) => () => { const it = mv.items[1]; return plateBody[k].localToWorld(V3(it.x + it.rx * 13, it.y + 4.6 + dy, it.z + it.rz * 13)); };
+  lab('HEMT amplifier · <tspan class="t">+40 dB</tspan> · 4 K', outLab(HEMT, 2, 1.7), [40, -20], 8.6, 9.25);
+  lab('TWPA · <tspan class="t">+20 dB</tspan> · 10 mK', outLab(STACK, 5, 3.7), [40, -16], 8.72, 9.25);
+  lab('Isolators', outLab(STACK, 5, 1.2), [40, 18], 8.78, 9.25);
+  lab('Mount screws', () => HEMTS.items[2].p.clone().applyMatrix4(plateBody[2].matrixWorld), [40, 22], 8.12, 8.42, 't');
+  lab('Still · ≈ 0.8 K', () => DU.still.localToWorld(V3(PUMP[0] - 4.2, PL[3].y - PL[3].t - 2, PUMP[1])), [-40, -10], 9.45, 9.82);
+  lab('Heat exchangers', () => DU.steps.localToWorld(V3(-3.5 - 2.4, PL[4].y - PL[4].t - 2, -6)), [-44, 0], 9.45, 9.82);
+  lab('Mixing chamber · ≈ 10 mK', () => DU.mxc.localToWorld(V3(MXP[0] - 4.0, PL[5].y + 1, MXP[1])), [-50, 30], 9.45, 10.15, 'b');
+  lab('Concentrated phase: almost pure ³He', () => DU.mxc.localToWorld(V3(MXP[0] + 1.2 * Math.sin(CUTAZ), PL[5].y + 3.8, MXP[1] + 1.2 * Math.cos(CUTAZ))), [60, -36], 9.8, 10.15);
+  lab('Dilute phase: 6.6 % ³He in ⁴He', () => DU.mxc.localToWorld(V3(MXP[0] + 1.2 * Math.sin(CUTAZ), PL[5].y + 1.4, MXP[1] + 1.2 * Math.cos(CUTAZ))), [60, 36], 9.8, 10.15);
+  lab('Magnetic shield', () => mu.g.localToWorld(V3(-rgt.x * 7.6, muTop - 9, 2.8 - rgt.z * 7.6)), [-38, 0], 10.05, 10.5, 'b');
+  lab('Cold finger', () => sampleG.localToWorld(V3(0, -117, -0.5)), [40, -18], 10.6, 11.15);
+  lab('Infrared filter', () => sampleG.localToWorld(V3(-4.5, -116.6, 3.4)), [-40, -14], 10.6, 11.15);
+  lab('Sample box', pkgC(10, 6, 14), [40, 20], 10.6, 11.15, 'b');
+  lab('M2 cap screws', pkgC(13.2, 7, 13.2), [36, -22], 11.12, 11.42, 't');
+  lab('Lid', () => pkg.lid.localToWorld(V3(8, 6, 8)), [40, -20], 11.42, 11.72);
+  lab('Circuit board', pkgC(9, 0, 9), [40, 20], 11.7, 12.2);
+  lab('SMA connector', pkgC(-21, 0.5, 0), [-38, -16], 11.7, 12.2);
+  lab('Chip, 6 × 6 mm', pkgC(2.4, 0, 2.6), [40, 26], 11.75, 12.2, 'b');
+  lab('Wire bonds, 25 µm aluminium', pkgC(-3.3, 0.24, 1.0), [-40, -30], 12.12, 12.42);
+  const filmP = (x, z, y = 0) => () => pkg.film.localToWorld(V3(x, y, z));
+  lab('Silicon substrate, 0.5 mm', () => pkg.chip.localToWorld(V3(3, -0.25, 1.5)), [50, 30], 13.3, 13.95);
+  lab('Aluminium film, ≈ 100 nm', filmP(3, 1.5), [50, -26], 13.3, 13.95);
+  lab('Feedline', filmP(1.7, 0), [56, 34], 13.55, 14.2, 'b');
+  lab('Readout resonator, λ/4', filmP(-1.9, 0.3), [-64, 30], 13.55, 14.2, 'b');
+  lab('Coupling capacitor', filmP(-0.66, 1.2), [70, 16], 13.55, 14.2);
+  lab('Qubit capacitor pads', filmP(-1.75, 1.75), [-70, -16], 13.55, 14.2, 'b');
+  lab('Josephson junction', filmP(-1.2, 1.625), [74, -44], 13.55, 14.2, 'b');
+  lab('Drive line', filmP(-1.2, 2.6), [-60, -40], 13.55, 14.2);
+  lab('Capacitor pad', filmP(-1.4, 1.5), [-42, -18], 14.22, 14.48, 'b');
+  lab('Capacitor pad', filmP(-1.0, 1.5), [42, -18], 14.22, 14.48, 'b');
+  const jjP = (x, y, z) => () => pkg.jj[0].g.localToWorld(V3(x, y, z));
+  lab('Leads', jjP(-20, 0.03, 0), [-40, -22], 14.5, 14.72);
+  lab('Bottom electrode, Al', jjP(-1.5, 0.02, -1.5), [-60, 40], 14.74, 15.12, 'b');
+  lab('Top electrode, Al, lifted', () => pkg.jj[0].g.localToWorld(V3(0.9, 0.05 + pkg.jj[0].top.position.y, -0.9)), [60, -40], 14.86, 15.12, 'b');
+  lab('AlOx barrier, ≈ 1–2 nm', jjP(-0.6, 0.037, -0.6), [60, 50], 14.88, 15.15, 'b');
+  lab('Junction area ≈ 200 × 200 nm', jjP(0, 0.037, 0), [-70, -50], 14.88, 15.15);
+  const atP = (x, y, z) => () => atoms.g.localToWorld(V3(x, y, z));
+  lab('Aluminium · fcc, <tspan class="m g">a = 4.05 Å</tspan>', atP(-atoms.hw, 15, atoms.hw), [-80, -10], 15.62, 16.2, 'b');
+  lab('Amorphous AlOx, ≈ 1.7 nm', atP(atoms.hw, 0, atoms.hw), [80, 0], 15.62, 16.2, 'b');
+  lab('Aluminium', atP(-atoms.hw, -15, atoms.hw), [-80, 10], 15.62, 16.2);
+  lab('Cooper pairs tunnelling (cartoon)', atP(atoms.hw, 12, -atoms.hw), [80, -40], 15.7, 16.2);
+
+  function Placer() {
+    const rects = []; let out = '';
+    const hit = r => rects.some(q => r[0] < q[2] && r[2] > q[0] && r[1] < q[3] && r[3] > q[1]);
+    return {
+      block(r) { rects.push(r); },
+      add(x, y, dx, dy, html, op, cls) {
+        const tw = (W < 721 ? 6.1 : 6.9) * html.replace(/<[^>]+>/g, '').length + 6;
+        const cands = [[dx, dy], [dx, dy - 18], [dx, dy + 18], [dx, dy - 36], [dx, dy + 36], [-dx, dy], [-dx, -dy], [dx * 1.6, dy - 26], [dx * 1.6, dy + 26], [-dx, dy + 30], [-dx, dy - 30]];
+        for (const [cx, cy] of cands) {
+          let ddx = cx, ddy = cy;
+          if (ddx > 0 && x + ddx + tw > W - 8) ddx = -ddx; else if (ddx < 0 && x + ddx - tw < 8) ddx = -ddx;
+          if (y + ddy < 16) ddy = Math.abs(ddy) + 4; else if (y + ddy > H - 10) ddy = -Math.abs(ddy) - 4;
+          const tx = x + ddx + (ddx < 0 ? -5 : 5), r = ddx < 0 ? [tx - tw, y + ddy - 10, tx, y + ddy + 6] : [tx, y + ddy - 10, tx + tw, y + ddy + 6];
+          if (r[0] < 4 || r[2] > W - 4) continue;
+          if (!hit(r)) {
+            rects.push(r);
+            const x2 = x + ddx, y2 = y + ddy, anchor = ddx < 0 ? 'end' : 'start';
+            out += `<g opacity="${op.toFixed(3)}"><line x1="${x.toFixed(1)}" y1="${y.toFixed(1)}" x2="${x2.toFixed(1)}" y2="${y2.toFixed(1)}" stroke="#8a8982" stroke-width="1"/>` +
+              `<circle cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" r="2.6" fill="#f2f1ec" stroke="#0a0a0a" stroke-width="1"/>` +
+              `<text class="${cls}" x="${tx.toFixed(1)}" y="${(y2 + 4).toFixed(1)}" text-anchor="${anchor}" stroke="#0a0a0a" stroke-width="4" paint-order="stroke" stroke-linejoin="round">${html}</text></g>`;
+            return true;
+          }
+        }
+        return false;
+      },
+      get svg() { return out; }
+    };
+  }
+  let blocks = [];
+  function measureBlocks() {
+    const sr = stageEl.getBoundingClientRect();
+    blocks = ['steps', 'cap', 'scale'].map(id => $(id)).concat([document.querySelector('.ctl')]).map(el => {
+      const r = el.getBoundingClientRect(); if (!r.width || !r.height) return null;
+      return [r.left - sr.left - 4, r.top - sr.top - 4, r.right - sr.left + 4, r.bottom - sr.top + 4];
+    }).filter(Boolean);
+    const lst = $('slist'); if (getComputedStyle(lst).display === 'none') blocks = blocks.filter(b => b[3] - b[1] < 80 || b[1] > 100);
+  }
+  function overlay() {
+    rgt.set(1, 0, 0).applyQuaternion(camera.quaternion); rgt.y = 0; rgt.normalize();
+    toCam.copy(camera.position).sub(cam.tgt); toCam.y = 0; toCam.normalize();
+    const pl = Placer(); blocks.forEach(b => pl.block(b));
+    for (const L of LB) {
+      const op = (L.k0 < 0 ? 1 : sstep(L.k0, L.k0 + 0.12, st.s)) * (1 - sstep(L.k1 - 0.12, L.k1, st.s)); if (op < 0.02) continue;
+      const p = L.at(); p.project(camera);
+      if (p.z > 1 || p.z < -1 || Math.abs(p.x) > 1.05 || Math.abs(p.y) > 1.05) continue;
+      const x = (p.x + 1) / 2 * W, y = (1 - p.y) / 2 * H;
+      if (blocks.some(b => x > b[0] && x < b[2] && y > b[1] && y < b[3])) continue;
+      pl.add(x, y, L.d[0], L.d[1], typeof L.t === 'function' ? L.t() : L.t, op, L.cls);
+    }
+    ov.innerHTML = pl.svg;
+  }
+
+  /* ====================================================================================
+     Render on demand
+     ==================================================================================== */
+  const scaleT = $('scaleT'), scaleB = $('scaleB');
+  function lenText(cm) {
+    const m = cm / 100, f = v => String(+v.toPrecision(2));
+    if (m >= 1) return f(m) + ' m'; if (m >= 0.01) return f(m * 100) + ' cm'; if (m >= 1e-3) return f(m * 1e3) + ' mm';
+    if (m >= 1e-6) return f(m * 1e6) + ' µm'; if (m >= 1e-9) return f(m * 1e9) + ' nm'; return f(m * 1e10) + ' Å';
+  }
+  function updateScale() {
+    const wpp = 2 * cam.d * tanV / H, want = 96 * wpp, p = Math.pow(10, Math.floor(Math.log10(want)));
+    let len = p; for (const k of [1, 2, 5, 10]) if (k * p <= want) len = k * p;
+    scaleB.style.width = (len / wpp).toFixed(1) + 'px'; scaleT.textContent = lenText(len);
+  }
+  const LDIR = V3(-0.5, 0.72, 0.62).normalize(), RA = V3(-0.85, 0.3, -0.75).normalize(), RB = V3(0.9, 0.22, -0.6).normalize();
+  function lights() {
+    const q = camera.quaternion, half = Math.max(cam.d * tanV * Math.max(1, W / H) * 1.2, 1e-9);
+    const kd = LDIR.clone().applyQuaternion(q);
+    key.target.position.copy(cam.tgt); key.position.copy(cam.tgt).addScaledVector(kd, half * 4);
+    const c = key.shadow.camera; c.left = -half; c.right = half; c.top = half; c.bottom = -half; c.near = half * 0.5; c.far = half * 9; c.updateProjectionMatrix();
+    key.shadow.normalBias = half * 0.0012; key.target.updateMatrixWorld();
+    for (const [L, d] of [[rimA, RA], [rimB, RB]]) { L.target.position.copy(cam.tgt); L.position.copy(cam.tgt).addScaledVector(d.clone().applyQuaternion(q), half * 4); L.target.updateMatrixWorld(); }
+  }
+  function gates() {
+    const d = cam.d, s = st.s;
+    const deep = d < 3.2, deeper = d < 0.05;
+    for (const g of plateBody) g.visible = !deep;
+    for (const sp of spans.values()) { sp.g.visible = !deep; const hi = d < 150; for (const m of sp.hiM) m.visible = hi; for (const m of sp.loM) m.visible = !hi; }
+    for (const g of DU.moving) g.visible = !deep;
+    for (const sh of SH) if (deep) sh.mesh.visible = false;
+    mu.g.visible = !deep && mu.mesh.visible;
+    sampleG.visible = !deeper;
+    pkg.base.visible = !deeper; pkg.lid.visible = pkg.lid.visible && !deeper;
+    const atomic = contF < 0.02;
+    pkg.si.visible = !atomic; pkg.metal.visible = !atomic;
+    key.shadow.bias = deeper ? -0.0008 : -0.0004;
+  }
+  let raf = 0, visible = true, tween = null, lastStep = -1, animT = 0, lastTime = 0;
+  function request() { if (!raf) raf = requestAnimationFrame(frame); }
+  function frame(now) {
+    raf = 0;
+    if (tween) {
+      const u = clamp((now - tween.t0) / tween.dur, 0, 1), v = lerp(tween.a, tween.b, ease(u));
+      setMaster(v, 'tween'); if (u >= 1) tween = null;
+    }
+    if (!visible && !tween) return;
+    apply(st.m); place(); gates(); lights();
+    const want = !RM && atomP > 0.6;
+    if (want) { animT += lastTime ? Math.min(0.05, (now - lastTime) / 1000) : 1 / 60; lastTime = now; } else lastTime = 0;
+    atoms.animate(RM ? 1.3 : animT, atomP > 0.6);
+    renderer.render(scene, camera);
+    overlay(); updateScale(); updateUI();
+    if (tween || want) request();
+  }
+
+  /* ====================================================================================
+     UI: slider, scroll, buttons, keys, step list
+     ==================================================================================== */
+  const slider = $('master'), posEl = $('pos'), list = $('slist');
+  STEPS.forEach((S, i) => {
+    const li = document.createElement('li'), b = document.createElement('button');
+    b.type = 'button'; b.className = 'sbtn'; b.dataset.i = i;
+    b.innerHTML = `<span class="n">${String(i + 1).padStart(2, '0')}</span><span class="t">${S.title}</span>`;
+    b.addEventListener('click', () => { goTo(REST(i)); if (matchMedia('(max-width:720px)').matches) toggleList(false); });
+    li.appendChild(b); list.appendChild(li);
+  });
+  const btns = [...list.querySelectorAll('.sbtn')];
+  const stepOf = m => Math.min(N - 1, Math.floor(m * N + 1e-9));
+  function updateUI() {
+    const i = stepOf(st.m);
+    posEl.textContent = `${i + 1} / ${N}`;
+    if (i === lastStep) return; lastStep = i;
+    const S = STEPS[i];
+    btns.forEach((b, j) => { if (j === i) b.setAttribute('aria-current', 'step'); else b.removeAttribute('aria-current'); b.classList.toggle('done', j < i); });
+    const cb = btns[i]; if (cb && cb.scrollIntoView && list.scrollHeight > list.clientHeight) { const r = cb.offsetTop - list.clientHeight / 2 + cb.offsetHeight / 2; list.scrollTop = r; }
+    $('capK').innerHTML = `Step ${i + 1} of ${N} <span>·</span> ${S.meta}`;
+    $('capT').textContent = S.title; $('capP').textContent = S.text;
+    $('stogN').textContent = String(i + 1).padStart(2, '0'); $('stogT').textContent = S.title;
+    slider.setAttribute('aria-valuetext', `Step ${i + 1} of ${N}: ${S.title}`);
+    cv.setAttribute('aria-label', `Teardown, step ${i + 1} of ${N}: ${S.title}. ${S.text}`);
+    $('prev').disabled = st.m <= 0.0005; $('next').disabled = st.m >= 0.9995;
+    measureBlocks();
+  }
+  let secTop = 0, secRange = 1, expectY = null;
+  const BAR = () => parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--bar')) || 52;
+  function measure() { const r = tear.getBoundingClientRect(); secTop = r.top + window.scrollY; secRange = Math.max(1, tear.offsetHeight - stageEl.offsetHeight); }
+  function syncScroll() { const y = Math.round(secTop - BAR() + st.m * secRange); expectY = y; window.scrollTo(0, y); }
+  function setMaster(v, from) {
+    st.m = clamp(v, 0, 1);
+    if (from !== 'slider') slider.value = st.m;
+    if (from !== 'scroll') syncScroll();
+    $('prev').disabled = st.m <= 0.0005; $('next').disabled = st.m >= 0.9995;
+    request();
+  }
+  slider.addEventListener('input', () => { tween = null; setMaster(+slider.value, 'slider'); });
+  slider.addEventListener('keydown', e => {      // arrow keys on the slider move one step at a time
+    const k = e.key;
+    if (k === 'ArrowRight' || k === 'ArrowUp' || k === 'PageDown') { e.preventDefault(); stepNext(1); }
+    else if (k === 'ArrowLeft' || k === 'ArrowDown' || k === 'PageUp') { e.preventDefault(); stepNext(-1); }
+    else if (k === 'Home') { e.preventDefault(); goTo(0); } else if (k === 'End') { e.preventDefault(); goTo(1); }
+  });
+  window.addEventListener('scroll', () => {
+    const y = window.scrollY;
+    if (expectY !== null && Math.abs(y - expectY) < 2) { expectY = null; return; }
+    expectY = null; tween = null;
+    setMaster((y + BAR() - secTop) / secRange, 'scroll');
+  }, { passive: true });
+  function goTo(v) {
+    if (RM) { tween = null; setMaster(v, 'tween'); return; }
+    const a = st.m, dur = clamp(Math.abs(v - a) * N * 1500, 450, 2600);
+    tween = { a, b: v, t0: performance.now(), dur }; request();
+  }
+  function stepNext(dir) {
+    const m = tween ? tween.b : st.m;
+    if (dir > 0) { for (let i = 0; i < N; i++) if (REST(i) > m + 0.002) return goTo(REST(i)); }
+    else { for (let i = N - 1; i >= 0; i--) if (REST(i) < m - 0.002) return goTo(REST(i)); goTo(0); }
+  }
+  $('next').addEventListener('click', () => stepNext(1));
+  $('prev').addEventListener('click', () => stepNext(-1));
+  $('reset').addEventListener('click', () => {
+    if (RM) { azOff = polOff = 0; request(); return; }
+    const a0 = azOff, p0 = polOff, t0 = performance.now();
+    const run = now => { const u = clamp((now - t0) / 450, 0, 1), e = ease(u); azOff = a0 * (1 - e); polOff = p0 * (1 - e); request(); if (u < 1) requestAnimationFrame(run); };
+    requestAnimationFrame(run);
+  });
+  document.addEventListener('keydown', e => {
+    if (e.defaultPrevented || e.altKey || e.ctrlKey || e.metaKey) return;
+    const tg = e.target; if (tg && (tg.tagName === 'INPUT' || tg.tagName === 'TEXTAREA' || tg.tagName === 'SELECT' || tg.isContentEditable)) return;
+    if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+    const r = stageEl.getBoundingClientRect(); if (r.bottom < innerHeight * 0.4 || r.top > innerHeight * 0.6) return;
+    e.preventDefault(); stepNext(e.key === 'ArrowRight' ? 1 : -1);
+  });
+  const stEl = $('steps'), stog = $('stoggle');
+  function toggleList(open) { stEl.classList.toggle('open', open); stog.setAttribute('aria-expanded', open ? 'true' : 'false'); measureBlocks(); request(); }
+  stog.addEventListener('click', () => toggleList(!stEl.classList.contains('open')));
+
+  function capMax() {         // tallest caption over all steps, so that the view does not jump between steps
+    const k = $('capK'), t = $('capT'), p = $('capP'), cap = $('cap'), save = [k.innerHTML, t.textContent, p.textContent];
+    let hmax = 0;
+    for (const S of STEPS) { k.innerHTML = `Step 16 of ${N} <span>·</span> ${S.meta}`; t.textContent = S.title; p.textContent = S.text; hmax = Math.max(hmax, cap.offsetHeight); }
+    [k.innerHTML, t.textContent, p.textContent] = save; return hmax;
+  }
+  function layout() {
+    W = stageEl.clientWidth; H = stageEl.clientHeight; if (!W || !H) return;
+    renderer.setSize(W, H, false); camera.aspect = W / H;
+    const mobile = W < 721;
+    let x0 = 0, x1 = W, y0 = 0, y1 = H - 62;
+    if (mobile) { y0 = 52; y1 = H - 60 - capMax() - 8; } else { x1 = W - (W < 981 ? 238 : 276); y1 = H - 62 - capMax() * (W < 1200 ? 0.45 : 0.22); }
+    view = { fw: x1 - x0, fh: y1 - y0, cx: (x0 + x1) / 2, cy: (y0 + y1) / 2 };
+    camera.setViewOffset(W, H, Math.round(W / 2 - view.cx), Math.round(H / 2 - view.cy), W, H);
+    camera.updateProjectionMatrix();
+    const pinned = window.scrollY + BAR() >= secTop - 1 && window.scrollY + BAR() <= secTop + secRange + 1;
+    measure(); measureBlocks(); if (pinned) syncScroll(); request();
+  }
+  new ResizeObserver(layout).observe(stageEl);
+  new IntersectionObserver(es => { visible = es[es.length - 1].isIntersecting; if (visible) request(); }, { rootMargin: '120px' }).observe(stageEl);
+  addEventListener('load', () => { measure(); setMaster((window.scrollY + BAR() - secTop) / secRange, 'scroll'); });
+  // the scroll track: about 80 % of a screen per step
+  tear.style.height = `calc(${N} * 80vh + 100vh)`;
+  layout(); measure();
+  st.m = clamp((window.scrollY + BAR() - secTop) / secRange, 0, 1); slider.value = st.m;
+  request();
+}
+main();
+</script>
+</body>
+</html>
